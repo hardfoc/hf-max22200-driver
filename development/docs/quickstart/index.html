@@ -329,24 +329,36 @@
 29
 30
 31
+32
+33
+34
+35
+36
+37
 </pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200.hpp"</span><span class="cp">
 </span>
 <span class="c1">// 1. Implement the SPI interface</span>
 <span class="k">class</span> <span class="nc">MySpi</span> <span class="o">:</span> <span class="k">public</span> <span class="n">max22200</span><span class="o">::</span><span class="n">SpiInterface</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="p">{</span>
 <span class="nl">public:</span>
-    <span class="kt">void</span> <span class="n">transfer</span><span class="p">(</span><span class="k">const</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">tx</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">rx</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// Your SPI transfer implementation</span>
-        <span class="c1">// Assert CS, transfer data, deassert CS</span>
+    <span class="kt">bool</span> <span class="n">Transfer</span><span class="p">(</span><span class="k">const</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">tx_data</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">rx_data</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">length</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Assert CS, perform full-duplex SPI transfer, deassert CS</span>
+        <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">tx_data</span><span class="p">;</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">rx_data</span><span class="p">;</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">length</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
     <span class="p">}</span>
+    <span class="c1">// ... also implement Initialize, SetChipSelect, Configure, IsReady,</span>
+    <span class="c1">//     DelayUs, GpioSet, GpioRead (see platform_integration.md)</span>
 <span class="p">};</span>
 
 <span class="c1">// 2. Create instances</span>
 <span class="n">MySpi</span> <span class="n">spi</span><span class="p">;</span>
-<span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+<span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
 
-<span class="c1">// 3. Initialize</span>
+<span class="c1">// 3. Set board config (IFS from RREF; required for CDR)</span>
+<span class="n">driver</span><span class="p">.</span><span class="n">SetBoardConfig</span><span class="p">(</span><span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">));</span>
+
+<span class="c1">// 4. Initialize</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">driver</span><span class="p">.</span><span class="n">Initialize</span><span class="p">()</span> <span class="o">==</span> <span class="n">max22200</span><span class="o">::</span><span class="n">DriverStatus</span><span class="o">::</span><span class="n">OK</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// 4. Configure channel 0 (CDR, low-side; user units: mA and ms)</span>
+    <span class="c1">// 5. Configure channel 0 (CDR, low-side; user units: mA and ms)</span>
     <span class="n">max22200</span><span class="o">::</span><span class="n">ChannelConfig</span> <span class="n">config</span><span class="p">;</span>
     <span class="n">config</span><span class="p">.</span><span class="n">drive_mode</span> <span class="o">=</span> <span class="n">max22200</span><span class="o">::</span><span class="n">DriveMode</span><span class="o">::</span><span class="n">CDR</span><span class="p">;</span>
     <span class="n">config</span><span class="p">.</span><span class="n">side_mode</span> <span class="o">=</span> <span class="n">max22200</span><span class="o">::</span><span class="n">SideMode</span><span class="o">::</span><span class="n">LOW_SIDE</span><span class="p">;</span>
@@ -402,13 +414,19 @@
 6
 7
 8
+9
+10
+11
 </pre></td><td class="rouge-code"><pre><span class="k">class</span> <span class="nc">MySpi</span> <span class="o">:</span> <span class="k">public</span> <span class="n">max22200</span><span class="o">::</span><span class="n">SpiInterface</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="p">{</span>
 <span class="nl">public:</span>
-    <span class="kt">void</span> <span class="n">transfer</span><span class="p">(</span><span class="k">const</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">tx</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">rx</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">bool</span> <span class="n">Transfer</span><span class="p">(</span><span class="k">const</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">tx_data</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">rx_data</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">length</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// Assert chip select</span>
         <span class="c1">// Perform SPI transfer</span>
         <span class="c1">// Deassert chip select</span>
+        <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">tx_data</span><span class="p">;</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">rx_data</span><span class="p">;</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">length</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
     <span class="p">}</span>
+    <span class="c1">// ... implement remaining SpiInterface methods</span>
 <span class="p">};</span>
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 <h3 id="step-3-create-driver-instance">
@@ -422,8 +440,10 @@
 
 <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
+3
 </pre></td><td class="rouge-code"><pre><span class="n">MySpi</span> <span class="n">spi</span><span class="p">;</span>
-<span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span> <span class="nf">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+<span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+<span class="n">driver</span><span class="p">.</span><span class="n">SetBoardConfig</span><span class="p">(</span><span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">));</span>  <span class="c1">// IFS from RREF (CDR)</span>
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p>The constructor takes a reference to your SPI interface implementation.</p>
@@ -549,6 +569,7 @@
 39
 40
 41
+42
 </pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200.hpp"</span><span class="cp">
 </span>
 <span class="k">class</span> <span class="nc">MySpi</span> <span class="o">:</span> <span class="k">public</span> <span class="n">max22200</span><span class="o">::</span><span class="n">SpiInterface</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="p">{</span>
@@ -557,7 +578,8 @@
 
 <span class="kt">void</span> <span class="n">app_main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">MySpi</span> <span class="n">spi</span><span class="p">;</span>
-    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">driver</span><span class="p">.</span><span class="n">SetBoardConfig</span><span class="p">(</span><span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">));</span>
     
     <span class="c1">// Initialize</span>
     <span class="n">max22200</span><span class="o">::</span><span class="n">DriverStatus</span> <span class="n">status</span> <span class="o">=</span> <span class="n">driver</span><span class="p">.</span><span class="n">Initialize</span><span class="p">();</span>
@@ -617,7 +639,7 @@
 <p>If you encounter issues:</p>
 
 <ul>
-  <li><strong>Compilation errors</strong>: Check that you’ve implemented the <code class="language-plaintext highlighter-rouge">transfer()</code> method in your SPI interface</li>
+  <li><strong>Compilation errors</strong>: Check that you’ve implemented all <code class="language-plaintext highlighter-rouge">SpiInterface</code> methods, especially <code class="language-plaintext highlighter-rouge">Transfer()</code></li>
   <li><strong>Initialization fails</strong>: Verify SPI connections and hardware setup</li>
   <li><strong>Channel not working</strong>: Check channel configuration and enable state</li>
   <li><strong>See</strong>: <a href="/hf-max22200-driver/development/docs/troubleshooting/">Troubleshooting</a> for common issues</li>

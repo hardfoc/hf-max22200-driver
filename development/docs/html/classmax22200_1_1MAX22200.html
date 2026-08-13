@@ -130,7 +130,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a64905d4b3e2e5516e222fd2d1df0c948"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize — disable channels, ACTIVE=0, ENABLE low.  <br /></td></tr>
 <tr class="separator:a64905d4b3e2e5516e222fd2d1df0c948"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b1487834c00d10abf7a7973e7b45018" id="r_a3b1487834c00d10abf7a7973e7b45018"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b1487834c00d10abf7a7973e7b45018">IsInitialized</a> () <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
-<tr class="memdesc:a3b1487834c00d10abf7a7973e7b45018"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if driver is initialized.  <br /></td></tr>
+<tr class="memdesc:a3b1487834c00d10abf7a7973e7b45018"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if driver completed <a class="el" href="#aecaf3ba33a236f604cb4e95766f638f1" title="Initialize the driver per datasheet flowchart (Figure 6)">Initialize()</a> successfully.  <br /></td></tr>
 <tr class="separator:a3b1487834c00d10abf7a7973e7b45018"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affc8972a21ff78c0faeb71a553449126" id="r_affc8972a21ff78c0faeb71a553449126"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27b">DriverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#affc8972a21ff78c0faeb71a553449126">ReadStatus</a> (<a class="el" href="structmax22200_1_1StatusConfig.html">StatusConfig</a> &amp;<a class="el" href="classmax22200_1_1MAX22200.html">status</a>) <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
 <tr class="memdesc:affc8972a21ff78c0faeb71a553449126"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the full 32-bit STATUS register.  <br /></td></tr>
@@ -145,10 +145,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a6b32448d946377dccb844cb4c2b66346"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a channel's configuration.  <br /></td></tr>
 <tr class="separator:a6b32448d946377dccb844cb4c2b66346"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76bc43f4531b2153a7ea4f6e7e198d94" id="r_a76bc43f4531b2153a7ea4f6e7e198d94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27b">DriverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a76bc43f4531b2153a7ea4f6e7e198d94">ConfigureAllChannels</a> (<a class="el" href="classmax22200_1_1MAX22200.html">const</a> <a class="el" href="namespacemax22200.html#a3e327356655b6da931a509aed046953c">ChannelConfigArray</a> &amp;<a class="el" href="classmax22200_1_1MAX22200.html">configs</a>)</td></tr>
-<tr class="memdesc:a76bc43f4531b2153a7ea4f6e7e198d94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure all channels.  <br /></td></tr>
+<tr class="memdesc:a76bc43f4531b2153a7ea4f6e7e198d94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure all eight channels (CFG_CH0 through CFG_CH7)  <br /></td></tr>
 <tr class="separator:a76bc43f4531b2153a7ea4f6e7e198d94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b44b20609b31ce832fa76395b423d0b" id="r_a7b44b20609b31ce832fa76395b423d0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27b">DriverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7b44b20609b31ce832fa76395b423d0b">GetAllChannelConfigs</a> (<a class="el" href="namespacemax22200.html#a3e327356655b6da931a509aed046953c">ChannelConfigArray</a> &amp;<a class="el" href="classmax22200_1_1MAX22200.html">configs</a>) <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
-<tr class="memdesc:a7b44b20609b31ce832fa76395b423d0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all channel configurations.  <br /></td></tr>
+<tr class="memdesc:a7b44b20609b31ce832fa76395b423d0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read configuration for all eight channels.  <br /></td></tr>
 <tr class="separator:a7b44b20609b31ce832fa76395b423d0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5a439900ab100b6e1f28421e9579590" id="r_ad5a439900ab100b6e1f28421e9579590"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27b">DriverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5a439900ab100b6e1f28421e9579590">EnableChannel</a> (<a class="el" href="classmax22200_1_1MAX22200.html">uint8_t</a> <a class="el" href="classmax22200_1_1MAX22200.html">channel</a>)</td></tr>
 <tr class="memdesc:ad5a439900ab100b6e1f28421e9579590"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn on a channel (set ONCHx = 1)  <br /></td></tr>
@@ -186,10 +186,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:abe470fcd29ca6359dcb30391b5c7ff30"><td class="mdescLeft">&#160;</td><td class="mdescRight">[Advanced] Read FAULT register with per-type selective clear (MAX22200A)  <br /></td></tr>
 <tr class="separator:abe470fcd29ca6359dcb30391b5c7ff30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a5eb5138a9479f297eac31aad340811" id="r_a5a5eb5138a9479f297eac31aad340811"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27b">DriverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5a5eb5138a9479f297eac31aad340811">ReadFaultFlags</a> (<a class="el" href="structmax22200_1_1StatusConfig.html">StatusConfig</a> &amp;<a class="el" href="classmax22200_1_1MAX22200.html">status</a>) <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
-<tr class="memdesc:a5a5eb5138a9479f297eac31aad340811"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read fault flags from STATUS register.  <br /></td></tr>
+<tr class="memdesc:a5a5eb5138a9479f297eac31aad340811"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read fault flags from STATUS register (byte 0, bits 7:1)  <br /></td></tr>
 <tr class="separator:a5a5eb5138a9479f297eac31aad340811"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee559c6f5881ef27186d8192882a7235" id="r_aee559c6f5881ef27186d8192882a7235"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27b">DriverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aee559c6f5881ef27186d8192882a7235">ClearFaultFlags</a> ()</td></tr>
-<tr class="memdesc:aee559c6f5881ef27186d8192882a7235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear fault flags by reading STATUS register.  <br /></td></tr>
+<tr class="memdesc:aee559c6f5881ef27186d8192882a7235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear STATUS fault flags by reading the STATUS register.  <br /></td></tr>
 <tr class="separator:aee559c6f5881ef27186d8192882a7235"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92683b26a641253278c6f179255cedb5" id="r_a92683b26a641253278c6f179255cedb5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27b">DriverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92683b26a641253278c6f179255cedb5">ConfigureDpm</a> (<a class="el" href="classmax22200_1_1MAX22200.html">float</a> <a class="el" href="classmax22200_1_1MAX22200.html">start_current_ma</a>, <a class="el" href="classmax22200_1_1MAX22200.html">float</a> <a class="el" href="classmax22200_1_1MAX22200.html">dip_threshold_ma</a>, <a class="el" href="classmax22200_1_1MAX22200.html">float</a> <a class="el" href="classmax22200_1_1MAX22200.html">debounce_ms</a>)</td></tr>
 <tr class="memdesc:a92683b26a641253278c6f179255cedb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure DPM in real units (easy API)  <br /></td></tr>
@@ -215,10 +215,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a3ed295e93831463ae2b928c4846f0d73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read nFAULT pin state (true = fault active, false = no fault)  <br /></td></tr>
 <tr class="separator:a3ed295e93831463ae2b928c4846f0d73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5141e07605df7a60c47852dd13e8f29a" id="r_a5141e07605df7a60c47852dd13e8f29a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27b">DriverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5141e07605df7a60c47852dd13e8f29a">ReadRegister32</a> (<a class="el" href="classmax22200_1_1MAX22200.html">uint8_t</a> <a class="el" href="classmax22200_1_1MAX22200.html">bank</a>, <a class="el" href="classmax22200_1_1MAX22200.html">uint32_t</a> &amp;<a class="el" href="classmax22200_1_1MAX22200.html">value</a>) <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
-<tr class="memdesc:a5141e07605df7a60c47852dd13e8f29a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a 32-bit register by bank address.  <br /></td></tr>
+<tr class="memdesc:a5141e07605df7a60c47852dd13e8f29a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a 32-bit register by bank address (debug/advanced)  <br /></td></tr>
 <tr class="separator:a5141e07605df7a60c47852dd13e8f29a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadcefe7dd508548545a7c9ff53594af7" id="r_aadcefe7dd508548545a7c9ff53594af7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27b">DriverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aadcefe7dd508548545a7c9ff53594af7">WriteRegister32</a> (<a class="el" href="classmax22200_1_1MAX22200.html">uint8_t</a> <a class="el" href="classmax22200_1_1MAX22200.html">bank</a>, <a class="el" href="classmax22200_1_1MAX22200.html">uint32_t</a> <a class="el" href="classmax22200_1_1MAX22200.html">value</a>)</td></tr>
-<tr class="memdesc:aadcefe7dd508548545a7c9ff53594af7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a 32-bit register by bank address.  <br /></td></tr>
+<tr class="memdesc:aadcefe7dd508548545a7c9ff53594af7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a 32-bit register by bank address (debug/advanced)  <br /></td></tr>
 <tr class="separator:aadcefe7dd508548545a7c9ff53594af7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a036b8faa33340ace123f03195a58aff1" id="r_a036b8faa33340ace123f03195a58aff1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27b">DriverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a036b8faa33340ace123f03195a58aff1">ReadRegister8</a> (<a class="el" href="classmax22200_1_1MAX22200.html">uint8_t</a> <a class="el" href="classmax22200_1_1MAX22200.html">bank</a>, <a class="el" href="classmax22200_1_1MAX22200.html">uint8_t</a> &amp;<a class="el" href="classmax22200_1_1MAX22200.html">value</a>) <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
 <tr class="memdesc:a036b8faa33340ace123f03195a58aff1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read 8-bit MSB of a register (fast 8-bit mode)  <br /></td></tr>
@@ -229,12 +229,16 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:afb2f8cfb6e928157b19dd0147a5932df" id="r_afb2f8cfb6e928157b19dd0147a5932df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">uint8_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb2f8cfb6e928157b19dd0147a5932df">GetLastFaultByte</a> () <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
 <tr class="separator:afb2f8cfb6e928157b19dd0147a5932df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a271fd228652566d82d49dd645d3212d5" id="r_a271fd228652566d82d49dd645d3212d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmax22200_1_1DriverStatistics.html">DriverStatistics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a271fd228652566d82d49dd645d3212d5">GetStatistics</a> () <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
+<tr class="memdesc:a271fd228652566d82d49dd645d3212d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get accumulated driver transfer statistics.  <br /></td></tr>
 <tr class="separator:a271fd228652566d82d49dd645d3212d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9defc6dbc606fb39a981ce7eacb13d28" id="r_a9defc6dbc606fb39a981ce7eacb13d28"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9defc6dbc606fb39a981ce7eacb13d28">ResetStatistics</a> ()</td></tr>
+<tr class="memdesc:a9defc6dbc606fb39a981ce7eacb13d28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset all statistics counters to zero.  <br /></td></tr>
 <tr class="separator:a9defc6dbc606fb39a981ce7eacb13d28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56050cdb42e14b233fd7c74d679c1fa5" id="r_a56050cdb42e14b233fd7c74d679c1fa5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a56050cdb42e14b233fd7c74d679c1fa5">SetFaultCallback</a> (<a class="el" href="namespacemax22200.html#aee8356bd3f2f5ecfa4f677e643f16d46">FaultCallback</a> <a class="el" href="classmax22200_1_1MAX22200.html">callback</a>, <a class="el" href="classmax22200_1_1MAX22200.html">void</a> *<a class="el" href="classmax22200_1_1MAX22200.html">user_data</a>)</td></tr>
+<tr class="memdesc:a56050cdb42e14b233fd7c74d679c1fa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a fault event callback (stored for application use)  <br /></td></tr>
 <tr class="separator:a56050cdb42e14b233fd7c74d679c1fa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add7be3d09d29f9a7d8a144da6f5f12c4" id="r_add7be3d09d29f9a7d8a144da6f5f12c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add7be3d09d29f9a7d8a144da6f5f12c4">SetStateChangeCallback</a> (<a class="el" href="namespacemax22200.html#ada9a4ce152e1a20efe1a89cd46ab9f90">StateChangeCallback</a> <a class="el" href="classmax22200_1_1MAX22200.html">callback</a>, <a class="el" href="classmax22200_1_1MAX22200.html">void</a> *<a class="el" href="classmax22200_1_1MAX22200.html">user_data</a>)</td></tr>
+<tr class="memdesc:add7be3d09d29f9a7d8a144da6f5f12c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a channel state-change callback (stored for application use)  <br /></td></tr>
 <tr class="separator:add7be3d09d29f9a7d8a144da6f5f12c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3928b79dd35d626bd152855217f7e224" id="r_a3928b79dd35d626bd152855217f7e224"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3928b79dd35d626bd152855217f7e224">SetBoardConfig</a> (<a class="el" href="classmax22200_1_1MAX22200.html">const</a> <a class="el" href="structmax22200_1_1BoardConfig.html">BoardConfig</a> &amp;<a class="el" href="classmax22200_1_1MAX22200.html">config</a>)</td></tr>
 <tr class="memdesc:a3928b79dd35d626bd152855217f7e224"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set board configuration (IFS, max current, max duty)  <br /></td></tr>
@@ -306,6 +310,7 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a508ea4db9fd7a4d8461eeb06f7cf1ab7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get duty cycle limits (δMIN, δMAX) for a configuration.  <br /></td></tr>
 <tr class="separator:a508ea4db9fd7a4d8461eeb06f7cf1ab7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c28579511b5557c76f203810445ff73" id="r_a7c28579511b5557c76f203810445ff73"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">static</a> <a class="el" href="classmax22200_1_1MAX22200.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7c28579511b5557c76f203810445ff73">IsValidChannel</a> (<a class="el" href="classmax22200_1_1MAX22200.html">uint8_t</a> <a class="el" href="classmax22200_1_1MAX22200.html">channel</a>)</td></tr>
+<tr class="memdesc:a7c28579511b5557c76f203810445ff73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether <code>channel</code> is a valid <a class="el" href="classmax22200_1_1MAX22200.html">MAX22200</a> channel index.  <br /></td></tr>
 <tr class="separator:a7c28579511b5557c76f203810445ff73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc1cf21d55c29571d17b1886d3d7d7ef" id="r_abc1cf21d55c29571d17b1886d3d7d7ef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">static</a> <a class="el" href="classmax22200_1_1MAX22200.html">constexpr</a> <a class="el" href="classmax22200_1_1MAX22200.html">const</a> <a class="el" href="classmax22200_1_1MAX22200.html">char</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc1cf21d55c29571d17b1886d3d7d7ef">GetDriverVersion</a> () <a class="el" href="classmax22200_1_1MAX22200.html">noexcept</a></td></tr>
 <tr class="memdesc:abc1cf21d55c29571d17b1886d3d7d7ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the compiled driver version string.  <br /></td></tr>
@@ -485,7 +490,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 
 <p>Clear all fault flags (read FAULT register and discard) </p>
 <p>Clears OCP, HHF, OLF, and DPM for all channels and deasserts nFAULT. Use when you only need to clear and do not need the fault snapshot.</p>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -519,7 +524,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -540,7 +545,9 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
       </table>
 </div><div class="memdoc">
 
-<p>Clear fault flags by reading STATUS register. </p>
+<p>Clear STATUS fault flags by reading the STATUS register. </p>
+<p>Performs <a class="el" href="#affc8972a21ff78c0faeb71a553449126" title="Read the full 32-bit STATUS register.">ReadStatus()</a> and discards the result. Clears UVM per datasheet; per-channel faults require <a class="el" href="#aed74d2a7f8b4e3e4a8e4aaf0964b46f3" title="Read per-channel fault register (FAULT)">ReadFaultRegister()</a> or <a class="el" href="#a65079d12a3111e01476dfb08cfe430b8" title="Clear all fault flags (read FAULT register and discard)">ClearAllFaults()</a>.</p>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -561,7 +568,15 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
       </table>
 </div><div class="memdoc">
 
-<p>Configure all channels. </p>
+<p>Configure all eight channels (CFG_CH0 through CFG_CH7) </p>
+<p>Calls <a class="el" href="#ad70aac658d37538c24aa96017302d7f4" title="Configure a channel (write full 32-bit CFG_CHx register)">ConfigureChannel()</a> for each index. Stops and returns the first non-OK status if any channel fails.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">configs</td><td>Array of eight <a class="el" href="structmax22200_1_1ChannelConfig.html" title="Channel configuration structure.">ChannelConfig</a> values (index N = channel N) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> if all channels configured successfully </dd></dl>
 
 </div>
 </div>
@@ -595,9 +610,9 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd>
 <dd>
-<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Invalid parameter provided.">DriverStatus::INVALID_PARAMETER</a> if channel &gt;= 8</dd></dl>
+<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Channel index, IFS, or unit conversion argument out of range.">DriverStatus::INVALID_PARAMETER</a> if channel &gt;= 8</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>For channels in PARALLEL mode, only the lower channel number's configuration is used (e.g., configure channel 0 for pair 0-1). </dd>
 <dd>
 For channels in HBRIDGE mode, both channels' configurations are used (CFG_CHy for forward, CFG_CHx for reverse). </dd>
@@ -687,7 +702,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -769,7 +784,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -809,9 +824,9 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd>
 <dd>
-<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Invalid parameter provided.">DriverStatus::INVALID_PARAMETER</a> if IFS not set or values out of range</dd></dl>
+<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Channel index, IFS, or unit conversion argument out of range.">DriverStatus::INVALID_PARAMETER</a> if IFS not set or values out of range</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>For custom fCHOP or raw register control use ReadDpmConfig/WriteDpmConfig. </dd></dl>
 
 </div>
@@ -840,7 +855,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 <li>Set ENABLE pin LOW (device enters sleep mode)</li>
 </ol>
 <p>After <a class="el" href="#a64905d4b3e2e5516e222fd2d1df0c948" title="Deinitialize — disable channels, ACTIVE=0, ENABLE low.">Deinitialize()</a>, the device consumes &lt; 11μA from VM.</p>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>All channels are three-stated when ACTIVE=0. </dd>
 <dd>
 It takes 2.5ms (tDIS) from ENABLE falling edge to OUT_ tristate. </dd></dl>
@@ -865,7 +880,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 </div><div class="memdoc">
 
 <p>Turn off all channels. </p>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -893,9 +908,9 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd>
 <dd>
-<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Invalid parameter provided.">DriverStatus::INVALID_PARAMETER</a> if channel &gt;= 8 </dd></dl>
+<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Channel index, IFS, or unit conversion argument out of range.">DriverStatus::INVALID_PARAMETER</a> if channel &gt;= 8 </dd></dl>
 
 </div>
 </div>
@@ -938,7 +953,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 </div><div class="memdoc">
 
 <p>Turn on all channels. </p>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -967,9 +982,9 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd>
 <dd>
-<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Invalid parameter provided.">DriverStatus::INVALID_PARAMETER</a> if channel &gt;= 8</dd></dl>
+<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Channel index, IFS, or unit conversion argument out of range.">DriverStatus::INVALID_PARAMETER</a> if channel &gt;= 8</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Use <a class="el" href="#a9be0b3196be3fd70da3e775d5b14c258" title="Turn off a channel (set ONCHx = 0)">DisableChannel()</a> to turn off. For multiple channels use <a class="el" href="#aa202f3f6d2aa304195dce77cb5e24f00">SetChannelsOn()</a>. </dd>
 <dd>
 Channel must be configured with <a class="el" href="#ad70aac658d37538c24aa96017302d7f4" title="Configure a channel (write full 32-bit CFG_CHx register)">ConfigureChannel()</a> before enabling. </dd></dl>
@@ -1014,7 +1029,14 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
       </table>
 </div><div class="memdoc">
 
-<p>Get all channel configurations. </p>
+<p>Read configuration for all eight channels. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">configs</td><td>Output array; index N receives channel N configuration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -1237,7 +1259,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -1271,7 +1293,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -1510,6 +1532,9 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
       </table>
 </div><div class="memdoc">
 
+<p>Get accumulated driver transfer statistics. </p>
+<dl class="section return"><dt>Returns</dt><dd>Copy of <a class="el" href="structmax22200_1_1DriverStatistics.html" title="Driver runtime statistics.">DriverStatistics</a>. Currently total_transfers and failed_transfers are updated by SPI operations; fault_events, state_changes, and uptime_ms remain zero unless future driver revisions populate them. </dd></dl>
+
 </div>
 </div>
 <a id="aecaf3ba33a236f604cb4e95766f638f1" name="aecaf3ba33a236f604cb4e95766f638f1"></a>
@@ -1547,11 +1572,11 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 </li>
 <li><b>Cache STATUS</b>: Store STATUS for fast ONCH updates</li>
 </ol>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd>
 <dd>
-<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27baca3a06257167acb5cd86e22cb0289115" title="SPI communication error.">DriverStatus::COMMUNICATION_ERROR</a> if COMER flag detected </dd>
+<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27baca3a06257167acb5cd86e22cb0289115" title="SPI transfer failed or COMER fault byte (0x04) detected.">DriverStatus::COMMUNICATION_ERROR</a> if COMER flag detected </dd>
 <dd>
-<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27ba7a348bf6d29011d629d13513e5382240" title="Initialization failed.">DriverStatus::INITIALIZATION_ERROR</a> if SPI or GPIO operations fail</dd></dl>
+<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27ba7a348bf6d29011d629d13513e5382240" title="SPI/GPIO setup or ENABLE sequencing failed during init.">DriverStatus::INITIALIZATION_ERROR</a> if SPI or GPIO operations fail</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>After <a class="el" href="#aecaf3ba33a236f604cb4e95766f638f1" title="Initialize the driver per datasheet flowchart (Figure 6)">Initialize()</a>, channels must be configured with <a class="el" href="#ad70aac658d37538c24aa96017302d7f4" title="Configure a channel (write full 32-bit CFG_CHx register)">ConfigureChannel()</a> before they can be enabled. </dd>
 <dd>
 The device enters normal operation after ACTIVE=1 with a wake-up time of 2.5ms (tWU). Channels can be enabled immediately after <a class="el" href="#aecaf3ba33a236f604cb4e95766f638f1" title="Initialize the driver per datasheet flowchart (Figure 6)">Initialize()</a>.</dd></dl>
@@ -1576,7 +1601,8 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
       </table>
 </div><div class="memdoc">
 
-<p>Check if driver is initialized. </p>
+<p>Check if driver completed <a class="el" href="#aecaf3ba33a236f604cb4e95766f638f1" title="Initialize the driver per datasheet flowchart (Figure 6)">Initialize()</a> successfully. </p>
+<dl class="section return"><dt>Returns</dt><dd>true after a successful <a class="el" href="#aecaf3ba33a236f604cb4e95766f638f1" title="Initialize the driver per datasheet flowchart (Figure 6)">Initialize()</a>; false after construction or <a class="el" href="#a64905d4b3e2e5516e222fd2d1df0c948" title="Deinitialize — disable channels, ACTIVE=0, ENABLE low.">Deinitialize()</a> </dd></dl>
 
 </div>
 </div>
@@ -1604,6 +1630,15 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Check whether <code>channel</code> is a valid <a class="el" href="classmax22200_1_1MAX22200.html">MAX22200</a> channel index. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>Channel number to test </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if channel is 0–7 </dd></dl>
 
 </div>
 </div>
@@ -1686,7 +1721,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="structmax22200_1_1DpmConfig.html" title="DPM (Detection of Plunger Movement) algorithm configuration.">DpmConfig</a>, <a class="el" href="#a71982b3ae255918f2d38314bdebc7dc7" title="Write DPM algorithm configuration (CFG_DPM register)">WriteDpmConfig</a>, <a class="el" href="#a92683b26a641253278c6f179255cedb5" title="Configure DPM in real units (easy API)">ConfigureDpm</a> </dd></dl>
 
 </div>
@@ -1708,7 +1743,15 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
       </table>
 </div><div class="memdoc">
 
-<p>Read fault flags from STATUS register. </p>
+<p>Read fault flags from STATUS register (byte 0, bits 7:1) </p>
+<p>Convenience wrapper around <a class="el" href="#affc8972a21ff78c0faeb71a553449126" title="Read the full 32-bit STATUS register.">ReadStatus()</a> when only global fault flags (OVT, OCP, OLF, HHF, DPM, COMER, UVM) are needed.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">status</td><td>Populated with STATUS fields; inspect hasFault() or individual flags </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -1737,7 +1780,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#a65079d12a3111e01476dfb08cfe430b8" title="Clear all fault flags (read FAULT register and discard)">ClearAllFaults()</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">to</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">clear</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">without</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">keeping</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">the</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">result</a> </dd>
 <dd>
 <a class="el" href="#a52c9b4b648616f4119ccda6841ace87c" title="Clear fault flags for selected channels only (MAX22200A)">ClearChannelFaults()</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">to</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">clear</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">only</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">specific</a> <a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">channels</a> (<a class="el" href="#ab7f0d3f7cdca08ccc293a843bfce827a" title="Constructor (SPI only; set board config later with SetBoardConfig())">MAX22200A</a>) </dd></dl>
@@ -1792,7 +1835,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -1817,7 +1860,16 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
       </table>
 </div><div class="memdoc">
 
-<p>Read a 32-bit register by bank address. </p>
+<p>Read a 32-bit register by bank address (debug/advanced) </p>
+<p>Two-phase SPI: Command Register (CMD HIGH, 8-bit) then 32-bit data (CMD LOW). Does not update cached_status_ when reading STATUS; prefer <a class="el" href="#affc8972a21ff78c0faeb71a553449126" title="Read the full 32-bit STATUS register.">ReadStatus()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bank</td><td><a class="el" href="namespacemax22200_1_1RegBank.html" title="Register bank addresses for MAX22200.">RegBank</a> address (0x00–0x0A) </td></tr>
+    <tr><td class="paramname">value</td><td>Received 32-bit register value </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -1843,6 +1895,15 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 </div><div class="memdoc">
 
 <p>Read 8-bit MSB of a register (fast 8-bit mode) </p>
+<p>Two-phase SPI with Command Register bit 0 set (8bit/n32 = 1). Reads only the most significant byte (e.g. STATUS[31:24] ONCH, FAULT[31:24] OCP).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bank</td><td><a class="el" href="namespacemax22200_1_1RegBank.html" title="Register bank addresses for MAX22200.">RegBank</a> address (0x00–0x0A) </td></tr>
+    <tr><td class="paramname">value</td><td>Received MSB byte </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -1864,6 +1925,15 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 </div><div class="memdoc">
 
 <p>Read the full 32-bit STATUS register. </p>
+<p>Performs a two-phase SPI read (Command Register with CMD HIGH, then 32-bit data with CMD LOW). Updates cached_status_ on success.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">status</td><td>Populated with parsed STATUS fields (ONCH, masks, CMxy, fault flags) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Reading STATUS clears the UVM flag and may deassert nFAULT. </dd></dl>
 
 </div>
 </div>
@@ -1883,6 +1953,8 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Reset all statistics counters to zero. </p>
 
 </div>
 </div>
@@ -1910,7 +1982,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -1939,7 +2011,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Alternatively pass <a class="el" href="structmax22200_1_1BoardConfig.html" title="Board/scale configuration for unit-based APIs.">BoardConfig</a> at construction: <a class="el" href="classmax22200_1_1MAX22200.html">MAX22200</a> driver(spi, <a class="el" href="structmax22200_1_1BoardConfig.html" title="Board/scale configuration for unit-based APIs.">BoardConfig</a>(30.0f, false)); </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Alternatively pass <a class="el" href="structmax22200_1_1BoardConfig.html" title="Board/scale configuration for unit-based APIs.">BoardConfig</a> at construction: MAX22200&lt;MySpi&gt; driver(spi, <a class="el" href="structmax22200_1_1BoardConfig.html" title="Board/scale configuration for unit-based APIs.">BoardConfig</a>(30.0f, false)); </dd></dl>
 
 </div>
 </div>
@@ -1972,7 +2044,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -2057,6 +2129,16 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
       </table>
 </div><div class="memdoc">
 
+<p>Register a fault event callback (stored for application use) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>Function invoked by the application when a fault is detected </td></tr>
+    <tr><td class="paramname">user_data</td><td>Opaque pointer passed to <code>callback</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>The driver stores the callback but does not invoke it automatically; poll <a class="el" href="#aed74d2a7f8b4e3e4a8e4aaf0964b46f3" title="Read per-channel fault register (FAULT)">ReadFaultRegister()</a> / <a class="el" href="#affc8972a21ff78c0faeb71a553449126" title="Read the full 32-bit STATUS register.">ReadStatus()</a> and call the callback from application code when needed. </dd></dl>
+
 </div>
 </div>
 <a id="a4d07c92a3bb0bc8753684e6fd1219108" name="a4d07c92a3bb0bc8753684e6fd1219108"></a>
@@ -2085,15 +2167,15 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pair_index</td><td>Pair index 0–3 (0 = ch0–ch1, 1 = ch2–ch3, 2 = ch4–ch5, 3 = ch6–ch7) </td></tr>
-    <tr><td class="paramname">state</td><td><a class="el" href="namespacemax22200.html#a6635e7b8136acb977eb22ce7c6b46450ab4f85051516c5085ef86dd9ea36ae937" title="ONCHx=0, ONCHy=0 — high impedance.">FullBridgeState::HiZ</a>, Forward, Reverse, or Brake </td></tr>
+    <tr><td class="paramname">state</td><td><a class="el" href="namespacemax22200.html#a6635e7b8136acb977eb22ce7c6b46450ab4f85051516c5085ef86dd9ea36ae937" title="ONCHx=0, ONCHy=0 — high impedance (both switches off)">FullBridgeState::HiZ</a>, Forward, Reverse, or Brake </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd>
 <dd>
-<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Invalid parameter provided.">DriverStatus::INVALID_PARAMETER</a> if pair_index &gt; 3</dd></dl>
+<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Channel index, IFS, or unit conversion argument out of range.">DriverStatus::INVALID_PARAMETER</a> if pair_index &gt; 3</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The pair must be configured as HBRIDGE in STATUS (CMxy = 10). </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacemax22200.html#a6635e7b8136acb977eb22ce7c6b46450" title="Full-bridge state for a channel pair (datasheet Table 7)">FullBridgeState</a>, StatusConfig::cm10, <a class="el" href="namespacemax22200.html#a339d71547e4d3f6ad5d66252bb002beaa0c71e75d72f1213021445c76ce5bd5df" title="Channels in H-bridge mode (CMxy = 10) — bidirectional drive.">ChannelMode::HBRIDGE</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacemax22200.html#a6635e7b8136acb977eb22ce7c6b46450" title="Full-bridge state for a channel pair (datasheet Table 7)">FullBridgeState</a>, <a class="el" href="structmax22200_1_1StatusConfig.html#a1c9a2f7d25d9ed9062a514106c15cc9b" title="CH0/CH1 pair mode.">StatusConfig::channel_pair_mode_10</a>, <a class="el" href="namespacemax22200.html#a339d71547e4d3f6ad5d66252bb002beaa0c71e75d72f1213021445c76ce5bd5df" title="Channels in H-bridge mode (CMxy = 10) — bidirectional drive.">ChannelMode::HBRIDGE</a> </dd></dl>
 
 </div>
 </div>
@@ -2153,9 +2235,9 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd>
 <dd>
-<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Invalid parameter provided.">DriverStatus::INVALID_PARAMETER</a> if channel &gt;= 8 or IFS not configured </dd></dl>
+<a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" title="Channel index, IFS, or unit conversion argument out of range.">DriverStatus::INVALID_PARAMETER</a> if channel &gt;= 8 or IFS not configured </dd></dl>
 
 </div>
 </div>
@@ -2188,7 +2270,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -2222,7 +2304,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -2256,7 +2338,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -2381,6 +2463,16 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
       </table>
 </div><div class="memdoc">
 
+<p>Register a channel state-change callback (stored for application use) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>Function invoked when a channel state transition occurs </td></tr>
+    <tr><td class="paramname">user_data</td><td>Opaque pointer passed to <code>callback</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>The driver stores the callback but does not invoke it automatically; the driver does not track HIT/HOLD phase at runtime. </dd></dl>
+
 </div>
 </div>
 <a id="a71982b3ae255918f2d38314bdebc7dc7" name="a71982b3ae255918f2d38314bdebc7dc7"></a>
@@ -2407,7 +2499,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation successful.">DriverStatus::OK</a> on success</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="structmax22200_1_1DpmConfig.html" title="DPM (Detection of Plunger Movement) algorithm configuration.">DpmConfig</a>, <a class="el" href="#a954e6242ee595056784164c23fc7caac" title="Read DPM algorithm configuration (CFG_DPM register)">ReadDpmConfig</a>, <a class="el" href="#a92683b26a641253278c6f179255cedb5" title="Configure DPM in real units (easy API)">ConfigureDpm</a> </dd></dl>
 
 </div>
@@ -2433,7 +2525,16 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
       </table>
 </div><div class="memdoc">
 
-<p>Write a 32-bit register by bank address. </p>
+<p>Write a 32-bit register by bank address (debug/advanced) </p>
+<p>Two-phase SPI write. Writing STATUS does not update cached_status_; prefer <a class="el" href="#a813dc0c1bb579983b2ad7bd69eb430f4" title="Write the STATUS register (writable bits only)">WriteStatus()</a> for ONCH and ACTIVE updates.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bank</td><td><a class="el" href="namespacemax22200_1_1RegBank.html" title="Register bank addresses for MAX22200.">RegBank</a> address (0x00–0x0A) </td></tr>
+    <tr><td class="paramname">value</td><td>32-bit value to write (LSB-first on SDI per datasheet) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -2459,6 +2560,15 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 </div><div class="memdoc">
 
 <p>Write 8-bit MSB of a register (fast 8-bit mode) </p>
+<p>Two-phase SPI with 8-bit mode. Writes only the MSB (e.g. ONCH byte or HOLD[6:0]|HFS for on-the-fly current updates).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bank</td><td><a class="el" href="namespacemax22200_1_1RegBank.html" title="Register bank addresses for MAX22200.">RegBank</a> address (0x00–0x0A) </td></tr>
+    <tr><td class="paramname">value</td><td>MSB byte to write </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>
@@ -2480,6 +2590,14 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 </div><div class="memdoc">
 
 <p>Write the STATUS register (writable bits only) </p>
+<p>Performs a two-phase SPI write. Writable fields include ONCH, fault masks, CMxy, FREQM, and ACTIVE; fault flag bits are read-only and ignored on write. Updates cached_status_ on success.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">status</td><td>STATUS configuration to encode and write </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespacemax22200.html#a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" title="Operation completed successfully.">DriverStatus::OK</a> on success </dd></dl>
 
 </div>
 </div>

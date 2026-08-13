@@ -375,66 +375,6 @@ abstraction. This design choice provides several critical benefits for embedded 
 16
 17
 18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
 </pre></td><td class="rouge-code"><pre><span class="c1">// Base template class (from max22200_spi_interface.hpp)</span>
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Derived</span><span class="p">&gt;</span>
 <span class="k">class</span> <span class="nc">SpiInterface</span> <span class="p">{</span>
@@ -453,14 +393,29 @@ abstraction. This design choice provides several critical benefits for embedded 
         <span class="c1">// Your platform-specific SPI code</span>
     <span class="p">}</span>
 <span class="p">};</span>
-<span class="err">```</span><span class="n">cpp</span>
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+<h2 id="interface-definition">
+  
+  
+    <a href="#interface-definition" class="anchor-heading" aria-labelledby="interface-definition"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Interface Definition
+  
+  
+</h2>
+    
 
-<span class="cp">## Interface Definition
-</span>
-<span class="n">The</span> <span class="n">MAX22200</span> <span class="n">driver</span> <span class="k">requires</span> <span class="n">you</span> <span class="n">to</span> <span class="n">implement</span> <span class="n">the</span> <span class="n">following</span> <span class="n">interface</span><span class="o">:</span>
+<p>The MAX22200 driver requires you to implement the following interface:</p>
 
-<span class="err">```</span><span class="n">cpp</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Derived</span><span class="p">&gt;</span>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Derived</span><span class="p">&gt;</span>
 <span class="k">class</span> <span class="nc">SpiInterface</span> <span class="p">{</span>
 <span class="nl">public:</span>
     <span class="c1">// Required methods (implement all of these)</span>
@@ -470,14 +425,61 @@ abstraction. This design choice provides several critical benefits for embedded 
     <span class="kt">bool</span> <span class="n">Configure</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">speed_hz</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">mode</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">msb_first</span> <span class="o">=</span> <span class="nb">true</span><span class="p">);</span>
     <span class="kt">bool</span> <span class="n">IsReady</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
 <span class="p">};</span>
-<span class="err">```</span><span class="n">cpp</span>
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+<h2 id="implementation-steps">
+  
+  
+    <a href="#implementation-steps" class="anchor-heading" aria-labelledby="implementation-steps"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Implementation Steps
+  
+  
+</h2>
+    
+<h3 id="step-1-create-your-implementation-class">
+  
+  
+    <a href="#step-1-create-your-implementation-class" class="anchor-heading" aria-labelledby="step-1-create-your-implementation-class"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Step 1: Create Your Implementation Class
+  
+  
+</h3>
+    
 
-<span class="cp">## Implementation Steps
-</span>
-<span class="cp">### Step 1: Create Your Implementation Class
-</span>
-<span class="err">```</span><span class="n">cpp</span>
-<span class="cp">#include</span> <span class="cpf">"max22200_spi_interface.hpp"</span><span class="cp">
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+</pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200_spi_interface.hpp"</span><span class="cp">
 </span>
 <span class="k">class</span> <span class="nc">MyPlatformSPI</span> <span class="o">:</span> <span class="k">public</span> <span class="n">max22200</span><span class="o">::</span><span class="n">SpiInterface</span><span class="o">&lt;</span><span class="n">MyPlatformSPI</span><span class="o">&gt;</span> <span class="p">{</span>
 <span class="nl">private:</span>
@@ -936,8 +938,10 @@ abstraction. This design choice provides several critical benefits for embedded 
 13
 14
 15
+16
 </pre></td><td class="rouge-code"><pre><span class="n">MyPlatformSPI</span> <span class="nf">spi</span><span class="p">(</span><span class="cm">/* your config */</span><span class="p">);</span>
-<span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span> <span class="nf">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+<span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MyPlatformSPI</span><span class="o">&gt;</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+<span class="n">driver</span><span class="p">.</span><span class="n">SetBoardConfig</span><span class="p">(</span><span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">));</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">driver</span><span class="p">.</span><span class="n">Initialize</span><span class="p">()</span> <span class="o">==</span> <span class="n">max22200</span><span class="o">::</span><span class="n">DriverStatus</span><span class="o">::</span><span class="n">OK</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">max22200</span><span class="o">::</span><span class="n">ChannelConfig</span> <span class="n">config</span><span class="p">;</span>

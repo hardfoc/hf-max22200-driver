@@ -329,14 +329,18 @@
 5
 6
 7
+8
 </pre></td><td class="rouge-code"><pre>inc/
   ├── max22200.hpp
   ├── max22200_spi_interface.hpp
   ├── max22200_registers.hpp
-  └── max22200_types.hpp
+  ├── max22200_types.hpp
+  └── max22200_version.h
 src/
-  └── max22200.cpp
+  └── max22200.ipp
 </pre></td></tr></tbody></table></div></code></pre></div></div>
+
+<p>The driver is <strong>header-only</strong>: <code class="language-plaintext highlighter-rouge">max22200.hpp</code> includes <code class="language-plaintext highlighter-rouge">max22200.ipp</code> at the end. No separate <code class="language-plaintext highlighter-rouge">.cpp</code> compilation unit is required.</p>
 <h2 id="integration-methods">
   
   
@@ -408,9 +412,9 @@ src/
 </pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200.hpp"</span><span class="cp">
 </span></pre></td></tr></tbody></table></div></code></pre></div>    </div>
   </li>
-  <li>Compile with C++20 support:
+  <li>Compile with C++20 support (include path must cover <code class="language-plaintext highlighter-rouge">inc/</code>; implementation is in <code class="language-plaintext highlighter-rouge">max22200.ipp</code> via the header):
     <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>g++ <span class="nt">-std</span><span class="o">=</span>c++20 <span class="nt">-I</span> inc/ your_code.cpp src/max22200.cpp
+</pre></td><td class="rouge-code"><pre>g++ <span class="nt">-std</span><span class="o">=</span>c++20 <span class="nt">-I</span> inc/ your_code.cpp
 </pre></td></tr></tbody></table></div></code></pre></div>    </div>
   </li>
 </ol>
@@ -431,9 +435,9 @@ src/
 </pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200.hpp"</span><span class="cp">
 </span></pre></td></tr></tbody></table></div></code></pre></div>    </div>
   </li>
-  <li>Compile a simple test:
+  <li>Compile a simple test (header-only — no separate driver object file):
     <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>g++ <span class="nt">-std</span><span class="o">=</span>c++20 <span class="nt">-I</span> inc/ <span class="nt">-c</span> src/max22200.cpp <span class="nt">-o</span> test.o
+</pre></td><td class="rouge-code"><pre>g++ <span class="nt">-std</span><span class="o">=</span>c++20 <span class="nt">-I</span> inc/ <span class="nt">-c</span> your_test.cpp <span class="nt">-o</span> test.o
 </pre></td></tr></tbody></table></div></code></pre></div>    </div>
   </li>
   <li>If compilation succeeds, the library is properly installed.</li>

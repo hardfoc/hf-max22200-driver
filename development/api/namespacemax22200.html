@@ -138,7 +138,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">DPM (Detection of Plunger Movement) algorithm configuration.  <a href="structmax22200_1_1DpmConfig.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmax22200_1_1DriverStatistics.html">DriverStatistics</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Driver statistics structure.  <a href="structmax22200_1_1DriverStatistics.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Driver runtime statistics.  <a href="structmax22200_1_1DriverStatistics.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmax22200_1_1DutyLimits.html">DutyLimits</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duty cycle limits (δMIN, δMAX) for a given configuration.  <a href="structmax22200_1_1DutyLimits.html#details">More...</a><br /></td></tr>
@@ -233,7 +233,7 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#a63bc0b5401ad8c7106ce140926eab27ba070a0fb40f6c308ab544b227660aadff">TIMEOUT</a>
 <br />
  }</td></tr>
-<tr class="memdesc:a63bc0b5401ad8c7106ce140926eab27b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Driver status enumeration.  <a href="#a63bc0b5401ad8c7106ce140926eab27b">More...</a><br /></td></tr>
+<tr class="memdesc:a63bc0b5401ad8c7106ce140926eab27b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Driver operation result codes.  <a href="#a63bc0b5401ad8c7106ce140926eab27b">More...</a><br /></td></tr>
 <tr class="separator:a63bc0b5401ad8c7106ce140926eab27b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3adda2d31ce48d65560f257a36a4e422" id="r_a3adda2d31ce48d65560f257a36a4e422"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3adda2d31ce48d65560f257a36a4e422">ChannelState</a> : uint8_t { <br />
 &#160;&#160;<a class="el" href="#a3adda2d31ce48d65560f257a36a4e422a055c1a591abb0e8cd86dc969727bcc0b">DISABLED</a> = 0
@@ -244,12 +244,13 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="#a3adda2d31ce48d65560f257a36a4e422a893b3aaf1661e3717b18e8335ff93a72">FAULT</a>
 <br />
  }</td></tr>
-<tr class="memdesc:a3adda2d31ce48d65560f257a36a4e422"><td class="mdescLeft">&#160;</td><td class="mdescRight">Channel state enumeration.  <a href="#a3adda2d31ce48d65560f257a36a4e422">More...</a><br /></td></tr>
+<tr class="memdesc:a3adda2d31ce48d65560f257a36a4e422"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logical channel state for application callbacks.  <a href="#a3adda2d31ce48d65560f257a36a4e422">More...</a><br /></td></tr>
 <tr class="separator:a3adda2d31ce48d65560f257a36a4e422"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ab4dbe12c79b4540933d59e925b619cf9" id="r_ab4dbe12c79b4540933d59e925b619cf9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">const</a> <a class="el" href="classmax22200_1_1MAX22200.html">char</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab4dbe12c79b4540933d59e925b619cf9">GetDriverVersion</a> () <a class="el" href="classmax22200_1_1MAX22200.html">noexcept</a></td></tr>
+<tr class="memdesc:ab4dbe12c79b4540933d59e925b619cf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the compiled driver version string (namespace-level convenience)  <br /></td></tr>
 <tr class="separator:ab4dbe12c79b4540933d59e925b619cf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab49b674a6a3f59d961019c61d18bf27" id="r_aab49b674a6a3f59d961019c61d18bf27"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">constexpr</a> <a class="el" href="classmax22200_1_1MAX22200.html">uint8_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab49b674a6a3f59d961019c61d18bf27">getChannelCfgBank</a> (<a class="el" href="classmax22200_1_1MAX22200.html">uint8_t</a> <a class="el" href="classmax22200_1_1MAX22200.html">channel</a>)</td></tr>
 <tr class="separator:aab49b674a6a3f59d961019c61d18bf27"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -319,6 +320,15 @@ Variables</h2></td></tr>
 <div class="ttc" id="anamespacemax22200_html_aa095193e585b7c2b7cae49c701df7a44"><div class="ttname"><a href="#aa095193e585b7c2b7cae49c701df7a44">max22200::FaultType</a></div><div class="ttdeci">FaultType</div><div class="ttdoc">Fault type enumeration.</div><div class="ttdef"><b>Definition</b> max22200_types.hpp:280</div></div>
 </div><!-- fragment -->
 <p>Callback function type for fault events. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>Channel index (0–7) associated with the fault, or 0xFF if global </td></tr>
+    <tr><td class="paramname">fault_type</td><td>Fault category (OCP, HHF, OLF, DPM, OVT, UVM, COMER) </td></tr>
+    <tr><td class="paramname">user_data</td><td>Application context pointer from SetFaultCallback()</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Stored by the driver; not invoked automatically — call from application code after ReadFaultRegister() or ReadStatus(). </dd></dl>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2hf-max22200-driver_2hf-max22200-driver_2inc_2max22200_types_8hpp-example.html#a204">/home/runner/work/hf-max22200-driver/hf-max22200-driver/inc/max22200_types.hpp</a>.</dd>
 </dl>
 
@@ -337,9 +347,19 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line"> void (*)(uint8_t channel, <a class="code hl_enumeration" href="#a3adda2d31ce48d65560f257a36a4e422">ChannelState</a> old_state,</div>
 <div class="line">                                     <a class="code hl_enumeration" href="#a3adda2d31ce48d65560f257a36a4e422">ChannelState</a> new_state, <span class="keywordtype">void</span> *user_data)</div>
-<div class="ttc" id="anamespacemax22200_html_a3adda2d31ce48d65560f257a36a4e422"><div class="ttname"><a href="#a3adda2d31ce48d65560f257a36a4e422">max22200::ChannelState</a></div><div class="ttdeci">ChannelState</div><div class="ttdoc">Channel state enumeration.</div><div class="ttdef"><b>Definition</b> max22200_types.hpp:959</div></div>
+<div class="ttc" id="anamespacemax22200_html_a3adda2d31ce48d65560f257a36a4e422"><div class="ttname"><a href="#a3adda2d31ce48d65560f257a36a4e422">max22200::ChannelState</a></div><div class="ttdeci">ChannelState</div><div class="ttdoc">Logical channel state for application callbacks.</div><div class="ttdef"><b>Definition</b> max22200_types.hpp:996</div></div>
 </div><!-- fragment -->
 <p>Callback function type for channel state changes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>Channel index (0–7) </td></tr>
+    <tr><td class="paramname">old_state</td><td>Previous logical state </td></tr>
+    <tr><td class="paramname">new_state</td><td>New logical state </td></tr>
+    <tr><td class="paramname">user_data</td><td>Application context pointer from SetStateChangeCallback()</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Stored by the driver; not invoked automatically. </dd></dl>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2hf-max22200-driver_2hf-max22200-driver_2inc_2max22200_types_8hpp-example.html#a205">/home/runner/work/hf-max22200-driver/hf-max22200-driver/inc/max22200_types.hpp</a>.</dd>
 </dl>
 
@@ -431,13 +451,19 @@ CMxy = 11 is reserved — do not use </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>Channel state enumeration. </p>
+<p>Logical channel state for application callbacks. </p>
+<p>Used with StateChangeCallback. The driver does not track HIT/HOLD phase internally; these values are for application-level state machines. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a3adda2d31ce48d65560f257a36a4e422a055c1a591abb0e8cd86dc969727bcc0b" name="a3adda2d31ce48d65560f257a36a4e422a055c1a591abb0e8cd86dc969727bcc0b"></a>DISABLED&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a3adda2d31ce48d65560f257a36a4e422ac8cf6eea8f096ed51160b484d97c5bbd" name="a3adda2d31ce48d65560f257a36a4e422ac8cf6eea8f096ed51160b484d97c5bbd"></a>ENABLED&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a3adda2d31ce48d65560f257a36a4e422a2eda3353145f7836f539037355133107" name="a3adda2d31ce48d65560f257a36a4e422a2eda3353145f7836f539037355133107"></a>HIT_PHASE&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a3adda2d31ce48d65560f257a36a4e422ae77d7787acc0512a80703ca3c166b024" name="a3adda2d31ce48d65560f257a36a4e422ae77d7787acc0512a80703ca3c166b024"></a>HOLD_PHASE&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a3adda2d31ce48d65560f257a36a4e422a893b3aaf1661e3717b18e8335ff93a72" name="a3adda2d31ce48d65560f257a36a4e422a893b3aaf1661e3717b18e8335ff93a72"></a>FAULT&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a3adda2d31ce48d65560f257a36a4e422a055c1a591abb0e8cd86dc969727bcc0b" name="a3adda2d31ce48d65560f257a36a4e422a055c1a591abb0e8cd86dc969727bcc0b"></a>DISABLED&#160;</td><td class="fielddoc"><p>Channel OFF (ONCHx = 0) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3adda2d31ce48d65560f257a36a4e422ac8cf6eea8f096ed51160b484d97c5bbd" name="a3adda2d31ce48d65560f257a36a4e422ac8cf6eea8f096ed51160b484d97c5bbd"></a>ENABLED&#160;</td><td class="fielddoc"><p>Channel ON, not necessarily in HIT or HOLD phase. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3adda2d31ce48d65560f257a36a4e422a2eda3353145f7836f539037355133107" name="a3adda2d31ce48d65560f257a36a4e422a2eda3353145f7836f539037355133107"></a>HIT_PHASE&#160;</td><td class="fielddoc"><p>Application-defined: channel in HIT excitation window. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3adda2d31ce48d65560f257a36a4e422ae77d7787acc0512a80703ca3c166b024" name="a3adda2d31ce48d65560f257a36a4e422ae77d7787acc0512a80703ca3c166b024"></a>HOLD_PHASE&#160;</td><td class="fielddoc"><p>Application-defined: channel in HOLD regulation. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3adda2d31ce48d65560f257a36a4e422a893b3aaf1661e3717b18e8335ff93a72" name="a3adda2d31ce48d65560f257a36a4e422a893b3aaf1661e3717b18e8335ff93a72"></a>FAULT&#160;</td><td class="fielddoc"><p>Application-defined: channel has an active fault condition. </p>
+</td></tr>
 </table>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2hf-max22200-driver_2hf-max22200-driver_2inc_2max22200_types_8hpp-example.html#a197">/home/runner/work/hf-max22200-driver/hf-max22200-driver/inc/max22200_types.hpp</a>.</dd>
 </dl>
@@ -553,17 +579,17 @@ FREQM is a global setting in STATUS register (affects all channels). </dd></dl>
 
 <p>Identifies the hardware control pins of the <a class="el" href="classmax22200_1_1MAX22200.html">MAX22200</a>. </p>
 <p>Used with <code>GpioSet()</code> / <code>GpioRead()</code> / <code>GpioSetActive()</code> / <code>GpioSetInactive()</code> to control the IC's dedicated GPIO pins through the <a class="el" href="classmax22200_1_1SpiInterface.html" title="CRTP-based template interface for SPI communication.">SpiInterface</a>.</p>
-<p>The mapping from <code><a class="el" href="#aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115" title="Pin function is asserted.">GpioSignal::ACTIVE</a></code> / <code>INACTIVE</code> to physical HIGH / LOW is determined by the platform bus implementation, based on the board's active-level design:</p><ul>
+<p>The mapping from <code><a class="el" href="#aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115" title="Pin function asserted (ENABLE on, CMD high, fault present on FAULT)">GpioSignal::ACTIVE</a></code> / <code>INACTIVE</code> to physical HIGH / LOW is determined by the platform bus implementation, based on the board's active-level design:</p><ul>
 <li><b>ENABLE</b>: Active-high (ACTIVE → physical HIGH, enables driver outputs)</li>
 <li><b>FAULT</b>: Active-low (ACTIVE → physical LOW, fault condition present)</li>
 <li><b>CMD</b>: Active-high (ACTIVE → physical HIGH, SPI register mode) </li>
 </ul>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af428d5c782976c9e2a6521b9401a3db8ab332708e4304e13c9b424e7465254954" name="af428d5c782976c9e2a6521b9401a3db8ab332708e4304e13c9b424e7465254954"></a>ENABLE&#160;</td><td class="fielddoc"><p>Output enable (active-high on the physical pin) </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af428d5c782976c9e2a6521b9401a3db8ab332708e4304e13c9b424e7465254954" name="af428d5c782976c9e2a6521b9401a3db8ab332708e4304e13c9b424e7465254954"></a>ENABLE&#160;</td><td class="fielddoc"><p>ENABLE pin — active-high; device sleep when INACTIVE. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="af428d5c782976c9e2a6521b9401a3db8a893b3aaf1661e3717b18e8335ff93a72" name="af428d5c782976c9e2a6521b9401a3db8a893b3aaf1661e3717b18e8335ff93a72"></a>FAULT&#160;</td><td class="fielddoc"><p>Fault status output (active-low, open-drain) </p>
+<tr><td class="fieldname"><a id="af428d5c782976c9e2a6521b9401a3db8a893b3aaf1661e3717b18e8335ff93a72" name="af428d5c782976c9e2a6521b9401a3db8a893b3aaf1661e3717b18e8335ff93a72"></a>FAULT&#160;</td><td class="fielddoc"><p>nFAULT pin — active-low open-drain fault output (read via GpioRead) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="af428d5c782976c9e2a6521b9401a3db8aa28966bac17b8eef99c5afa5eb594130" name="af428d5c782976c9e2a6521b9401a3db8aa28966bac17b8eef99c5afa5eb594130"></a>CMD&#160;</td><td class="fielddoc"><p>Command mode select (HIGH = SPI register, LOW = direct drive) </p>
+<tr><td class="fieldname"><a id="af428d5c782976c9e2a6521b9401a3db8aa28966bac17b8eef99c5afa5eb594130" name="af428d5c782976c9e2a6521b9401a3db8aa28966bac17b8eef99c5afa5eb594130"></a>CMD&#160;</td><td class="fielddoc"><p>CMD pin — ACTIVE = Command Register phase; INACTIVE = data phase. </p>
 </td></tr>
 </table>
 
@@ -640,19 +666,20 @@ VDR (Voltage Drive Regulation)</h3>
 </table>
 </div><div class="memdoc">
 
-<p>Driver status enumeration. </p>
+<p>Driver operation result codes. </p>
+<p>Returned by public <a class="el" href="classmax22200_1_1MAX22200.html">MAX22200</a> methods to indicate success or failure category. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" name="a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564"></a>OK&#160;</td><td class="fielddoc"><p>Operation successful. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564" name="a63bc0b5401ad8c7106ce140926eab27bae0aa021e21dddbd6d8cecec71e9cf564"></a>OK&#160;</td><td class="fielddoc"><p>Operation completed successfully. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27ba7a348bf6d29011d629d13513e5382240" name="a63bc0b5401ad8c7106ce140926eab27ba7a348bf6d29011d629d13513e5382240"></a>INITIALIZATION_ERROR&#160;</td><td class="fielddoc"><p>Initialization failed. </p>
+<tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27ba7a348bf6d29011d629d13513e5382240" name="a63bc0b5401ad8c7106ce140926eab27ba7a348bf6d29011d629d13513e5382240"></a>INITIALIZATION_ERROR&#160;</td><td class="fielddoc"><p>SPI/GPIO setup or ENABLE sequencing failed during init. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27baca3a06257167acb5cd86e22cb0289115" name="a63bc0b5401ad8c7106ce140926eab27baca3a06257167acb5cd86e22cb0289115"></a>COMMUNICATION_ERROR&#160;</td><td class="fielddoc"><p>SPI communication error. </p>
+<tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27baca3a06257167acb5cd86e22cb0289115" name="a63bc0b5401ad8c7106ce140926eab27baca3a06257167acb5cd86e22cb0289115"></a>COMMUNICATION_ERROR&#160;</td><td class="fielddoc"><p>SPI transfer failed or COMER fault byte (0x04) detected. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" name="a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30"></a>INVALID_PARAMETER&#160;</td><td class="fielddoc"><p>Invalid parameter provided. </p>
+<tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30" name="a63bc0b5401ad8c7106ce140926eab27bafeb1a30cb74c35aaf4ea067736109e30"></a>INVALID_PARAMETER&#160;</td><td class="fielddoc"><p>Channel index, IFS, or unit conversion argument out of range. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27ba26fbfa51c0f7c7dc7255456ec5787aeb" name="a63bc0b5401ad8c7106ce140926eab27ba26fbfa51c0f7c7dc7255456ec5787aeb"></a>HARDWARE_FAULT&#160;</td><td class="fielddoc"><p>Hardware fault detected. </p>
+<tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27ba26fbfa51c0f7c7dc7255456ec5787aeb" name="a63bc0b5401ad8c7106ce140926eab27ba26fbfa51c0f7c7dc7255456ec5787aeb"></a>HARDWARE_FAULT&#160;</td><td class="fielddoc"><p>Reserved for hardware fault detection (not currently returned) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27ba070a0fb40f6c308ab544b227660aadff" name="a63bc0b5401ad8c7106ce140926eab27ba070a0fb40f6c308ab544b227660aadff"></a>TIMEOUT&#160;</td><td class="fielddoc"><p>Operation timeout. </p>
+<tr><td class="fieldname"><a id="a63bc0b5401ad8c7106ce140926eab27ba070a0fb40f6c308ab544b227660aadff" name="a63bc0b5401ad8c7106ce140926eab27ba070a0fb40f6c308ab544b227660aadff"></a>TIMEOUT&#160;</td><td class="fielddoc"><p>Reserved for timed operations (not currently returned) </p>
 </td></tr>
 </table>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2hf-max22200-driver_2hf-max22200-driver_2inc_2max22200_types_8hpp-example.html#a189">/home/runner/work/hf-max22200-driver/hf-max22200-driver/inc/max22200_types.hpp</a>.</dd>
@@ -725,13 +752,13 @@ VDR (Voltage Drive Regulation)</h3>
 <p>Full-bridge state for a channel pair (datasheet Table 7) </p>
 <p>For a pair (x, y) = (0,1), (2,3), (4,5), or (6,7): ONCHy and ONCHx determine the bridge state. Forward uses CFG_CHy; Reverse uses CFG_CHx. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a6635e7b8136acb977eb22ce7c6b46450ab4f85051516c5085ef86dd9ea36ae937" name="a6635e7b8136acb977eb22ce7c6b46450ab4f85051516c5085ef86dd9ea36ae937"></a>HiZ&#160;</td><td class="fielddoc"><p>ONCHx=0, ONCHy=0 — high impedance. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a6635e7b8136acb977eb22ce7c6b46450ab4f85051516c5085ef86dd9ea36ae937" name="a6635e7b8136acb977eb22ce7c6b46450ab4f85051516c5085ef86dd9ea36ae937"></a>HiZ&#160;</td><td class="fielddoc"><p>ONCHx=0, ONCHy=0 — high impedance (both switches off) </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a6635e7b8136acb977eb22ce7c6b46450a67d2f6740a8eaebf4d5c6f79be8da481" name="a6635e7b8136acb977eb22ce7c6b46450a67d2f6740a8eaebf4d5c6f79be8da481"></a>Forward&#160;</td><td class="fielddoc"><p>ONCHx=1, ONCHy=0 — forward (control from CFG_CHy) </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a6635e7b8136acb977eb22ce7c6b46450a67f115c1fddc4ce1aeb1c754001585bc" name="a6635e7b8136acb977eb22ce7c6b46450a67f115c1fddc4ce1aeb1c754001585bc"></a>Reverse&#160;</td><td class="fielddoc"><p>ONCHx=0, ONCHy=1 — reverse (control from CFG_CHx) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6635e7b8136acb977eb22ce7c6b46450a9af901a16c3d66abda1f656f0b7c4e15" name="a6635e7b8136acb977eb22ce7c6b46450a9af901a16c3d66abda1f656f0b7c4e15"></a>Brake&#160;</td><td class="fielddoc"><p>ONCHx=1, ONCHy=1 — brake (both outputs to GND) </p>
+<tr><td class="fieldname"><a id="a6635e7b8136acb977eb22ce7c6b46450a9af901a16c3d66abda1f656f0b7c4e15" name="a6635e7b8136acb977eb22ce7c6b46450a9af901a16c3d66abda1f656f0b7c4e15"></a>Brake&#160;</td><td class="fielddoc"><p>ONCHx=1, ONCHy=1 — brake (both outputs driven to GND) </p>
 </td></tr>
 </table>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2hf-max22200-driver_2hf-max22200-driver_2inc_2max22200_types_8hpp-example.html#a184">/home/runner/work/hf-max22200-driver/hf-max22200-driver/inc/max22200_types.hpp</a>.</dd>
@@ -762,9 +789,9 @@ VDR (Voltage Drive Regulation)</h3>
 <p>Abstract signal level for control pins. </p>
 <p>Decouples the driver's intent from the physical pin polarity. The platform bus implementation translates <code>ACTIVE</code> / <code>INACTIVE</code> to the correct electrical level for each pin. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aacf1ddc59c91ce8cf173bc60bfffeff1a6b273343c454f9c53dcfc9c4ccf171d2" name="aacf1ddc59c91ce8cf173bc60bfffeff1a6b273343c454f9c53dcfc9c4ccf171d2"></a>INACTIVE&#160;</td><td class="fielddoc"><p>Pin function is deasserted. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aacf1ddc59c91ce8cf173bc60bfffeff1a6b273343c454f9c53dcfc9c4ccf171d2" name="aacf1ddc59c91ce8cf173bc60bfffeff1a6b273343c454f9c53dcfc9c4ccf171d2"></a>INACTIVE&#160;</td><td class="fielddoc"><p>Pin function deasserted (ENABLE off, CMD low, no fault on FAULT) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115" name="aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115"></a>ACTIVE&#160;</td><td class="fielddoc"><p>Pin function is asserted. </p>
+<tr><td class="fieldname"><a id="aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115" name="aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115"></a>ACTIVE&#160;</td><td class="fielddoc"><p>Pin function asserted (ENABLE on, CMD high, fault present on FAULT) </p>
 </td></tr>
 </table>
 
@@ -891,7 +918,7 @@ High-Side Mode (HSnLS = 1)</h3>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Non-null C string </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Non-null C string (e.g. "OK", "COMMUNICATION_ERROR") </dd></dl>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2hf-max22200-driver_2hf-max22200-driver_2inc_2max22200_types_8hpp-example.html#a196">/home/runner/work/hf-max22200-driver/hf-max22200-driver/inc/max22200_types.hpp</a>.</dd>
 </dl>
 
@@ -1023,6 +1050,9 @@ High-Side Mode (HSnLS = 1)</h3>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Get the compiled driver version string (namespace-level convenience) </p>
+<dl class="section return"><dt>Returns</dt><dd>Null-terminated version string (same as <a class="el" href="classmax22200_1_1MAX22200.html#abc1cf21d55c29571d17b1886d3d7d7ef" title="Get the compiled driver version string.">MAX22200::GetDriverVersion()</a>) </dd></dl>
 
 </div>
 </div>

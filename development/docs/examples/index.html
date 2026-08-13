@@ -311,12 +311,14 @@
 25
 26
 27
+28
 </pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200.hpp"</span><span class="cp">
 </span>
 <span class="kt">void</span> <span class="nf">app_main</span><span class="p">()</span> <span class="p">{</span>
     <span class="c1">// SPI setup (implement SpiInterface for your platform)</span>
     <span class="n">MySpi</span> <span class="n">spi</span><span class="p">;</span>
-    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">driver</span><span class="p">.</span><span class="n">SetBoardConfig</span><span class="p">(</span><span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">));</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">driver</span><span class="p">.</span><span class="n">Initialize</span><span class="p">()</span> <span class="o">!=</span> <span class="n">max22200</span><span class="o">::</span><span class="n">DriverStatus</span><span class="o">::</span><span class="n">OK</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">printf</span><span class="p">(</span><span class="s">"Initialization failed</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
@@ -379,11 +381,13 @@
 27
 28
 29
+30
 </pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200.hpp"</span><span class="cp">
 </span>
 <span class="kt">void</span> <span class="nf">app_main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">MySpi</span> <span class="n">spi</span><span class="p">;</span>
-    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">driver</span><span class="p">.</span><span class="n">SetBoardConfig</span><span class="p">(</span><span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">));</span>
     <span class="n">driver</span><span class="p">.</span><span class="n">Initialize</span><span class="p">();</span>
 
     <span class="c1">// Set pair 0 (ch0–ch1) to H-bridge; both channels must be off first</span>
@@ -458,6 +462,7 @@
 36
 37
 38
+39
 </pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200.hpp"</span><span class="cp">
 </span>
 <span class="kt">void</span> <span class="nf">fault_handler</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">channel</span><span class="p">,</span> <span class="n">max22200</span><span class="o">::</span><span class="n">FaultType</span> <span class="n">fault_type</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">user_data</span><span class="p">)</span> <span class="p">{</span>
@@ -466,7 +471,8 @@
 
 <span class="kt">void</span> <span class="n">app_main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">MySpi</span> <span class="n">spi</span><span class="p">;</span>
-    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">driver</span><span class="p">.</span><span class="n">SetBoardConfig</span><span class="p">(</span><span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">));</span>
     <span class="n">driver</span><span class="p">.</span><span class="n">Initialize</span><span class="p">();</span>
     <span class="n">driver</span><span class="p">.</span><span class="n">SetFaultCallback</span><span class="p">(</span><span class="n">fault_handler</span><span class="p">);</span>
 
@@ -546,11 +552,13 @@
 36
 37
 38
+39
 </pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200.hpp"</span><span class="cp">
 </span>
 <span class="kt">void</span> <span class="nf">app_main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">MySpi</span> <span class="n">spi</span><span class="p">;</span>
-    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">driver</span><span class="p">.</span><span class="n">SetBoardConfig</span><span class="p">(</span><span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">));</span>
     <span class="n">driver</span><span class="p">.</span><span class="n">Initialize</span><span class="p">();</span>
 
     <span class="k">for</span> <span class="p">(</span><span class="kt">uint8_t</span> <span class="n">ch</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">ch</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">;</span> <span class="n">ch</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
@@ -615,11 +623,13 @@
 17
 18
 19
+20
 </pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200.hpp"</span><span class="cp">
 </span>
 <span class="kt">void</span> <span class="nf">app_main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">MySpi</span> <span class="n">spi</span><span class="p">;</span>
-    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+    <span class="n">driver</span><span class="p">.</span><span class="n">SetBoardConfig</span><span class="p">(</span><span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">));</span>
     <span class="n">driver</span><span class="p">.</span><span class="n">Initialize</span><span class="p">();</span>
 
     <span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span> <span class="n">board</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>

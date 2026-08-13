@@ -128,7 +128,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:af9d05a8769954eeef57fa096422139d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Blocking delay in microseconds (from comm/CRTP implementation).  <br /></td></tr>
 <tr class="separator:af9d05a8769954eeef57fa096422139d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">GPIO Pin Control</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>Unified interface for controlling <a class="el" href="classmax22200_1_1MAX22200.html">MAX22200</a> hardware control pins. The platform bus implementation maps <a class="el" href="namespacemax22200.html#aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115" title="Pin function is asserted.">GpioSignal::ACTIVE</a>/INACTIVE to the correct physical level for each pin based on its polarity. </p>
+<tr><td colspan="2"><div class="groupText"><p>Unified interface for controlling <a class="el" href="classmax22200_1_1MAX22200.html">MAX22200</a> hardware control pins. The platform bus implementation maps <a class="el" href="namespacemax22200.html#aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115" title="Pin function asserted (ENABLE on, CMD high, fault present on FAULT)">GpioSignal::ACTIVE</a>/INACTIVE to the correct physical level for each pin based on its polarity. </p>
 </div></td></tr>
 <tr class="memitem:aa4e100ba6824321c1dae87f4c61079b8" id="r_aa4e100ba6824321c1dae87f4c61079b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa4e100ba6824321c1dae87f4c61079b8">GpioSet</a> (<a class="el" href="namespacemax22200.html#af428d5c782976c9e2a6521b9401a3db8">CtrlPin</a> <a class="el" href="classmax22200_1_1MAX22200.html">pin</a>, <a class="el" href="namespacemax22200.html#aacf1ddc59c91ce8cf173bc60bfffeff1">GpioSignal</a> <a class="el" href="classmax22200_1_1MAX22200.html">signal</a>)</td></tr>
 <tr class="memdesc:aa4e100ba6824321c1dae87f4c61079b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a control pin to the specified signal state.  <br /></td></tr>
@@ -437,8 +437,8 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 </ul>
 </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">signal</td><td>Receives the current signal state:<ul>
-<li><a class="el" href="namespacemax22200.html#aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115" title="Pin function is asserted.">GpioSignal::ACTIVE</a> = fault present (for FAULT pin)</li>
-<li><a class="el" href="namespacemax22200.html#aacf1ddc59c91ce8cf173bc60bfffeff1a6b273343c454f9c53dcfc9c4ccf171d2" title="Pin function is deasserted.">GpioSignal::INACTIVE</a> = no fault (for FAULT pin) </li>
+<li><a class="el" href="namespacemax22200.html#aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115" title="Pin function asserted (ENABLE on, CMD high, fault present on FAULT)">GpioSignal::ACTIVE</a> = fault present (for FAULT pin)</li>
+<li><a class="el" href="namespacemax22200.html#aacf1ddc59c91ce8cf173bc60bfffeff1a6b273343c454f9c53dcfc9c4ccf171d2" title="Pin function deasserted (ENABLE off, CMD low, no fault on FAULT)">GpioSignal::INACTIVE</a> = no fault (for FAULT pin) </li>
 </ul>
 </td></tr>
   </table>
@@ -483,7 +483,7 @@ template&lt;<a class="el" href="classmax22200_1_1MAX22200.html">typename</a> <a 
 </div><div class="memdoc">
 
 <p>Set a control pin to the specified signal state. </p>
-<p>Controls the <a class="el" href="classmax22200_1_1MAX22200.html">MAX22200</a> hardware control pins (ENABLE, CMD, FAULT). The platform implementation maps <a class="el" href="namespacemax22200.html#aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115" title="Pin function is asserted.">GpioSignal::ACTIVE</a>/INACTIVE to the correct physical level based on each pin's polarity.</p>
+<p>Controls the <a class="el" href="classmax22200_1_1MAX22200.html">MAX22200</a> hardware control pins (ENABLE, CMD, FAULT). The platform implementation maps <a class="el" href="namespacemax22200.html#aacf1ddc59c91ce8cf173bc60bfffeff1a18ff74f43da410c5529f7d6fca84f115" title="Pin function asserted (ENABLE on, CMD high, fault present on FAULT)">GpioSignal::ACTIVE</a>/INACTIVE to the correct physical level based on each pin's polarity.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">pin</td><td>Which control pin to drive:<ul>

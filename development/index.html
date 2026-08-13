@@ -365,19 +365,43 @@ Interactive guides, examples, and step-by-step tutorials</p>
 29
 30
 31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
 </pre></td><td class="rouge-code"><pre><span class="cp">#include</span> <span class="cpf">"max22200.hpp"</span><span class="cp">
 </span>
 <span class="c1">// 1. Implement the SPI interface (see platform_integration.md)</span>
 <span class="k">class</span> <span class="nc">MySpi</span> <span class="o">:</span> <span class="k">public</span> <span class="n">max22200</span><span class="o">::</span><span class="n">SpiInterface</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="p">{</span>
 <span class="nl">public:</span>
-    <span class="kt">void</span> <span class="n">transfer</span><span class="p">(</span><span class="k">const</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">tx</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">rx</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">bool</span> <span class="n">Initialize</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">bool</span> <span class="n">Transfer</span><span class="p">(</span><span class="k">const</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">tx_data</span><span class="p">,</span> <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">rx_data</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">length</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// Your SPI transfer implementation</span>
+        <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">tx_data</span><span class="p">;</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">rx_data</span><span class="p">;</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">length</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
     <span class="p">}</span>
+    <span class="kt">void</span> <span class="n">SetChipSelect</span><span class="p">(</span><span class="kt">bool</span> <span class="n">state</span><span class="p">)</span> <span class="p">{</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">state</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">bool</span> <span class="n">Configure</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">speed_hz</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">mode</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">msb_first</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">speed_hz</span><span class="p">;</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">mode</span><span class="p">;</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">msb_first</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">bool</span> <span class="n">IsReady</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">void</span> <span class="n">DelayUs</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">us</span><span class="p">)</span> <span class="p">{</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">us</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">void</span> <span class="n">GpioSet</span><span class="p">(</span><span class="n">CtrlPin</span> <span class="n">pin</span><span class="p">,</span> <span class="n">GpioSignal</span> <span class="n">signal</span><span class="p">)</span> <span class="p">{</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">pin</span><span class="p">;</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">signal</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">bool</span> <span class="n">GpioRead</span><span class="p">(</span><span class="n">CtrlPin</span> <span class="n">pin</span><span class="p">,</span> <span class="n">GpioSignal</span><span class="o">&amp;</span> <span class="n">signal</span><span class="p">)</span> <span class="p">{</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">pin</span><span class="p">;</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">signal</span><span class="p">;</span> <span class="k">return</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
 <span class="p">};</span>
 
 <span class="c1">// 2. Create driver instance</span>
 <span class="n">MySpi</span> <span class="n">spi</span><span class="p">;</span>
-<span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
+<span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;</span> <span class="n">driver</span><span class="p">(</span><span class="n">spi</span><span class="p">);</span>
 
 <span class="c1">// 3. Set board config (IFS from RREF; required for CDR)</span>
 <span class="n">driver</span><span class="p">.</span><span class="n">SetBoardConfig</span><span class="p">(</span><span class="n">max22200</span><span class="o">::</span><span class="n">BoardConfig</span><span class="p">(</span><span class="mf">30.0</span><span class="n">f</span><span class="p">,</span> <span class="nb">false</span><span class="p">));</span>

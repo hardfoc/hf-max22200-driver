@@ -651,7 +651,7 @@
   <tbody>
     <tr>
       <td><code class="language-plaintext highlighter-rouge">GetStatistics()</code></td>
-      <td>Return DriverStatistics (transfers, faults, uptime, etc.)</td>
+      <td>Return DriverStatistics (total_transfers, failed_transfers updated; fault_events/state_changes/uptime_ms reserved)</td>
     </tr>
     <tr>
       <td><code class="language-plaintext highlighter-rouge">ResetStatistics()</code></td>
@@ -659,11 +659,11 @@
     </tr>
     <tr>
       <td><code class="language-plaintext highlighter-rouge">SetFaultCallback(FaultCallback, void *user_data)</code></td>
-      <td>Fault event callback</td>
+      <td>Store fault callback (not invoked automatically by driver)</td>
     </tr>
     <tr>
       <td><code class="language-plaintext highlighter-rouge">SetStateChangeCallback(StateChangeCallback, void *user_data)</code></td>
-      <td>State change callback</td>
+      <td>Store state callback (not invoked automatically by driver)</td>
     </tr>
   </tbody>
 </table></div>
@@ -801,7 +801,7 @@
     </tr>
     <tr>
       <td><code class="language-plaintext highlighter-rouge">DriverStatistics</code></td>
-      <td>total_transfers, failed_transfers, fault_events, state_changes, uptime_ms. Helpers: <code class="language-plaintext highlighter-rouge">getSuccessRate()</code>, <code class="language-plaintext highlighter-rouge">hasFailures()</code>, <code class="language-plaintext highlighter-rouge">isHealthy()</code>, <code class="language-plaintext highlighter-rouge">getTotalTransfers()</code>, …</td>
+      <td>total_transfers, failed_transfers (updated by driver); fault_events, state_changes, uptime_ms (reserved, currently 0). Helpers: <code class="language-plaintext highlighter-rouge">getSuccessRate()</code>, <code class="language-plaintext highlighter-rouge">hasFailures()</code>, <code class="language-plaintext highlighter-rouge">isHealthy()</code>, <code class="language-plaintext highlighter-rouge">getTotalTransfers()</code>, …</td>
     </tr>
   </tbody>
 </table></div>
@@ -828,11 +828,11 @@
     </tr>
     <tr>
       <td><code class="language-plaintext highlighter-rouge">FaultCallback</code></td>
-      <td><code class="language-plaintext highlighter-rouge">void (*)(uint8_t channel, FaultType fault_type, void *user_data)</code></td>
+      <td><code class="language-plaintext highlighter-rouge">void (*)(uint8_t channel, FaultType fault_type, void *user_data)</code> — stored by driver, invoke from application</td>
     </tr>
     <tr>
       <td><code class="language-plaintext highlighter-rouge">StateChangeCallback</code></td>
-      <td><code class="language-plaintext highlighter-rouge">void (*)(uint8_t channel, ChannelState old_state, ChannelState new_state, void *user_data)</code></td>
+      <td><code class="language-plaintext highlighter-rouge">void (*)(uint8_t channel, ChannelState old_state, ChannelState new_state, void *user_data)</code> — stored by driver, invoke from application</td>
     </tr>
   </tbody>
 </table></div>
