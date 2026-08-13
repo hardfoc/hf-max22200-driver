@@ -426,13 +426,21 @@ struct ChannelConfig {
   }
 
   // ── Mode-aware accessors (same storage; use for clear intent at call site) ─
+  /** @brief Set HIT setpoint in mA (CDR mode) */
   void set_hit_ma(float ma) { hit_setpoint = ma; }
+  /** @brief Set HOLD setpoint in mA (CDR mode) */
   void set_hold_ma(float ma) { hold_setpoint = ma; }
+  /** @brief Set HIT duty cycle in percent (VDR mode, 0–100) */
   void set_hit_duty_percent(float pct) { hit_setpoint = pct; }
+  /** @brief Set HOLD duty cycle in percent (VDR mode, 0–100) */
   void set_hold_duty_percent(float pct) { hold_setpoint = pct; }
+  /** @brief HIT setpoint in mA (CDR) or percent (VDR) */
   float hit_ma() const { return hit_setpoint; }
+  /** @brief HOLD setpoint in mA (CDR) or percent (VDR) */
   float hold_ma() const { return hold_setpoint; }
+  /** @brief HIT duty cycle in percent (VDR); same storage as hit_setpoint */
   float hit_duty_percent() const { return hit_setpoint; }
+  /** @brief HOLD duty cycle in percent (VDR); same storage as hold_setpoint */
   float hold_duty_percent() const { return hold_setpoint; }
 
   /**
@@ -575,18 +583,31 @@ struct ChannelConfig {
 
   // ── Inline probe helpers (human-readable, compiler can optimize away) ─────
 
+  /** @brief true when drive_mode is CDR */
   bool isCdr() const { return drive_mode == DriveMode::CDR; }
+  /** @brief true when drive_mode is VDR */
   bool isVdr() const { return drive_mode == DriveMode::VDR; }
+  /** @brief true when side_mode is LOW_SIDE */
   bool isLowSide() const { return side_mode == SideMode::LOW_SIDE; }
+  /** @brief true when side_mode is HIGH_SIDE */
   bool isHighSide() const { return side_mode == SideMode::HIGH_SIDE; }
+  /** @brief true when hit_time_ms > 0 (finite HIT window) */
   bool hasHitTime() const { return hit_time_ms > 0.0f; }
+  /** @brief true when hit_time_ms indicates continuous HIT (negative or very large) */
   bool isContinuousHit() const { return hit_time_ms < 0.0f || hit_time_ms >= 1000000.0f; }
+  /** @brief true when channel is controlled via SPI ONCH (TRGnSPI = 0) */
   bool isTriggeredBySpi() const { return !trigger_from_pin; }
+  /** @brief true when channel is controlled via TRIGA/TRIGB pin (TRGnSPI = 1) */
   bool isTriggeredByPin() const { return trigger_from_pin; }
+  /** @brief true when HFS bit is set (half full-scale, low-side only) */
   bool isHalfFullScale() const { return half_full_scale; }
+  /** @brief true when SRC (slew rate control) is enabled */
   bool isSlewRateControlEnabled() const { return slew_rate_control_enabled; }
+  /** @brief true when open-load detection (OL_EN) is enabled */
   bool isOpenLoadDetectionEnabled() const { return open_load_detection_enabled; }
+  /** @brief true when plunger movement detection (DPM_EN) is enabled */
   bool isPlungerMovementDetectionEnabled() const { return plunger_movement_detection_enabled; }
+  /** @brief true when HIT current check (HHF_EN) is enabled */
   bool isHitCurrentCheckEnabled() const { return hit_current_check_enabled; }
   /** @brief Chopping frequency config (FREQ_CFG); see ChopFreq enum */
   ChopFreq getChopFreq() const { return chop_freq; }
@@ -680,7 +701,10 @@ struct StatusConfig {
         undervoltage(false) {}
 
   /**
-   * @brief Build 32-bit register value from writable fields
+   * @brief Build 32-bit STATUS register value from writable fields
+   *
+   * Encodes ONCH, fault masks, CMxy, FREQM, and ACTIVE. Fault flag bits are
+   * read-only on the device and are not included in the output.
    */
   uint32_t toRegister() const {
     uint32_t val = 0;
@@ -702,7 +726,8 @@ struct StatusConfig {
   }
 
   /**
-   * @brief Parse a 32-bit register value
+   * @brief Parse a 32-bit STATUS register value into this structure
+   * @param val Raw 32-bit value read from the device
    */
   void fromRegister(uint32_t val) {
     channels_on_mask = static_cast<uint8_t>((val >> StatusReg::ONCH_SHIFT) & 0xFF);
@@ -729,7 +754,8 @@ struct StatusConfig {
   }
 
   /**
-   * @brief Check if any fault flag is active
+   * @brief Check if any global fault flag in byte 0 is active
+   * @return true if any of OVT, OCP, OLF, HHF, DPM, COMER, or UVM is set
    */
   bool hasFault() const {
     return overtemperature || overcurrent || open_load_fault || hit_not_reached
@@ -811,6 +837,10 @@ struct FaultStatus {
   FaultStatus() : overcurrent_channel_mask(0), hit_not_reached_channel_mask(0),
                   open_load_fault_channel_mask(0), plunger_movement_fault_channel_mask(0) {}
 
+  /**
+   * @brief Parse a 32-bit FAULT register value into per-channel bitmasks
+   * @param val Raw 32-bit value read from RegBank::FAULT
+   */
   void fromRegister(uint32_t val) {
     overcurrent_channel_mask            = static_cast<uint8_t>((val >> FaultReg::OCP_SHIFT) & 0xFF);
     hit_not_reached_channel_mask        = static_cast<uint8_t>((val >> FaultReg::HHF_SHIFT) & 0xFF);
@@ -887,12 +917,14 @@ struct DpmConfig {
   DpmConfig() : plunger_movement_start_current(0), plunger_movement_debounce_time(0),
                 plunger_movement_current_threshold(0) {}
 
+  /** @brief Encode writable CFG_DPM fields to a 32-bit register value */
   uint32_t toRegister() const {
     return (static_cast<uint32_t>(plunger_movement_start_current & 0x7Fu) << CfgDpmReg::DPM_ISTART_SHIFT) |
            (static_cast<uint32_t>(plunger_movement_debounce_time & 0x0Fu) << CfgDpmReg::DPM_TDEB_SHIFT) |
            (static_cast<uint32_t>(plunger_movement_current_threshold & 0x0Fu) << CfgDpmReg::DPM_IPTH_SHIFT);
   }
 
+  /** @brief Parse a 32-bit CFG_DPM register value */
   void fromRegister(uint32_t val) {
     plunger_movement_start_current   = static_cast<uint8_t>((val >> CfgDpmReg::DPM_ISTART_SHIFT) & 0x7F);
     plunger_movement_debounce_time   = static_cast<uint8_t>((val >> CfgDpmReg::DPM_TDEB_SHIFT) & 0x0F);
@@ -911,28 +943,30 @@ struct DpmConfig {
  * the bridge state. Forward uses CFG_CHy; Reverse uses CFG_CHx.
  */
 enum class FullBridgeState : uint8_t {
-  HiZ     = 0, ///< ONCHx=0, ONCHy=0 — high impedance
+  HiZ     = 0, ///< ONCHx=0, ONCHy=0 — high impedance (both switches off)
   Forward = 1, ///< ONCHx=1, ONCHy=0 — forward (control from CFG_CHy)
   Reverse = 2, ///< ONCHx=0, ONCHy=1 — reverse (control from CFG_CHx)
-  Brake   = 3  ///< ONCHx=1, ONCHy=1 — brake (both outputs to GND)
+  Brake   = 3  ///< ONCHx=1, ONCHy=1 — brake (both outputs driven to GND)
 };
 
 /**
- * @brief Driver status enumeration
+ * @brief Driver operation result codes
+ *
+ * Returned by public MAX22200 methods to indicate success or failure category.
  */
 enum class DriverStatus : uint8_t {
-  OK = 0,               ///< Operation successful
-  INITIALIZATION_ERROR,  ///< Initialization failed
-  COMMUNICATION_ERROR,   ///< SPI communication error
-  INVALID_PARAMETER,     ///< Invalid parameter provided
-  HARDWARE_FAULT,        ///< Hardware fault detected
-  TIMEOUT                ///< Operation timeout
+  OK = 0,               ///< Operation completed successfully
+  INITIALIZATION_ERROR, ///< SPI/GPIO setup or ENABLE sequencing failed during init
+  COMMUNICATION_ERROR,  ///< SPI transfer failed or COMER fault byte (0x04) detected
+  INVALID_PARAMETER,    ///< Channel index, IFS, or unit conversion argument out of range
+  HARDWARE_FAULT,       ///< Reserved for hardware fault detection (not currently returned)
+  TIMEOUT               ///< Reserved for timed operations (not currently returned)
 };
 
 /**
  * @brief Return a human-readable string for DriverStatus (for logging and tests)
  * @param s Status value
- * @return Non-null C string
+ * @return Non-null C string (e.g. "OK", "COMMUNICATION_ERROR")
  */
 inline const char *DriverStatusToStr(DriverStatus s) {
   switch (s) {
@@ -954,14 +988,17 @@ inline const char *DriverStatusToStr(DriverStatus s) {
 }
 
 /**
- * @brief Channel state enumeration
+ * @brief Logical channel state for application callbacks
+ *
+ * Used with StateChangeCallback. The driver does not track HIT/HOLD phase
+ * internally; these values are for application-level state machines.
  */
 enum class ChannelState : uint8_t {
-  DISABLED = 0,
-  ENABLED,
-  HIT_PHASE,
-  HOLD_PHASE,
-  FAULT
+  DISABLED = 0, ///< Channel OFF (ONCHx = 0)
+  ENABLED,      ///< Channel ON, not necessarily in HIT or HOLD phase
+  HIT_PHASE,    ///< Application-defined: channel in HIT excitation window
+  HOLD_PHASE,   ///< Application-defined: channel in HOLD regulation
+  FAULT         ///< Application-defined: channel has an active fault condition
 };
 
 /**
@@ -971,12 +1008,26 @@ using ChannelConfigArray = std::array<ChannelConfig, NUM_CHANNELS_>;
 
 /**
  * @brief Callback function type for fault events
+ *
+ * @param channel   Channel index (0–7) associated with the fault, or 0xFF if global
+ * @param fault_type Fault category (OCP, HHF, OLF, DPM, OVT, UVM, COMER)
+ * @param user_data Application context pointer from SetFaultCallback()
+ *
+ * @note Stored by the driver; not invoked automatically — call from application
+ *       code after ReadFaultRegister() or ReadStatus().
  */
 using FaultCallback = void (*)(uint8_t channel, FaultType fault_type,
                                void *user_data);
 
 /**
  * @brief Callback function type for channel state changes
+ *
+ * @param channel   Channel index (0–7)
+ * @param old_state Previous logical state
+ * @param new_state New logical state
+ * @param user_data Application context pointer from SetStateChangeCallback()
+ *
+ * @note Stored by the driver; not invoked automatically.
  */
 using StateChangeCallback = void (*)(uint8_t channel, ChannelState old_state,
                                      ChannelState new_state, void *user_data);
@@ -1077,14 +1128,18 @@ struct DutyLimits {
 };
 
 /**
- * @brief Driver statistics structure
+ * @brief Driver runtime statistics
+ *
+ * Counters updated by the driver during SPI operations. As of the current
+ * implementation, only total_transfers and failed_transfers are incremented;
+ * fault_events, state_changes, and uptime_ms remain at zero.
  */
 struct DriverStatistics {
-  uint32_t total_transfers;
-  uint32_t failed_transfers;
-  uint32_t fault_events;
-  uint32_t state_changes;
-  uint32_t uptime_ms;
+  uint32_t total_transfers;  ///< Total SPI operations attempted
+  uint32_t failed_transfers; ///< SPI or parameter failures counted by updateStatistics()
+  uint32_t fault_events;     ///< Reserved (not incremented by current driver)
+  uint32_t state_changes;    ///< Reserved (not incremented by current driver)
+  uint32_t uptime_ms;        ///< Reserved (not incremented by current driver)
 
   DriverStatistics()
       : total_transfers(0), failed_transfers(0), fault_events(0),
@@ -1095,12 +1150,19 @@ struct DriverStatistics {
     return ((float)(total_transfers - failed_transfers) / total_transfers) * 100.0f;
   }
 
+  /** @brief true if failed_transfers > 0 */
   bool hasFailures() const { return failed_transfers != 0u; }
+  /** @brief true if failed_transfers == 0 */
   bool isHealthy() const { return failed_transfers == 0u; }
+  /** @brief Total SPI transfer attempts */
   uint32_t getTotalTransfers() const { return total_transfers; }
+  /** @brief Failed SPI or validation operations */
   uint32_t getFailedTransfers() const { return failed_transfers; }
+  /** @brief Fault event counter (reserved, always 0 in current driver) */
   uint32_t getFaultEvents() const { return fault_events; }
+  /** @brief State change counter (reserved, always 0 in current driver) */
   uint32_t getStateChanges() const { return state_changes; }
+  /** @brief Uptime counter in ms (reserved, always 0 in current driver) */
   uint32_t getUptimeMs() const { return uptime_ms; }
 };
 

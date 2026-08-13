@@ -553,7 +553,7 @@ void MAX22200<SpiType>::ResetStatistics() {
 }
 
 // ============================================================================
-// Callbacks
+// Callbacks (stored for application use; not invoked by driver)
 // ============================================================================
 
 template <typename SpiType>

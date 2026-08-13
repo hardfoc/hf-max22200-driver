@@ -69,9 +69,9 @@ namespace max22200 {
  * - **CMD**:    Active-high (ACTIVE → physical HIGH, SPI register mode)
  */
 enum class CtrlPin : uint8_t {
-  ENABLE = 0, ///< Output enable (active-high on the physical pin)
-  FAULT,      ///< Fault status output (active-low, open-drain)
-  CMD         ///< Command mode select (HIGH = SPI register, LOW = direct drive)
+  ENABLE = 0, ///< ENABLE pin — active-high; device sleep when INACTIVE
+  FAULT,      ///< nFAULT pin — active-low open-drain fault output (read via GpioRead)
+  CMD         ///< CMD pin — ACTIVE = Command Register phase; INACTIVE = data phase
 };
 
 /**
@@ -83,8 +83,8 @@ enum class CtrlPin : uint8_t {
  * electrical level for each pin.
  */
 enum class GpioSignal : uint8_t {
-  INACTIVE = 0, ///< Pin function is deasserted
-  ACTIVE   = 1  ///< Pin function is asserted
+  INACTIVE = 0, ///< Pin function deasserted (ENABLE off, CMD low, no fault on FAULT)
+  ACTIVE   = 1  ///< Pin function asserted (ENABLE on, CMD high, fault present on FAULT)
 };
 
 /**

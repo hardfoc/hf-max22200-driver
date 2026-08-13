@@ -63,7 +63,7 @@ public:
         // Your platform-specific SPI code
     }
 };
-```cpp
+```
 
 ## Interface Definition
 
@@ -80,7 +80,7 @@ public:
     bool Configure(uint32_t speed_hz, uint8_t mode, bool msb_first = true);
     bool IsReady() const;
 };
-```cpp
+```
 
 ## Implementation Steps
 
@@ -325,7 +325,8 @@ After implementing the interface, test it:
 
 ```cpp
 MyPlatformSPI spi(/* your config */);
-max22200::MAX22200 driver(spi);
+max22200::MAX22200<MyPlatformSPI> driver(spi);
+driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
 
 if (driver.Initialize() == max22200::DriverStatus::OK) {
     max22200::ChannelConfig config;

@@ -37,10 +37,13 @@ inc/
   ├── max22200.hpp
   ├── max22200_spi_interface.hpp
   ├── max22200_registers.hpp
-  └── max22200_types.hpp
+  ├── max22200_types.hpp
+  └── max22200_version.h
 src/
-  └── max22200.cpp
+  └── max22200.ipp
 ```
+
+The driver is **header-only**: `max22200.hpp` includes `max22200.ipp` at the end. No separate `.cpp` compilation unit is required.
 
 ## Integration Methods
 
@@ -77,9 +80,9 @@ idf_component_register(
    ```cpp
    #include "max22200.hpp"
    ```
-4. Compile with C++20 support:
+4. Compile with C++20 support (include path must cover `inc/`; implementation is in `max22200.ipp` via the header):
    ```bash
-   g++ -std=c++20 -I inc/ your_code.cpp src/max22200.cpp
+   g++ -std=c++20 -I inc/ your_code.cpp
    ```
 
 ## Verification
@@ -91,9 +94,9 @@ To verify the installation:
    #include "max22200.hpp"
    ```
 
-2. Compile a simple test:
+2. Compile a simple test (header-only — no separate driver object file):
    ```bash
-   g++ -std=c++20 -I inc/ -c src/max22200.cpp -o test.o
+   g++ -std=c++20 -I inc/ -c your_test.cpp -o test.o
    ```
 
 3. If compilation succeeds, the library is properly installed.

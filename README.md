@@ -60,14 +60,26 @@ The driver uses a CRTP-based `SpiInterface` for hardware abstraction, allowing i
 // 1. Implement the SPI interface (see platform_integration.md)
 class MySpi : public max22200::SpiInterface<MySpi> {
 public:
-    void transfer(const uint8_t* tx, uint8_t* rx, size_t len) {
+    bool Initialize() { return true; }
+    bool Transfer(const uint8_t* tx_data, uint8_t* rx_data, size_t length) {
         // Your SPI transfer implementation
+        (void)tx_data; (void)rx_data; (void)length;
+        return true;
     }
+    void SetChipSelect(bool state) { (void)state; }
+    bool Configure(uint32_t speed_hz, uint8_t mode, bool msb_first) {
+        (void)speed_hz; (void)mode; (void)msb_first;
+        return true;
+    }
+    bool IsReady() const { return true; }
+    void DelayUs(uint32_t us) { (void)us; }
+    void GpioSet(CtrlPin pin, GpioSignal signal) { (void)pin; (void)signal; }
+    bool GpioRead(CtrlPin pin, GpioSignal& signal) { (void)pin; (void)signal; return true; }
 };
 
 // 2. Create driver instance
 MySpi spi;
-max22200::MAX22200 driver(spi);
+max22200::MAX22200<MySpi> driver(spi);
 
 // 3. Set board config (IFS from RREF; required for CDR)
 driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));

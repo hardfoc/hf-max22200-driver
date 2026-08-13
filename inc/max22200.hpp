@@ -218,7 +218,9 @@ public:
   DriverStatus Deinitialize();
 
   /**
-   * @brief Check if driver is initialized
+   * @brief Check if driver completed Initialize() successfully
+   *
+   * @return true after a successful Initialize(); false after construction or Deinitialize()
    */
   bool IsInitialized() const;
 
@@ -228,11 +230,26 @@ public:
 
   /**
    * @brief Read the full 32-bit STATUS register
+   *
+   * Performs a two-phase SPI read (Command Register with CMD HIGH, then 32-bit
+   * data with CMD LOW). Updates cached_status_ on success.
+   *
+   * @param status Populated with parsed STATUS fields (ONCH, masks, CMxy, fault flags)
+   * @return DriverStatus::OK on success
+   *
+   * @note Reading STATUS clears the UVM flag and may deassert nFAULT.
    */
   DriverStatus ReadStatus(StatusConfig &status) const;
 
   /**
    * @brief Write the STATUS register (writable bits only)
+   *
+   * Performs a two-phase SPI write. Writable fields include ONCH, fault masks,
+   * CMxy, FREQM, and ACTIVE; fault flag bits are read-only and ignored on write.
+   * Updates cached_status_ on success.
+   *
+   * @param status STATUS configuration to encode and write
+   * @return DriverStatus::OK on success
    */
   DriverStatus WriteStatus(const StatusConfig &status);
 
@@ -271,12 +288,21 @@ public:
   DriverStatus GetChannelConfig(uint8_t channel, ChannelConfig &config) const;
 
   /**
-   * @brief Configure all channels
+   * @brief Configure all eight channels (CFG_CH0 through CFG_CH7)
+   *
+   * Calls ConfigureChannel() for each index. Stops and returns the first
+   * non-OK status if any channel fails.
+   *
+   * @param configs Array of eight ChannelConfig values (index N = channel N)
+   * @return DriverStatus::OK if all channels configured successfully
    */
   DriverStatus ConfigureAllChannels(const ChannelConfigArray &configs);
 
   /**
-   * @brief Get all channel configurations
+   * @brief Read configuration for all eight channels
+   *
+   * @param configs Output array; index N receives channel N configuration
+   * @return DriverStatus::OK on success
    */
   DriverStatus GetAllChannelConfigs(ChannelConfigArray &configs) const;
 
@@ -362,7 +388,7 @@ public:
    * @return DriverStatus::INVALID_PARAMETER if pair_index > 3
    *
    * @note The pair must be configured as HBRIDGE in STATUS (CMxy = 10).
-   * @see FullBridgeState, StatusConfig::cm10, ChannelMode::HBRIDGE
+   * @see FullBridgeState, StatusConfig::channel_pair_mode_10, ChannelMode::HBRIDGE
    */
   DriverStatus SetFullBridgeState(uint8_t pair_index, FullBridgeState state);
 
@@ -429,12 +455,23 @@ public:
                                               FaultStatus &faults) const;
 
   /**
-   * @brief Read fault flags from STATUS register
+   * @brief Read fault flags from STATUS register (byte 0, bits 7:1)
+   *
+   * Convenience wrapper around ReadStatus() when only global fault flags
+   * (OVT, OCP, OLF, HHF, DPM, COMER, UVM) are needed.
+   *
+   * @param status Populated with STATUS fields; inspect hasFault() or individual flags
+   * @return DriverStatus::OK on success
    */
   DriverStatus ReadFaultFlags(StatusConfig &status) const;
 
   /**
-   * @brief Clear fault flags by reading STATUS register
+   * @brief Clear STATUS fault flags by reading the STATUS register
+   *
+   * Performs ReadStatus() and discards the result. Clears UVM per datasheet;
+   * per-channel faults require ReadFaultRegister() or ClearAllFaults().
+   *
+   * @return DriverStatus::OK on success
    */
   DriverStatus ClearFaultFlags();
 
@@ -531,22 +568,50 @@ public:
   // =========================================================================
 
   /**
-   * @brief Read a 32-bit register by bank address
+   * @brief Read a 32-bit register by bank address (debug/advanced)
+   *
+   * Two-phase SPI: Command Register (CMD HIGH, 8-bit) then 32-bit data (CMD LOW).
+   * Does not update cached_status_ when reading STATUS; prefer ReadStatus().
+   *
+   * @param bank  RegBank address (0x00–0x0A)
+   * @param value Received 32-bit register value
+   * @return DriverStatus::OK on success
    */
   DriverStatus ReadRegister32(uint8_t bank, uint32_t &value) const;
 
   /**
-   * @brief Write a 32-bit register by bank address
+   * @brief Write a 32-bit register by bank address (debug/advanced)
+   *
+   * Two-phase SPI write. Writing STATUS does not update cached_status_;
+   * prefer WriteStatus() for ONCH and ACTIVE updates.
+   *
+   * @param bank  RegBank address (0x00–0x0A)
+   * @param value 32-bit value to write (LSB-first on SDI per datasheet)
+   * @return DriverStatus::OK on success
    */
   DriverStatus WriteRegister32(uint8_t bank, uint32_t value);
 
   /**
    * @brief Read 8-bit MSB of a register (fast 8-bit mode)
+   *
+   * Two-phase SPI with Command Register bit 0 set (8bit/n32 = 1). Reads only
+   * the most significant byte (e.g. STATUS[31:24] ONCH, FAULT[31:24] OCP).
+   *
+   * @param bank  RegBank address (0x00–0x0A)
+   * @param value Received MSB byte
+   * @return DriverStatus::OK on success
    */
   DriverStatus ReadRegister8(uint8_t bank, uint8_t &value) const;
 
   /**
    * @brief Write 8-bit MSB of a register (fast 8-bit mode)
+   *
+   * Two-phase SPI with 8-bit mode. Writes only the MSB (e.g. ONCH byte or
+   * HOLD[6:0]|HFS for on-the-fly current updates).
+   *
+   * @param bank  RegBank address (0x00–0x0A)
+   * @param value MSB byte to write
+   * @return DriverStatus::OK on success
    */
   DriverStatus WriteRegister8(uint8_t bank, uint8_t value);
 
@@ -576,14 +641,46 @@ public:
   // Statistics
   // =========================================================================
 
+  /**
+   * @brief Get accumulated driver transfer statistics
+   *
+   * @return Copy of DriverStatistics. Currently total_transfers and
+   *         failed_transfers are updated by SPI operations; fault_events,
+   *         state_changes, and uptime_ms remain zero unless future driver
+   *         revisions populate them.
+   */
   DriverStatistics GetStatistics() const;
+
+  /**
+   * @brief Reset all statistics counters to zero
+   */
   void ResetStatistics();
 
   // =========================================================================
   // Callbacks
   // =========================================================================
 
+  /**
+   * @brief Register a fault event callback (stored for application use)
+   *
+   * @param callback  Function invoked by the application when a fault is detected
+   * @param user_data Opaque pointer passed to @p callback
+   *
+   * @note The driver stores the callback but does not invoke it automatically;
+   *       poll ReadFaultRegister() / ReadStatus() and call the callback from
+   *       application code when needed.
+   */
   void SetFaultCallback(FaultCallback callback, void *user_data);
+
+  /**
+   * @brief Register a channel state-change callback (stored for application use)
+   *
+   * @param callback  Function invoked when a channel state transition occurs
+   * @param user_data Opaque pointer passed to @p callback
+   *
+   * @note The driver stores the callback but does not invoke it automatically;
+   *       the driver does not track HIT/HOLD phase at runtime.
+   */
   void SetStateChangeCallback(StateChangeCallback callback, void *user_data);
 
   // =========================================================================
@@ -600,7 +697,7 @@ public:
    * @param config Board configuration (IFS in mA, optional max limits)
    *
    * @note Alternatively pass BoardConfig at construction:
-   *       MAX22200 driver(spi, BoardConfig(30.0f, false));
+   *       MAX22200<MySpi> driver(spi, BoardConfig(30.0f, false));
    */
   void SetBoardConfig(const BoardConfig &config);
 
@@ -826,6 +923,11 @@ public:
   // Validation
   // =========================================================================
 
+  /**
+   * @brief Check whether @p channel is a valid MAX22200 channel index
+   * @param channel Channel number to test
+   * @return true if channel is 0–7
+   */
   static bool IsValidChannel(uint8_t channel) { return channel < NUM_CHANNELS_; }
 
   // ===========================================================================
@@ -872,7 +974,7 @@ private:
    *
    * Performs Phase 1 of the MAX22200 SPI protocol:
    * 1. Set CMD pin HIGH (must be HIGH during entire transfer)
-  2. Transfer 1 byte (Command Register)
+   * 2. Transfer 1 byte (Command Register)
    * 3. Device responds with STATUS[7:0] on SDO (Fault Flag Byte)
    * 4. Store STATUS[7:0] in last_fault_byte_ for diagnostic purposes
    * 5. Set CMD pin LOW (ready for Phase 2)
@@ -899,12 +1001,16 @@ private:
                                     bool mode8 = false) const;
 
   /**
-   * @brief Write 32-bit data register (Phase 2, after Command Register)
+   * @brief Write 32-bit data register (Phase 2, CMD pin LOW)
+   *
+   * Must follow writeCommandRegister(). Transfers 4 bytes LSB-first on SDI.
    */
   DriverStatus writeData32(uint32_t value) const;
 
   /**
-   * @brief Read 32-bit data register (Phase 2, after Command Register)
+   * @brief Read 32-bit data register (Phase 2, CMD pin LOW)
+   *
+   * Must follow writeCommandRegister(). Receives 4 bytes MSB-first on SDO.
    */
   DriverStatus readData32(uint32_t &value) const;
 
@@ -915,41 +1021,45 @@ private:
   DriverStatus readData32WithTx(const uint8_t tx[4], uint32_t &value) const;
 
   /**
-   * @brief Write 8-bit data register (Phase 2, after Command Register)
+   * @brief Write 8-bit MSB data (Phase 2, CMD pin LOW, 8-bit mode)
    */
   DriverStatus writeData8(uint8_t value) const;
 
   /**
-   * @brief Read 8-bit data register (Phase 2, after Command Register)
+   * @brief Read 8-bit MSB data (Phase 2, CMD pin LOW, 8-bit mode)
    */
   DriverStatus readData8(uint8_t &value) const;
 
   // ── Convenience wrappers ───────────────────────────────────────────────
 
   /**
-   * @brief Full 32-bit register write (Command Register + data)
+   * @brief Full 32-bit register write (Phase 1 Command Register + Phase 2 data)
    */
   DriverStatus writeReg32(uint8_t bank, uint32_t value) const;
 
   /**
-   * @brief Full 32-bit register read (Command Register + data)
+   * @brief Full 32-bit register read (Phase 1 Command Register + Phase 2 data)
    */
   DriverStatus readReg32(uint8_t bank, uint32_t &value) const;
 
   /**
-   * @brief Full 8-bit MSB register write (Command Register + data)
+   * @brief Full 8-bit MSB register write (Phase 1 + Phase 2, 8-bit mode)
    */
   DriverStatus writeReg8(uint8_t bank, uint8_t value) const;
 
   /**
-   * @brief Full 8-bit MSB register read (Command Register + data)
+   * @brief Full 8-bit MSB register read (Phase 1 + Phase 2, 8-bit mode)
    */
   DriverStatus readReg8(uint8_t bank, uint8_t &value) const;
 
+  /** @brief Increment transfer counters after an SPI operation */
   void updateStatistics(bool success) const;
 };
 
-// Public API: Get driver version string
+/**
+ * @brief Get the compiled driver version string (namespace-level convenience)
+ * @return Null-terminated version string (same as MAX22200::GetDriverVersion())
+ */
 inline const char* GetDriverVersion() noexcept {
   return HF_MAX22200_VERSION_STRING;
 }

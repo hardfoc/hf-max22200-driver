@@ -121,10 +121,10 @@ Template parameter: `SpiType` — your SPI implementation (must inherit `max2220
 
 | Method | Description |
 |--------|-------------|
-| `GetStatistics()` | Return DriverStatistics (transfers, faults, uptime, etc.) |
+| `GetStatistics()` | Return DriverStatistics (total_transfers, failed_transfers updated; fault_events/state_changes/uptime_ms reserved) |
 | `ResetStatistics()` | Reset statistics |
-| `SetFaultCallback(FaultCallback, void *user_data)` | Fault event callback |
-| `SetStateChangeCallback(StateChangeCallback, void *user_data)` | State change callback |
+| `SetFaultCallback(FaultCallback, void *user_data)` | Store fault callback (not invoked automatically by driver) |
+| `SetStateChangeCallback(StateChangeCallback, void *user_data)` | Store state callback (not invoked automatically by driver) |
 
 ### Validation
 
@@ -159,15 +159,15 @@ Template parameter: `SpiType` — your SPI implementation (must inherit `max2220
 | `DpmConfig` | CFG_DPM: plunger_movement_start_current, plunger_movement_debounce_time, plunger_movement_current_threshold. Helpers: `getPlungerMovementStartCurrent()`, `getPlungerMovementDebounceTime()`, `getPlungerMovementCurrentThreshold()`. |
 | `BoardConfig` | full_scale_current_ma, max_current_ma, max_duty_percent. Constructor `BoardConfig(rref_kohm, half_full_scale)` for IFS from RREF. Helpers: `hasMaxCurrentLimit()`, `hasMaxDutyLimit()`, `hasIfsConfigured()`, `getFullScaleCurrentMa()`, `getMaxCurrentLimitMa()`, `getMaxDutyLimitPercent()`. |
 | `DutyLimits` | min_percent, max_percent. Helpers: `getMinPercent()`, `getMaxPercent()`, `inRange(percent)`, `clamp(percent)`. |
-| `DriverStatistics` | total_transfers, failed_transfers, fault_events, state_changes, uptime_ms. Helpers: `getSuccessRate()`, `hasFailures()`, `isHealthy()`, `getTotalTransfers()`, … |
+| `DriverStatistics` | total_transfers, failed_transfers (updated by driver); fault_events, state_changes, uptime_ms (reserved, currently 0). Helpers: `getSuccessRate()`, `hasFailures()`, `isHealthy()`, `getTotalTransfers()`, … |
 
 ### Type Aliases
 
 | Type | Definition |
 |------|------------|
 | `ChannelConfigArray` | `std::array<ChannelConfig, 8>` |
-| `FaultCallback` | `void (*)(uint8_t channel, FaultType fault_type, void *user_data)` |
-| `StateChangeCallback` | `void (*)(uint8_t channel, ChannelState old_state, ChannelState new_state, void *user_data)` |
+| `FaultCallback` | `void (*)(uint8_t channel, FaultType fault_type, void *user_data)` — stored by driver, invoke from application |
+| `StateChangeCallback` | `void (*)(uint8_t channel, ChannelState old_state, ChannelState new_state, void *user_data)` — stored by driver, invoke from application |
 
 ### Helper Functions
 

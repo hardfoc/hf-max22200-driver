@@ -27,19 +27,25 @@ Here's a complete working example:
 // 1. Implement the SPI interface
 class MySpi : public max22200::SpiInterface<MySpi> {
 public:
-    void transfer(const uint8_t* tx, uint8_t* rx, size_t len) {
-        // Your SPI transfer implementation
-        // Assert CS, transfer data, deassert CS
+    bool Transfer(const uint8_t* tx_data, uint8_t* rx_data, size_t length) {
+        // Assert CS, perform full-duplex SPI transfer, deassert CS
+        (void)tx_data; (void)rx_data; (void)length;
+        return true;
     }
+    // ... also implement Initialize, SetChipSelect, Configure, IsReady,
+    //     DelayUs, GpioSet, GpioRead (see platform_integration.md)
 };
 
 // 2. Create instances
 MySpi spi;
-max22200::MAX22200 driver(spi);
+max22200::MAX22200<MySpi> driver(spi);
 
-// 3. Initialize
+// 3. Set board config (IFS from RREF; required for CDR)
+driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
+
+// 4. Initialize
 if (driver.Initialize() == max22200::DriverStatus::OK) {
-    // 4. Configure channel 0 (CDR, low-side; user units: mA and ms)
+    // 5. Configure channel 0 (CDR, low-side; user units: mA and ms)
     max22200::ChannelConfig config;
     config.drive_mode = max22200::DriveMode::CDR;
     config.side_mode = max22200::SideMode::LOW_SIDE;
@@ -72,11 +78,14 @@ You need to implement the `SpiInterface` for your platform. See [Platform Integr
 ```cpp
 class MySpi : public max22200::SpiInterface<MySpi> {
 public:
-    void transfer(const uint8_t* tx, uint8_t* rx, size_t len) {
+    bool Transfer(const uint8_t* tx_data, uint8_t* rx_data, size_t length) {
         // Assert chip select
         // Perform SPI transfer
         // Deassert chip select
+        (void)tx_data; (void)rx_data; (void)length;
+        return true;
     }
+    // ... implement remaining SpiInterface methods
 };
 ```
 
@@ -84,7 +93,8 @@ public:
 
 ```cpp
 MySpi spi;
-max22200::MAX22200 driver(spi);
+max22200::MAX22200<MySpi> driver(spi);
+driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));  // IFS from RREF (CDR)
 ```
 
 The constructor takes a reference to your SPI interface implementation.
@@ -139,7 +149,8 @@ class MySpi : public max22200::SpiInterface<MySpi> {
 
 void app_main() {
     MySpi spi;
-    max22200::MAX22200 driver(spi);
+    max22200::MAX22200<MySpi> driver(spi);
+    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
     
     // Initialize
     max22200::DriverStatus status = driver.Initialize();
@@ -186,7 +197,7 @@ Channel 0 hit current: 500 mA
 
 If you encounter issues:
 
-- **Compilation errors**: Check that you've implemented the `transfer()` method in your SPI interface
+- **Compilation errors**: Check that you've implemented all `SpiInterface` methods, especially `Transfer()`
 - **Initialization fails**: Verify SPI connections and hardware setup
 - **Channel not working**: Check channel configuration and enable state
 - **See**: [Troubleshooting](troubleshooting.md) for common issues

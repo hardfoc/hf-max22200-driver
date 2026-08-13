@@ -268,8 +268,18 @@ If the chip still misbehaves after a clean POR, the chip itself may be damaged â
 
 ### Enable Diagnostics
 
+Use `GetStatistics()` to inspect SPI transfer success/failure counts, and
+`GetLastFaultByte()` after register access to check for COMER (0x04):
+
 ```cpp
-max22200::MAX22200 driver(spi, true);  // Enable diagnostics
+max22200::DriverStatistics stats = driver.GetStatistics();
+printf("Transfers: %u failed / %u total\n",
+       stats.getFailedTransfers(), stats.getTotalTransfers());
+
+uint8_t fault_byte = driver.GetLastFaultByte();
+if (fault_byte == max22200::StatusReg::FAULT_BYTE_COMER) {
+    printf("Communication error on last SPI command phase\n");
+}
 ```
 
 ### Check Fault Status

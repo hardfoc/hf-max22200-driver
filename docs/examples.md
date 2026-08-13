@@ -21,7 +21,8 @@ CDR mode, low-side, with hit/hold current and HIT time.
 void app_main() {
     // SPI setup (implement SpiInterface for your platform)
     MySpi spi;
-    max22200::MAX22200 driver(spi);
+    max22200::MAX22200<MySpi> driver(spi);
+    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
 
     if (driver.Initialize() != max22200::DriverStatus::OK) {
         printf("Initialization failed\n");
@@ -54,7 +55,8 @@ Use channel-pair mode HBRIDGE and set full-bridge state.
 
 void app_main() {
     MySpi spi;
-    max22200::MAX22200 driver(spi);
+    max22200::MAX22200<MySpi> driver(spi);
+    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
     driver.Initialize();
 
     // Set pair 0 (ch0–ch1) to H-bridge; both channels must be off first
@@ -94,7 +96,8 @@ void fault_handler(uint8_t channel, max22200::FaultType fault_type, void *user_d
 
 void app_main() {
     MySpi spi;
-    max22200::MAX22200 driver(spi);
+    max22200::MAX22200<MySpi> driver(spi);
+    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
     driver.Initialize();
     driver.SetFaultCallback(fault_handler);
 
@@ -135,7 +138,8 @@ Use `ReadStatus()` for channel on/off and `ReadFaultRegister()` for per-channel 
 
 void app_main() {
     MySpi spi;
-    max22200::MAX22200 driver(spi);
+    max22200::MAX22200<MySpi> driver(spi);
+    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
     driver.Initialize();
 
     for (uint8_t ch = 0; ch < 8; ch++) {
@@ -180,7 +184,8 @@ Set IFS via `BoardConfig`, then use mA and ms APIs.
 
 void app_main() {
     MySpi spi;
-    max22200::MAX22200 driver(spi);
+    max22200::MAX22200<MySpi> driver(spi);
+    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
     driver.Initialize();
 
     max22200::BoardConfig board(30.0f, false);
