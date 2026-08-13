@@ -113,13 +113,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:af2aa80b98d6dc7ca8ecefcfaad96791c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor.  <br /></td></tr>
 <tr class="separator:af2aa80b98d6dc7ca8ecefcfaad96791c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1bf45c2bc6a9687214bcd8a1039fc6e" id="r_ae1bf45c2bc6a9687214bcd8a1039fc6e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae1bf45c2bc6a9687214bcd8a1039fc6e">toRegister</a> () <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
-<tr class="memdesc:ae1bf45c2bc6a9687214bcd8a1039fc6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build 32-bit register value from writable fields.  <br /></td></tr>
+<tr class="memdesc:ae1bf45c2bc6a9687214bcd8a1039fc6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build 32-bit STATUS register value from writable fields.  <br /></td></tr>
 <tr class="separator:ae1bf45c2bc6a9687214bcd8a1039fc6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a242a79a620c8af84b2eb9e1f6cfc1cac" id="r_a242a79a620c8af84b2eb9e1f6cfc1cac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a242a79a620c8af84b2eb9e1f6cfc1cac">fromRegister</a> (<a class="el" href="classmax22200_1_1MAX22200.html">uint32_t</a> <a class="el" href="classmax22200_1_1MAX22200.html">val</a>)</td></tr>
-<tr class="memdesc:a242a79a620c8af84b2eb9e1f6cfc1cac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse a 32-bit register value.  <br /></td></tr>
+<tr class="memdesc:a242a79a620c8af84b2eb9e1f6cfc1cac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse a 32-bit STATUS register value into this structure.  <br /></td></tr>
 <tr class="separator:a242a79a620c8af84b2eb9e1f6cfc1cac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af464b4d02581823da9d62241a59670df" id="r_af464b4d02581823da9d62241a59670df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af464b4d02581823da9d62241a59670df">hasFault</a> () <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
-<tr class="memdesc:af464b4d02581823da9d62241a59670df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if any fault flag is active.  <br /></td></tr>
+<tr class="memdesc:af464b4d02581823da9d62241a59670df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if any global fault flag in byte 0 is active.  <br /></td></tr>
 <tr class="separator:af464b4d02581823da9d62241a59670df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5db0a14316d7c56d25f3f19c5cc34aa9" id="r_a5db0a14316d7c56d25f3f19c5cc34aa9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5db0a14316d7c56d25f3f19c5cc34aa9">hasOvertemperature</a> () <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
 <tr class="separator:a5db0a14316d7c56d25f3f19c5cc34aa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -345,7 +345,13 @@ Reading STATUS register clears UVM flag and deasserts nFAULT pin. </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>Parse a 32-bit register value. </p>
+<p>Parse a 32-bit STATUS register value into this structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>Raw 32-bit value read from the device </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2hf-max22200-driver_2hf-max22200-driver_2inc_2max22200_types_8hpp-example.html#a116">/home/runner/work/hf-max22200-driver/hf-max22200-driver/inc/max22200_types.hpp</a>.</dd>
 </dl>
 
@@ -536,7 +542,8 @@ Reading STATUS register clears UVM flag and deasserts nFAULT pin. </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>Check if any fault flag is active. </p>
+<p>Check if any global fault flag in byte 0 is active. </p>
+<dl class="section return"><dt>Returns</dt><dd>true if any of OVT, OCP, OLF, HHF, DPM, COMER, or UVM is set </dd></dl>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2hf-max22200-driver_2hf-max22200-driver_2inc_2max22200_types_8hpp-example.html#a124">/home/runner/work/hf-max22200-driver/hf-max22200-driver/inc/max22200_types.hpp</a>.</dd>
 </dl>
 
@@ -1024,7 +1031,8 @@ Reading STATUS register clears UVM flag and deasserts nFAULT pin. </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>Build 32-bit register value from writable fields. </p>
+<p>Build 32-bit STATUS register value from writable fields. </p>
+<p>Encodes ONCH, fault masks, CMxy, FREQM, and ACTIVE. Fault flag bits are read-only on the device and are not included in the output. </p>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2hf-max22200-driver_2hf-max22200-driver_2inc_2max22200_types_8hpp-example.html#a101">/home/runner/work/hf-max22200-driver/hf-max22200-driver/inc/max22200_types.hpp</a>.</dd>
 </dl>
 

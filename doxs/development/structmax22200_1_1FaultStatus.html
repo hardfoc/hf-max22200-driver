@@ -112,6 +112,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3f020a7c3fa1b5bbba61ca7b82b6e6ca" id="r_a3f020a7c3fa1b5bbba61ca7b82b6e6ca"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f020a7c3fa1b5bbba61ca7b82b6e6ca">FaultStatus</a> ()</td></tr>
 <tr class="separator:a3f020a7c3fa1b5bbba61ca7b82b6e6ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8a82d49471b487e1ef6937316fd2302" id="r_aa8a82d49471b487e1ef6937316fd2302"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa8a82d49471b487e1ef6937316fd2302">fromRegister</a> (<a class="el" href="classmax22200_1_1MAX22200.html">uint32_t</a> <a class="el" href="classmax22200_1_1MAX22200.html">val</a>)</td></tr>
+<tr class="memdesc:aa8a82d49471b487e1ef6937316fd2302"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse a 32-bit FAULT register value into per-channel bitmasks.  <br /></td></tr>
 <tr class="separator:aa8a82d49471b487e1ef6937316fd2302"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96bc66c963cabef81e2974c38d521b13" id="r_a96bc66c963cabef81e2974c38d521b13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmax22200_1_1MAX22200.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96bc66c963cabef81e2974c38d521b13">hasFault</a> () <a class="el" href="classmax22200_1_1MAX22200.html">const</a></td></tr>
 <tr class="memdesc:a96bc66c963cabef81e2974c38d521b13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if any per-channel fault is active.  <br /></td></tr>
@@ -257,6 +258,14 @@ Reading the FAULT register also deasserts the nFAULT pin (if no other faults are
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Parse a 32-bit FAULT register value into per-channel bitmasks. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>Raw 32-bit value read from <a class="el" href="namespacemax22200_1_1RegBank.html#a460a7fd3711f8af8457e3dfca00700f8" title="Fault register (32-bit, read-only) — per-channel fault flags.">RegBank::FAULT</a> </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2hf-max22200-driver_2hf-max22200-driver_2inc_2max22200_types_8hpp-example.html#a154">/home/runner/work/hf-max22200-driver/hf-max22200-driver/inc/max22200_types.hpp</a>.</dd>
 </dl>
 

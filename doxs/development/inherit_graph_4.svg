@@ -11,7 +11,7 @@
 <!-- Node0 -->
 <g id="Node000000" class="node">
 <title>Node0</title>
-<g id="a_Node000000"><a xlink:href="structmax22200_1_1DriverStatistics.html" target="_top" xlink:title="Driver statistics structure.">
+<g id="a_Node000000"><a xlink:href="structmax22200_1_1DriverStatistics.html" target="_top" xlink:title="Driver runtime statistics.">
 <polygon fill="white" stroke="#666666" points="149,-19 0,-19 0,0 149,0 149,-19"/>
 <text text-anchor="middle" x="74.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">max22200::DriverStatistics</text>
 </a>
