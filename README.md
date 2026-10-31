@@ -12,15 +12,15 @@ This branch contains the versioned documentation for this repository.
 
 ## Access
 
-- **Latest**: [https://N3b3x.github.io/hf-max22200-driver/](https://N3b3x.github.io/hf-max22200-driver/)
-- **All Versions**: [https://N3b3x.github.io/hf-max22200-driver/version_selector.html](https://N3b3x.github.io/hf-max22200-driver/version_selector.html)
+- **Latest**: [https://hardfoc.github.io/hf-max22200-driver/](https://hardfoc.github.io/hf-max22200-driver/)
+- **All Versions**: [https://hardfoc.github.io/hf-max22200-driver/version_selector.html](https://hardfoc.github.io/hf-max22200-driver/version_selector.html)
 
 ## Current Version
 
 - **Version**: development
 - **Type**: development
-- **Deployed**: 2026-08-30T19:25:39Z
-- **Commit**: 1a40a88297d4bcca5720ab84918e34dd77370db2
+- **Deployed**: 2026-10-31T08:18:09Z
+- **Commit**: 643933ab04a1396eb2d89b8616825fbf2a6a0a9e
 
 ---
 
