@@ -211,7 +211,7 @@ seo:
   name: "HardFOC MAX22200 Driver"
   description: >
     Comprehensive C++20 driver library for the MAX22200 octal solenoid and motor driver IC with hardware abstraction
-  url: "https://n3b3x.github.io/hf-max22200-driver"
+  url: "https://hardfoc.github.io/hf-max22200-driver"
   twitter:
     card: "summary_large_image"
     site: "@n3b3x"

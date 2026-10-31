@@ -60,7 +60,7 @@ exclude = [
   '^https?://img\.shields\.io/badge/License-.*',
   
   # GitHub Actions badge URLs (may not exist yet)
-  '^https://github\.com/N3b3x/hf-max22200-driver/actions/workflows/.*',
+  '^https://github\.com/hardfoc/hf-max22200-driver/actions/workflows/.*',
   
   # Documentation site URLs (may not be published yet)
   '^https://n3b3x\.github\.io/hf-max22200-driver/.*',
