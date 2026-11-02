@@ -188,3 +188,138 @@ TEST_CASE("Deinitialize clears ACTIVE and releases ENABLE") {
   CHECK_EQ(chip.regs[kStatus] & 0x01u, 0u);
   CHECK_EQ(chip.regs[kStatus] >> 24, 0u);
 }
+
+TEST_CASE("VDR duty is written as percent per Table 3 (40 % -> HIT[6:0] = 40)") {
+  MockMax22200 chip;
+  Driver driver(chip, board1A());
+  REQUIRE(driver.Initialize() == DriverStatus::OK);
+  const auto cfg = max22200::ChannelConfig::makeSolenoidVdr(40.0f, 25.0f, 0.0f);
+  REQUIRE(driver.ConfigureChannel(0, cfg) == DriverStatus::OK);
+  CHECK_EQ((chip.regs[1] >> 16) & 0x7Fu, 40u);      // HIT[6:0]
+  CHECK_EQ((chip.regs[1] >> 24) & 0x7Fu, 25u);      // HOLD[6:0]
+  CHECK_EQ((chip.regs[1] >> 7) & 1u, 1u);           // VDRnCDR
+
+  max22200::ChannelConfig back;
+  REQUIRE(driver.GetChannelConfig(0, back) == DriverStatus::OK);
+  CHECK(back.isVdr());
+  CHECK(back.hit_duty_percent() > 39.9f && back.hit_duty_percent() < 40.1f);
+  CHECK(back.hold_duty_percent() > 24.9f && back.hold_duty_percent() < 25.1f);
+
+  // 100 % and above is full duty; a raw value of 100..127 reads back as 100 %.
+  chip.regs[1] = (chip.regs[1] & ~(0x7Fu << 16)) | (110u << 16);
+  REQUIRE(driver.GetChannelConfig(0, back) == DriverStatus::OK);
+  CHECK(back.hit_duty_percent() > 99.9f && back.hit_duty_percent() < 100.1f);
+}
+
+TEST_CASE("Current setters do not switch a VDR channel to CDR, duty setters not CDR to VDR") {
+  MockMax22200 chip;
+  Driver driver(chip, board1A());
+  REQUIRE(driver.Initialize() == DriverStatus::OK);
+
+  REQUIRE(driver.ConfigureChannelVdr(0, 60.0f, 30.0f, 0.0f) == DriverStatus::OK);
+  const uint32_t vdr_reg = chip.regs[1];
+  CHECK(driver.SetHoldCurrentMa(0, 200) == DriverStatus::INVALID_PARAMETER);
+  CHECK(driver.SetHitCurrentMa(0, 200) == DriverStatus::INVALID_PARAMETER);
+  CHECK(driver.SetHitCurrentA(0, 0.2f) == DriverStatus::INVALID_PARAMETER);
+  CHECK(driver.SetHoldCurrentPercent(0, 20.0f) == DriverStatus::INVALID_PARAMETER);
+  CHECK_EQ(chip.regs[1], vdr_reg);                  // VDRnCDR and both duties untouched
+  REQUIRE(driver.SetHoldDutyPercent(0, 25.0f) == DriverStatus::OK);
+  CHECK_EQ((chip.regs[1] >> 7) & 1u, 1u);
+  CHECK_EQ((chip.regs[1] >> 24) & 0x7Fu, 25u);
+
+  REQUIRE(driver.ConfigureChannelCdr(1, 500, 200, 10.0f) == DriverStatus::OK);
+  const uint32_t cdr_reg = chip.regs[2];
+  CHECK(driver.SetHitDutyPercent(1, 50.0f) == DriverStatus::INVALID_PARAMETER);
+  CHECK(driver.SetHoldDutyPercent(1, 50.0f) == DriverStatus::INVALID_PARAMETER);
+  CHECK_EQ(chip.regs[2], cdr_reg);
+  REQUIRE(driver.SetHoldCurrentMa(1, 100) == DriverStatus::OK);
+  CHECK_EQ((chip.regs[2] >> 7) & 1u, 0u);
+}
+
+TEST_CASE("Initialize waits tWU = 2.5 ms after ACTIVE = 1 before it returns") {
+  MockMax22200 chip;
+  Driver driver(chip, board1A());
+  REQUIRE(driver.Initialize() == DriverStatus::OK);
+  REQUIRE(chip.commands.size() == 3u);
+  CHECK(chip.command_delay_us[0] >= 500u);                          // tEN before the first access
+  CHECK(chip.command_delay_us[2] - chip.command_delay_us[1] >= 2500u);   // tWU after the ACTIVE write
+  CHECK(chip.delay_us_total >= 3000u);
+}
+
+TEST_CASE("ConfigureDpm converts the debounce with the fCHOP of the DPM channels") {
+  MockMax22200 chip;
+  Driver driver(chip, board1A());
+  REQUIRE(driver.Initialize() == DriverStatus::OK);
+  // Channel 0 at FREQ_CFG = 11 (100 kHz with FREQM = 0), DPM on.
+  REQUIRE(driver.ConfigureChannelCdr(0, 500, 200, 10.0f, max22200::SideMode::LOW_SIDE,
+                                     max22200::ChopFreq::FMAIN, false, false, true) == DriverStatus::OK);
+  REQUIRE(driver.ConfigureDpm(300.0f, 50.0f, 0.1f) == DriverStatus::OK);
+  // TDEB = DPM_TDEB / fCHOP: 0.1 ms * 100 kHz = 10 periods (not 0.1 ms * 25 kHz = 3).
+  CHECK_EQ((chip.regs[kCfgDpm] >> 4) & 0x0Fu, 10u);
+
+  // Explicit frequency: 0.3 ms at FMAIN_DIV3 (33.33 kHz) = 10 periods.
+  REQUIRE(driver.ConfigureDpm(300.0f, 50.0f, 0.3f, max22200::ChopFreq::FMAIN_DIV3) == DriverStatus::OK);
+  CHECK_EQ((chip.regs[kCfgDpm] >> 4) & 0x0Fu, 10u);
+
+  // DPM channels at different frequencies: one TDEB code cannot fit both, so ask for the explicit form.
+  REQUIRE(driver.ConfigureChannelCdr(1, 500, 200, 10.0f, max22200::SideMode::LOW_SIDE,
+                                     max22200::ChopFreq::FMAIN_DIV2, false, false, true) == DriverStatus::OK);
+  const uint32_t before = chip.regs[kCfgDpm];
+  CHECK(driver.ConfigureDpm(300.0f, 50.0f, 0.1f) == DriverStatus::INVALID_PARAMETER);
+  CHECK_EQ(chip.regs[kCfgDpm], before);
+}
+
+namespace {
+struct FaultEvent {
+  uint8_t channel;
+  max22200::FaultType type;
+};
+std::vector<FaultEvent> g_fault_events;
+void recordFault(uint8_t channel, max22200::FaultType type, void* user_data) {
+  CHECK(user_data == &g_fault_events);
+  g_fault_events.push_back({channel, type});
+}
+bool hasEvent(uint8_t channel, max22200::FaultType type) {
+  for (const auto& e : g_fault_events) {
+    if (e.channel == channel && e.type == type) return true;
+  }
+  return false;
+}
+} // namespace
+
+TEST_CASE("Fault callback fires for every FAULT bit and STATUS OVT / UVM read by the driver") {
+  MockMax22200 chip;
+  Driver driver(chip, board1A());
+  g_fault_events.clear();
+  driver.SetFaultCallback(&recordFault, &g_fault_events);
+  REQUIRE(driver.Initialize() == DriverStatus::OK);
+  CHECK(g_fault_events.empty());                    // the power-up UVM read by Initialize() is expected
+
+  chip.regs[kFault] = (1u << 28) | (1u << 17) | (1u << 9) | (1u << 3);   // OCP4, HHF1, OLF1, DPM3
+  max22200::FaultStatus faults;
+  REQUIRE(driver.ReadFaultRegister(faults) == DriverStatus::OK);
+  CHECK_EQ(g_fault_events.size(), 4u);
+  CHECK(hasEvent(4, max22200::FaultType::OCP));
+  CHECK(hasEvent(1, max22200::FaultType::HHF));
+  CHECK(hasEvent(1, max22200::FaultType::OLF));
+  CHECK(hasEvent(3, max22200::FaultType::DPM));
+
+  g_fault_events.clear();
+  chip.regs[kFault] = 1u << 5;                      // DPM on channel 5, read via the selective clear
+  REQUIRE(driver.ClearChannelFaults(0xFF) == DriverStatus::OK);
+  CHECK_EQ(g_fault_events.size(), 1u);
+  CHECK(hasEvent(5, max22200::FaultType::DPM));
+
+  g_fault_events.clear();
+  chip.regs[kStatus] |= 0x80u | 0x02u;              // OVT and UVM
+  max22200::StatusConfig status;
+  REQUIRE(driver.ReadStatus(status) == DriverStatus::OK);
+  CHECK(hasEvent(0xFF, max22200::FaultType::OVT));
+  CHECK(hasEvent(0xFF, max22200::FaultType::UVM));
+
+  g_fault_events.clear();
+  driver.SetFaultCallback(nullptr, nullptr);
+  chip.regs[kFault] = 1u << 24;
+  REQUIRE(driver.ReadFaultRegister(faults) == DriverStatus::OK);
+  CHECK(g_fault_events.empty());
+}

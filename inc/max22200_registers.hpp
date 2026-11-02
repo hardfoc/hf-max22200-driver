@@ -77,6 +77,21 @@ constexpr uint32_t MAX_SPI_FREQ_STANDALONE_ = 10000000; // 10 MHz
  */
 constexpr uint32_t MAX_SPI_FREQ_DAISY_CHAIN_ = 5000000; // 5 MHz
 
+/**
+ * @brief Enable time tEN: ENABLE rising edge to SPI ready (us)
+ *
+ * Datasheet Electrical Characteristics: tEN = 0.5 ms maximum.
+ */
+constexpr uint32_t ENABLE_TIME_US_ = 500;
+
+/**
+ * @brief Wake-up time tWU: ACTIVE = 1 to normal operation, outputs active (us)
+ *
+ * Datasheet Electrical Characteristics: tWU = 2.5 ms maximum. Initialize() waits this long
+ * after it writes ACTIVE = 1.
+ */
+constexpr uint32_t WAKE_UP_TIME_US_ = 2500;
+
 // ============================================================================
 // Register Bank Addresses (A_BNK field in Command Register, bits [4:1])
 // ============================================================================

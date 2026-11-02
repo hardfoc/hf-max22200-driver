@@ -40,11 +40,12 @@ value was rejected or the transfer failed ([Architecture](architecture.md#errors
 `Initialize()` follows the datasheet's programming flow (Figure 6): it calls your port's `Initialize()` and
 `Configure(10 MHz, mode 0, MSB first)`, raises ENABLE, waits 0.5 ms, reads STATUS to clear the power-up UVM flag,
 writes STATUS with ACTIVE = 1, every channel off and COMER masked (other masks and pair modes as read: their reset
-values after power-up), then reads STATUS again. A COMER reply restarts the sequence, up to three times.
+values after power-up), waits 2.5 ms (t<sub>WU</sub>, ACTIVE = 1 to outputs active), then reads STATUS again. A
+COMER reply restarts the sequence, up to three times.
 
 Set the board's full-scale current before you configure a CDR channel. `BoardConfig()` without arguments assumes
-1000 mA (RREF = 15 kΩ); a wrong IFS scales every current by the same error. The outputs need 2.5 ms (t<sub>WU</sub>)
-after `Initialize()` before they switch.
+1000 mA (RREF = 15 kΩ); a wrong IFS scales every current by the same error. Because `Initialize()` waits
+t<sub>WU</sub>, the outputs switch as soon as it returns; it takes at least 3 ms.
 
 `Deinitialize()`, also called by the destructor, turns every channel off, clears ACTIVE and lowers ENABLE.
 
@@ -70,10 +71,6 @@ presets `makeSolenoidCdr(hit_ma, hold_ma, hit_ms)` and `makeSolenoidVdr(hit_pct,
 channel at `FMAIN_DIV4`; `ConfigureChannelCdr()` and `ConfigureChannelVdr()` do the same in one call with the other
 fields as arguments.
 
-!!! warning "VDR percentages"
-    The driver scales VDR duty by 127 / 100 before writing it, but the chip reads the field as percent: 40 %
-    runs at 51 %. [Drive modes](drive-modes.md#voltage-drive-vdr) explains it and the workaround.
-
 ## Switch channels
 
 ```cpp
@@ -92,9 +89,10 @@ TRIG pin instead of ONCH.
 
 Each `Set...()` call reads CFG_CHx, changes one field and writes all 32 bits back. HOLD current, chopping frequency
 and SRC can change while the channel is on; drive mode and side cannot. The `...A()` variants take amperes, the
-`...CurrentPercent()` variants a fraction of IFS. The current setters also set the channel to CDR and the duty
-setters to VDR: use each only on a channel already in that mode, or the other setpoint is reinterpreted in the
-wrong unit.
+`...CurrentPercent()` variants a fraction of IFS. The setters never change the drive mode: the current setters
+work on a CDR channel and the duty setters on a VDR channel, and on a channel in the other mode they return
+`INVALID_PARAMETER` without writing anything. Select the mode with `ConfigureChannel()`,
+`ConfigureChannelCdr()` or `ConfigureChannelVdr()`.
 
 ## Run a full bridge
 
@@ -130,9 +128,18 @@ outputs and the odd channel's is ignored; switch both channels on together.
 | FAULT pin low | Any unmasked fault above | Read STATUS and FAULT |
 
 STATUS bits OCP, OLF, HHF and DPM summarise FAULT; reading STATUS does not clear them. Mask a fault from the FAULT
-pin with the `..._masked` fields of `StatusConfig` and `WriteStatus()`. The fault and state callbacks
-(`SetFaultCallback()`, `SetStateChangeCallback()`) are stored but never called by the driver; call them from your
-own polling code if you use them.
+pin with the `..._masked` fields of `StatusConfig` and `WriteStatus()`.
+
+```cpp
+--8<-- "tests/docs/api_tasks.cpp:fault-callback"
+```
+
+`SetFaultCallback(fn, user_data)` registers a callback the driver calls for every fault it reads: once per set
+bit of a FAULT read (`ReadFaultRegister()`, `ReadFaultRegisterSelectiveClear()`, `ClearChannelFaults()`,
+`ClearAllFaults()`) with the channel and `OCP`, `HHF`, `OLF` or `DPM`, and for OVT, UVM and COMER of a STATUS read
+after `Initialize()` with channel `0xFF`. The driver does not poll: read FAULT when the FAULT pin goes low. The
+callback runs in the caller's context, so keep it short. `SetStateChangeCallback()` is stored but not called by the
+driver.
 
 ## Detect plunger movement
 
@@ -143,8 +150,11 @@ own polling code if you use them.
 DPM looks for the dip a moving plunger causes in the HIT current. The search starts above the start current and
 ends at the HIT level or the end of the HIT time; a dip counts when it is deeper than the threshold and longer
 than the debounce time. The settings are global; DPM_EN is per channel and low-side only. The datasheet asks for a
-current slope below 700 mA/ms above the start current. `ConfigureDpm()` converts the debounce with the
-`FMAIN_DIV4` frequency whatever the channels use; use `WriteDpmConfig()` for other frequencies.
+current slope below 700 mA/ms above the start current. The debounce is a count of chopping periods
+(DPM_TDEB / f<sub>CHOP</sub>), and f<sub>CHOP</sub> is per channel: `ConfigureDpm(start, threshold, debounce)` converts
+it with the `chop_freq` of the channels that have DPM enabled, so enable DPM first. With no DPM channel it uses
+`FMAIN_DIV4`; DPM channels at different frequencies return `INVALID_PARAMETER`. Pass the frequency as a fourth
+argument to choose it yourself.
 
 ## Use a register directly
 

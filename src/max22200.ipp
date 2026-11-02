@@ -61,9 +61,9 @@ DriverStatus MAX22200<SpiType>::Initialize() {
     return DriverStatus::INITIALIZATION_ERROR;
   }
 
-  // Step 1: ENABLE pin HIGH, power-up delay
+  // Step 1: ENABLE pin HIGH, then tEN (0.5 ms, ENABLE rising edge to SPI ready) before the first access
   spi_interface_.GpioSetActive(CtrlPin::ENABLE);
-  spi_interface_.DelayUs(500); // 0.5ms power-up delay
+  spi_interface_.DelayUs(ENABLE_TIME_US_);
 
   constexpr int kMaxInitRetries = 3;
   StatusConfig status;
@@ -99,6 +99,10 @@ DriverStatus MAX22200<SpiType>::Initialize() {
 
     // Cache the status for ONCH updates
     cached_status_ = status;
+
+    // Wake-up: tWU (2.5 ms) from ACTIVE = 1 to normal operation, the "wake-up completed?" step of
+    // Figure 6. Without it a channel switched on right after Initialize() would not drive its output.
+    spi_interface_.DelayUs(WAKE_UP_TIME_US_);
 
     // Step 4: Read STATUS again to verify UVM is cleared
     result = ReadStatus(status);
@@ -166,6 +170,10 @@ DriverStatus MAX22200<SpiType>::ReadStatus(StatusConfig &status) const {
   if (result == DriverStatus::OK) {
     status.fromRegister(raw);
     cached_status_ = status;  // Keep cache in sync for FREQM, ONCH, duty limits, etc.
+    // UVM is set at every power-up and Initialize() reads it to clear it: report only afterwards.
+    if (initialized_) {
+      notifyStatusFaults(status);
+    }
   }
   return result;
 }
@@ -348,6 +356,7 @@ DriverStatus MAX22200<SpiType>::ReadFaultRegister(FaultStatus &faults) const {
   DriverStatus result = readReg32(RegBank::FAULT, raw);
   if (result == DriverStatus::OK) {
     faults.fromRegister(raw);
+    notifyFaults(faults);
   }
   updateStatistics(result == DriverStatus::OK);
   return result;
@@ -385,6 +394,7 @@ DriverStatus MAX22200<SpiType>::ReadFaultRegisterSelectiveClear(
   result = readData32WithTx(tx, raw);
   if (result == DriverStatus::OK) {
     faults.fromRegister(raw);
+    notifyFaults(faults);
   }
   updateStatistics(result == DriverStatus::OK);
   return result;
@@ -448,7 +458,40 @@ template <typename SpiType>
 DriverStatus MAX22200<SpiType>::ConfigureDpm(float start_current_ma,
                                               float dip_threshold_ma,
                                               float debounce_ms) {
-  if (board_config_.full_scale_current_ma == 0) {
+  // DPM_TDEB counts chopping periods of the channel being monitored (CFG_DPM, TDEB = DPM_TDEB / fCHOP),
+  // and fCHOP is per channel (FREQ_CFG). Use the frequency of the channels that have DPM_EN set; with
+  // none set, use the reset value FREQ_CFG = 00 (FMAIN_DIV4).
+  bool found = false;
+  ChopFreq chop_freq = ChopFreq::FMAIN_DIV4;
+  for (uint8_t ch = 0; ch < NUM_CHANNELS_; ++ch) {
+    uint32_t raw = 0;
+    DriverStatus result = readReg32(getChannelCfgBank(ch), raw);
+    if (result != DriverStatus::OK) {
+      updateStatistics(false);
+      return result;
+    }
+    if ((raw & CfgChReg::DPM_EN_BIT) == 0) {
+      continue;
+    }
+    const auto cf = static_cast<ChopFreq>((raw >> CfgChReg::FREQ_CFG_SHIFT) & 0x03u);
+    if (found && cf != chop_freq) {
+      // One TDEB code cannot give the same time at two frequencies: use the explicit overload.
+      updateStatistics(false);
+      return DriverStatus::INVALID_PARAMETER;
+    }
+    chop_freq = cf;
+    found = true;
+  }
+  return ConfigureDpm(start_current_ma, dip_threshold_ma, debounce_ms, chop_freq);
+}
+
+template <typename SpiType>
+DriverStatus MAX22200<SpiType>::ConfigureDpm(float start_current_ma,
+                                              float dip_threshold_ma,
+                                              float debounce_ms,
+                                              ChopFreq chop_freq) {
+  if (board_config_.full_scale_current_ma == 0 || !(debounce_ms >= 0.0f) ||
+      !(start_current_ma >= 0.0f) || !(dip_threshold_ma >= 0.0f)) {
     updateStatistics(false);
     return DriverStatus::INVALID_PARAMETER;
   }
@@ -459,15 +502,15 @@ DriverStatus MAX22200<SpiType>::ConfigureDpm(float start_current_ma,
   }
   // ISTART = plunger_movement_start_current × (IFS/127)  =>  value = round(start_ma / IFS_ma * 127)
   float ratio = start_current_ma / static_cast<float>(board_config_.full_scale_current_ma);
-  config.plunger_movement_start_current = static_cast<uint8_t>(ratio * 127.0f + 0.5f);
-  if (config.plunger_movement_start_current > 127) config.plunger_movement_start_current = 127;
+  uint32_t istart = static_cast<uint32_t>(ratio * 127.0f + 0.5f);
+  config.plunger_movement_start_current = (istart > 127) ? 127 : static_cast<uint8_t>(istart);
   ratio = dip_threshold_ma / static_cast<float>(board_config_.full_scale_current_ma);
   uint32_t ipth = static_cast<uint32_t>(ratio * 127.0f + 0.5f);
   config.plunger_movement_current_threshold = (ipth > 15) ? 15 : static_cast<uint8_t>(ipth);
-  // TDEB = plunger_movement_debounce_time / fCHOP; use actual fCHOP from cached STATUS (FREQM + FMAIN_DIV4)
-  uint32_t fchop_khz = getChopFreqKhz(cached_status_.master_clock_80khz, ChopFreq::FMAIN_DIV4);
-  float periods_f = debounce_ms * static_cast<float>(fchop_khz) + 0.5f;
-  uint32_t periods = static_cast<uint32_t>(periods_f);
+  // TDEB = DPM_TDEB / fCHOP  =>  DPM_TDEB = round(TDEB × fCHOP), with fCHOP = fMAIN / divider
+  // (fMAIN = 100 kHz, or 80 kHz with FREQM = 1; divider 4, 3, 2, 1 for FREQ_CFG 00..11, Table 1).
+  const float fchop_khz = getChopFreqKhzExact(cached_status_.master_clock_80khz, chop_freq);
+  const uint32_t periods = static_cast<uint32_t>(debounce_ms * fchop_khz + 0.5f);
   config.plunger_movement_debounce_time = (periods > 15) ? 15 : static_cast<uint8_t>(periods);
   return WriteDpmConfig(config);
 }
@@ -553,8 +596,36 @@ void MAX22200<SpiType>::ResetStatistics() {
 }
 
 // ============================================================================
-// Callbacks (stored for application use; not invoked by driver)
+// Callbacks
 // ============================================================================
+
+template <typename SpiType>
+void MAX22200<SpiType>::notifyFaults(const FaultStatus &faults) const {
+  if (fault_callback_ == nullptr) {
+    return;
+  }
+  for (uint8_t ch = 0; ch < NUM_CHANNELS_; ++ch) {
+    const uint8_t bit = static_cast<uint8_t>(1u << ch);
+    if (faults.overcurrent_channel_mask & bit) fault_callback_(ch, FaultType::OCP, fault_user_data_);
+    if (faults.hit_not_reached_channel_mask & bit) fault_callback_(ch, FaultType::HHF, fault_user_data_);
+    if (faults.open_load_fault_channel_mask & bit) fault_callback_(ch, FaultType::OLF, fault_user_data_);
+    if (faults.plunger_movement_fault_channel_mask & bit) {
+      fault_callback_(ch, FaultType::DPM, fault_user_data_);
+    }
+  }
+}
+
+template <typename SpiType>
+void MAX22200<SpiType>::notifyStatusFaults(const StatusConfig &status) const {
+  if (fault_callback_ == nullptr) {
+    return;
+  }
+  // Chip-wide flags only; the per-channel OCP / HHF / OLF / DPM summary bits are reported, with
+  // their channel, when the FAULT register is read.
+  if (status.overtemperature) fault_callback_(0xFF, FaultType::OVT, fault_user_data_);
+  if (status.undervoltage) fault_callback_(0xFF, FaultType::UVM, fault_user_data_);
+  if (status.communication_error) fault_callback_(0xFF, FaultType::COMER, fault_user_data_);
+}
 
 template <typename SpiType>
 void MAX22200<SpiType>::SetFaultCallback(FaultCallback callback,
@@ -772,7 +843,12 @@ DriverStatus MAX22200<SpiType>::SetHitCurrentMa(uint8_t channel, uint32_t ma) {
   if (result != DriverStatus::OK) {
     return result;
   }
-  config.drive_mode = DriveMode::CDR;
+  // A current only means something on a CDR channel. Do not flip VDRnCDR here: the chip changes it only
+  // while every channel is off and TRIGA/TRIGB are low (datasheet, Programming Procedure step 5c).
+  if (config.drive_mode != DriveMode::CDR) {
+    updateStatistics(false);
+    return DriverStatus::INVALID_PARAMETER;
+  }
   config.hit_setpoint = static_cast<float>(ma);
   return ConfigureChannel(channel, config);
 }
@@ -793,7 +869,12 @@ DriverStatus MAX22200<SpiType>::SetHoldCurrentMa(uint8_t channel, uint32_t ma) {
   if (result != DriverStatus::OK) {
     return result;
   }
-  config.drive_mode = DriveMode::CDR;
+  // A current only means something on a CDR channel. Do not flip VDRnCDR here: the chip changes it only
+  // while every channel is off and TRIGA/TRIGB are low (datasheet, Programming Procedure step 5c).
+  if (config.drive_mode != DriveMode::CDR) {
+    updateStatistics(false);
+    return DriverStatus::INVALID_PARAMETER;
+  }
   config.hold_setpoint = static_cast<float>(ma);
   return ConfigureChannel(channel, config);
 }
@@ -940,6 +1021,11 @@ DriverStatus MAX22200<SpiType>::SetHitDutyPercent(uint8_t channel, float percent
   if (result != DriverStatus::OK) {
     return result;
   }
+  // A duty cycle only means something on a VDR channel; never flip VDRnCDR implicitly.
+  if (config.drive_mode != DriveMode::VDR) {
+    updateStatistics(false);
+    return DriverStatus::INVALID_PARAMETER;
+  }
 
   // Get duty limits based on FREQM + FREQ_CFG + SRC
   DutyLimits limits;
@@ -952,8 +1038,6 @@ DriverStatus MAX22200<SpiType>::SetHitDutyPercent(uint8_t channel, float percent
   if (percent < limits.min_percent) percent = limits.min_percent;
   if (percent > limits.max_percent) percent = limits.max_percent;
 
-  // Set user unit directly (VDR mode)
-  config.drive_mode = DriveMode::VDR;
   config.hit_setpoint = percent;
   return ConfigureChannel(channel, config);
 }
@@ -974,6 +1058,11 @@ DriverStatus MAX22200<SpiType>::SetHoldDutyPercent(uint8_t channel, float percen
   if (result != DriverStatus::OK) {
     return result;
   }
+  // A duty cycle only means something on a VDR channel; never flip VDRnCDR implicitly.
+  if (config.drive_mode != DriveMode::VDR) {
+    updateStatistics(false);
+    return DriverStatus::INVALID_PARAMETER;
+  }
 
   DutyLimits limits;
   result = GetDutyLimits(cached_status_.master_clock_80khz, config.chop_freq, config.slew_rate_control_enabled, limits);
@@ -984,8 +1073,6 @@ DriverStatus MAX22200<SpiType>::SetHoldDutyPercent(uint8_t channel, float percen
   if (percent < limits.min_percent) percent = limits.min_percent;
   if (percent > limits.max_percent) percent = limits.max_percent;
 
-  // Set user unit directly (VDR mode)
-  config.drive_mode = DriveMode::VDR;
   config.hold_setpoint = percent;
   return ConfigureChannel(channel, config);
 }

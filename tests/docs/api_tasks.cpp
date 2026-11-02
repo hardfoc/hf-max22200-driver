@@ -46,7 +46,7 @@ bool configure_cdr(Driver& driver) {
 
 bool configure_vdr(Driver& driver) {
   // --8<-- [start:configure-vdr]
-  // High-side load (to GND): VDR only. Setpoints are duty cycle; see the note on VDR scaling.
+  // High-side load (to GND): VDR only. Setpoints are duty cycle in percent, written as HIT[6:0] = percent.
   auto cfg = max22200::ChannelConfig::makeSolenoidVdr(100.0f, 40.0f, 50.0f);
   cfg.side_mode = max22200::SideMode::HIGH_SIDE;
   if (driver.ConfigureChannel(1, cfg) != DriverStatus::OK) {
@@ -132,12 +132,25 @@ void faults(Driver& driver) {
   // --8<-- [end:faults]
 }
 
+void on_fault(uint8_t channel, max22200::FaultType type, void* /*user_data*/) {
+  std::printf("fault %s on channel %u\n", max22200::FaultTypeToStr(type), channel);   // 0xFF: chip-wide
+}
+
+void fault_callback(Driver& driver) {
+  // --8<-- [start:fault-callback]
+  driver.SetFaultCallback(&on_fault, nullptr);
+  max22200::FaultStatus faults;
+  driver.ReadFaultRegister(faults);               // calls on_fault() once per set FAULT bit
+  // --8<-- [end:fault-callback]
+}
+
 bool dpm(Driver& driver) {
   // --8<-- [start:dpm]
+  // Per channel: DPM_EN on channels 0 and 1 (low-side only). Do this first: the debounce below is
+  // converted with these channels' chopping frequency.
+  if (driver.SetDpmEnabledChannels(0b0000'0011) != DriverStatus::OK) return false;
   // Global DPM settings: search for the dip above 150 mA, dip of at least 40 mA lasting 0.4 ms.
   if (driver.ConfigureDpm(150.0f, 40.0f, 0.4f) != DriverStatus::OK) return false;
-  // Per channel: DPM_EN on channels 0 and 1 (low-side only).
-  if (driver.SetDpmEnabledChannels(0b0000'0011) != DriverStatus::OK) return false;
   // A DPM flag in FAULT[7:0] after a HIT means no dip was seen: the plunger did not move.
   // --8<-- [end:dpm]
   return true;

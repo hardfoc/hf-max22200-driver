@@ -45,11 +45,10 @@ for high-side channels (load to GND). The datasheet (Table 3) defines HIT[6:0] a
 cycle in percent: 0 is off, values from δMIN to δMAX are that duty, 100 and above is fully on, and values between
 are clamped to δMIN or δMAX.
 
-!!! warning "VDR duty is scaled by 127 / 100 in the current driver"
-    `ChannelConfig::toRegister()` writes a VDR percentage as round(percent × 127 / 100), the same scaling it uses
-    for CDR. By Table 3 the chip reads the register as percent, so a requested 40 % runs at 51 %. 0 % and 100 %
-    are exact. Until this is fixed, write the percentage you want × 100 / 127 (40 % → 31.5), or set the field with
-    `WriteRegister32()`.
+`ChannelConfig::hit_setpoint` and `hold_setpoint` are in percent in VDR. The driver writes round(percent), 0 for
+0 % or less and 100 for 100 % or more, so a requested 40 % is HIT[6:0] = 40. Reading back returns the field as
+percent, with any raw value of 100 or above read as 100 %. Driver 1.0.0 scaled VDR duty by 127 / 100, so 40 %
+ran at 51 %; remove any compensation written for it.
 
 ## Chopping frequency
 

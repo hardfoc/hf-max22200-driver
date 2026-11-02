@@ -63,7 +63,8 @@ return `false` from `GpioRead()` and poll `ReadStatus()` instead.
 
 The ESP32 examples use [`esp32_max22200_bus.hpp`](../examples/esp32/main/esp32_max22200_bus.hpp): an ESP-IDF
 `spi_master` port with `spi_device_transmit()` (blocking, CS handled by the peripheral), `esp_rom_delay_us()` and
-GPIOs for ENABLE, CMD, FAULT, TRIGA and TRIGB. Start from it for any ESP-IDF target.
+GPIOs for ENABLE, CMD, FAULT, TRIGA and TRIGB (TRIGA and TRIGB start low, inactive). Start from it for any ESP-IDF
+target.
 
 ## Check your port
 

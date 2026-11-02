@@ -474,7 +474,7 @@ static bool test_control_pins() noexcept {
 /**
  * @brief Test TRIGA/TRIGB pin toggling
  *
- * If the SPI interface has TRIGA/TRIGB, cycles each high → low → high and logs.
+ * If the SPI interface has TRIGA/TRIGB, pulses each low -> high -> low (ending inactive) and logs.
  * @return true (no failure path; skipped if interface has no trigger pins)
  */
 static bool test_trigger_pins() noexcept {
@@ -484,16 +484,16 @@ static bool test_trigger_pins() noexcept {
   }
 
   if (g_spi_interface->HasTrigA()) {
-    g_spi_interface->SetTrigA(true);
     g_spi_interface->SetTrigA(false);
     g_spi_interface->SetTrigA(true);
-    ESP_LOGI(TAG, "[trig] TRIGA cycled (high -> low -> high)");
+    g_spi_interface->SetTrigA(false);
+    ESP_LOGI(TAG, "[trig] TRIGA pulsed (low -> high -> low)");
   }
   if (g_spi_interface->HasTrigB()) {
-    g_spi_interface->SetTrigB(true);
     g_spi_interface->SetTrigB(false);
     g_spi_interface->SetTrigB(true);
-    ESP_LOGI(TAG, "[trig] TRIGB cycled (high -> low -> high)");
+    g_spi_interface->SetTrigB(false);
+    ESP_LOGI(TAG, "[trig] TRIGB pulsed (low -> high -> low)");
   }
   ESP_LOGI(TAG, "[trig] Trigger pins test passed");
   return true;
@@ -573,7 +573,7 @@ static bool test_board_config() noexcept {
 /**
  * @brief Test current unit APIs in mA and percent (CDR)
  *
- * Uses board config from construction; SetHitCurrentMa(ch, 300), SetHoldCurrentMa(ch, 200),
+ * Uses board config from construction; ConfigureChannelCdr(ch, ...), SetHitCurrentMa(ch, 300), SetHoldCurrentMa(ch, 200),
  * GetHitCurrentMa, SetHoldCurrentPercent(ch, 40), GetHoldCurrentPercent. Logs set vs read values.
  * @return true if all driver calls succeed
  */
@@ -591,8 +591,14 @@ static bool test_unit_apis_current_ma_percent() noexcept {
   const uint32_t set_ma = 300;
   const float set_pct = 40.0f;
 
+  // The current setters work on a CDR channel only (they never change the drive mode)
+  DriverStatus st = g_driver->ConfigureChannelCdr(ch, set_ma, 200, 10.0f);
+  if (!require_ok(st, "ConfigureChannelCdr")) {
+    return false;
+  }
+
   // Set HIT/HOLD in mA
-  DriverStatus st = g_driver->SetHitCurrentMa(ch, set_ma);
+  st = g_driver->SetHitCurrentMa(ch, set_ma);
   if (!require_ok(st, "SetHitCurrentMa")) {
     return false;
   }
@@ -626,7 +632,7 @@ static bool test_unit_apis_current_ma_percent() noexcept {
 /**
  * @brief Test duty cycle unit APIs in percent (VDR)
  *
- * Reads STATUS for FREQM, calls GetDutyLimits, then SetHitDutyPercent/SetHoldDutyPercent
+ * Reads STATUS for FREQM, calls GetDutyLimits, ConfigureChannelVdr, then SetHitDutyPercent/SetHoldDutyPercent
  * on channel 1 and readback via GetHitDutyPercent/GetHoldDutyPercent. Logs limits and set/read.
  * @return true if all driver calls succeed
  */
@@ -652,6 +658,12 @@ static bool test_unit_apis_duty_percent() noexcept {
   const uint8_t ch = 1;
   const float set_hit = 50.0f;
   const float set_hold = 30.0f;
+
+  // The duty setters work on a VDR channel only (they never change the drive mode)
+  st = g_driver->ConfigureChannelVdr(ch, set_hit, set_hold, 10.0f);
+  if (!require_ok(st, "ConfigureChannelVdr")) {
+    return false;
+  }
 
   st = g_driver->SetHitDutyPercent(ch, set_hit);
   if (!require_ok(st, "SetHitDutyPercent")) {

@@ -257,7 +257,10 @@ public:
 
   /**
    * @brief Set TRIGA pin level (direct-drive trigger A)
-   * @param active true = drive high (inactive), false = drive low (trigger)
+   *
+   * TRIGA is active-high with an internal pull-down: high switches on the channels whose TRGnSPI
+   * bit selects the pin, low switches them off (datasheet Pin Description and Figure 1).
+   * @param active true = drive high (trigger asserted), false = drive low (inactive)
    */
   void SetTrigA(bool active) {
     if (config_.triga_pin >= 0) {
@@ -267,7 +270,10 @@ public:
 
   /**
    * @brief Set TRIGB pin level (direct-drive trigger B)
-   * @param active true = drive high (inactive), false = drive low (trigger)
+   *
+   * TRIGB is active-high with an internal pull-down: high switches on the channels whose TRGnSPI
+   * bit selects the pin, low switches them off (datasheet Pin Description and Figure 1).
+   * @param active true = drive high (trigger asserted), false = drive low (inactive)
    */
   void SetTrigB(bool active) {
     if (config_.trigb_pin >= 0) {
@@ -312,8 +318,10 @@ private:
     };
     if (!configure_output(config_.enable_pin, "ENABLE", 0)) return false;
     if (!configure_output(config_.cmd_pin, "CMD", 1)) return false; // CMD HIGH = SPI mode
-    if (!configure_output(config_.triga_pin, "TRIGA", 1)) return false; // TRIGA high = inactive
-    if (!configure_output(config_.trigb_pin, "TRIGB", 1)) return false; // TRIGB high = inactive
+    // TRIGA / TRIGB are active-high (internal pull-down): start them low, inactive. A high TRIG pin
+    // also blocks VDRnCDR / HSnLS changes (datasheet Programming Procedure step 5c).
+    if (!configure_output(config_.triga_pin, "TRIGA", 0)) return false;
+    if (!configure_output(config_.trigb_pin, "TRIGB", 0)) return false;
 
     // FAULT: input, active-low, inactive-high. Pull-up so inactive = high when open-drain released.
     if (config_.fault_pin >= 0) {

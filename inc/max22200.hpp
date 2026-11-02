@@ -185,7 +185,8 @@ public:
    *    - All channels OFF (ONCH = 0)
    *    - All channel pairs in INDEPENDENT mode
    *    - Fault masks set to defaults (M_COMF = 1, others = 0)
-   * 5. **Cache STATUS**: Store STATUS for fast ONCH updates
+   * 5. **Wake-up**: wait tWU (2.5 ms) after ACTIVE = 1, then read STATUS again
+   * 6. **Cache STATUS**: Store STATUS for fast ONCH updates
    *
    * @return DriverStatus::OK on success
    * @return DriverStatus::COMMUNICATION_ERROR if COMER flag detected
@@ -193,8 +194,9 @@ public:
    *
    * @note After Initialize(), channels must be configured with ConfigureChannel()
    *       before they can be enabled.
-   * @note The device enters normal operation after ACTIVE=1 with a wake-up time
-   *       of 2.5ms (tWU). Channels can be enabled immediately after Initialize().
+   * @note The device enters normal operation 2.5 ms (tWU) after ACTIVE=1. Initialize() waits
+   *       tWU through the port's DelayUs() before it returns, so channels can be enabled as
+   *       soon as it returns OK. Initialize() therefore takes at least 3 ms (tEN + tWU).
    *
    * @see MAX22200 datasheet Figure 6: Programming Flow Chart
    */
@@ -482,20 +484,38 @@ public:
   /**
    * @brief Configure DPM in real units (easy API)
    *
-   * Sets start current, dip threshold, and debounce time. Uses board IFS for
-   * current conversion and cached STATUS (FREQM) + FMAIN_DIV4 for debounce fCHOP.
-   * Call SetBoardConfig() first so IFS is set; call ReadStatus or Initialize so cache is valid.
+   * Sets start current, dip threshold, and debounce time. Uses board IFS for current conversion.
+   * The debounce is a count of chopping periods (TDEB = DPM_TDEB / fCHOP, datasheet CFG_DPM), and
+   * fCHOP is per channel, so this overload reads CFG_CH0..7 and uses the FREQ_CFG of the channels
+   * that have DPM_EN set (with FREQM from the cached STATUS). With no DPM channel yet it uses
+   * FREQ_CFG = 00 (FMAIN_DIV4, the reset value); enable DPM first, or use the overload that takes
+   * the frequency.
    *
    * @param start_current_ma  Current (mA) above which DPM monitors for dip
    * @param dip_threshold_ma Minimum dip amplitude (mA) to count as valid
-   * @param debounce_ms      Min dip duration (ms); converted to chopping periods using actual fCHOP
+   * @param debounce_ms      Min dip duration (ms); converted to chopping periods, clamped to 15
    * @return DriverStatus::OK on success
-   * @return DriverStatus::INVALID_PARAMETER if IFS not set or values out of range
-   *
-   * @note For custom fCHOP or raw register control use ReadDpmConfig/WriteDpmConfig.
+   * @return DriverStatus::INVALID_PARAMETER if IFS not set, a value is negative or NaN, or DPM
+   *         channels use different FREQ_CFG (nothing is written)
    */
   DriverStatus ConfigureDpm(float start_current_ma, float dip_threshold_ma,
                            float debounce_ms);
+
+  /**
+   * @brief Configure DPM in real units for a given chopping frequency
+   *
+   * As ConfigureDpm(float, float, float), but converts the debounce with @p chop_freq (and FREQM
+   * from the cached STATUS) instead of reading the channels.
+   *
+   * @param start_current_ma  Current (mA) above which DPM monitors for dip
+   * @param dip_threshold_ma Minimum dip amplitude (mA) to count as valid
+   * @param debounce_ms      Min dip duration (ms); converted to chopping periods, clamped to 15
+   * @param chop_freq        FREQ_CFG of the channels DPM will monitor
+   * @return DriverStatus::OK on success
+   * @return DriverStatus::INVALID_PARAMETER if IFS not set or a value is negative or NaN
+   */
+  DriverStatus ConfigureDpm(float start_current_ma, float dip_threshold_ma,
+                           float debounce_ms, ChopFreq chop_freq);
 
   /**
    * @brief Read DPM algorithm configuration (CFG_DPM register)
@@ -661,14 +681,19 @@ public:
   // =========================================================================
 
   /**
-   * @brief Register a fault event callback (stored for application use)
+   * @brief Register a fault event callback
    *
-   * @param callback  Function invoked by the application when a fault is detected
+   * The driver calls @p callback from the calling thread whenever it reads a fault:
+   * - once per set bit when it reads FAULT (ReadFaultRegister(), ReadFaultRegisterSelectiveClear(),
+   *   ClearChannelFaults(), ClearAllFaults()): OCP, HHF, OLF or DPM with the channel number;
+   * - when it reads STATUS after Initialize() (ReadStatus(), ReadFaultFlags(), ClearFaultFlags()):
+   *   OVT, UVM or COMER with channel 0xFF. The power-up UVM that Initialize() clears is not reported.
+   *
+   * The driver does not poll: read FAULT or STATUS (for example when the FAULT pin goes low) to get
+   * callbacks. Pass nullptr to stop them.
+   *
+   * @param callback  Function to call for each fault read, or nullptr
    * @param user_data Opaque pointer passed to @p callback
-   *
-   * @note The driver stores the callback but does not invoke it automatically;
-   *       poll ReadFaultRegister() / ReadStatus() and call the callback from
-   *       application code when needed.
    */
   void SetFaultCallback(FaultCallback callback, void *user_data);
 
@@ -719,12 +744,20 @@ public:
    * @param channel Channel number (0-7)
    * @param ma     Current in milliamps
    * @return DriverStatus::OK on success
-   * @return DriverStatus::INVALID_PARAMETER if channel >= 8 or IFS not configured
+   * @return DriverStatus::INVALID_PARAMETER if channel >= 8, IFS not configured, or the channel
+   *         is not in CDR (nothing is written)
+   *
+   * @note The current and duty setters never change VDRnCDR: the chip accepts a drive-mode change
+   *       only while every channel is off and TRIGA/TRIGB are low. Select the mode with
+   *       ConfigureChannel(), ConfigureChannelCdr() or ConfigureChannelVdr() first. The same
+   *       applies to SetHoldCurrentMa(), the ...A() and ...CurrentPercent() variants.
    */
   DriverStatus SetHitCurrentMa(uint8_t channel, uint32_t ma);
 
   /**
    * @brief Set HOLD current in milliamps (CDR mode)
+   *
+   * @return DriverStatus::INVALID_PARAMETER if the channel is not in CDR (see SetHitCurrentMa())
    */
   DriverStatus SetHoldCurrentMa(uint8_t channel, uint32_t ma);
 
@@ -783,25 +816,29 @@ public:
   /**
    * @brief Set HIT duty cycle in percent (VDR mode)
    *
-   * Converts percent to 7-bit: raw = round((pct / 100) × 127).
+   * Writes the duty cycle as percent: raw = round(pct) (datasheet Table 3).
    * Clamps to max_duty_percent if set, then to [δMIN, δMAX] based on FREQM,
    * FREQ_CFG, and SRC settings.
    *
    * @param channel Channel number (0-7)
    * @param percent Duty cycle in percent (0-100)
    * @return DriverStatus::OK on success
+   * @return DriverStatus::INVALID_PARAMETER if channel >= 8 or the channel is not in VDR (nothing
+   *         is written; the setter does not change VDRnCDR, see SetHitCurrentMa())
    */
   DriverStatus SetHitDutyPercent(uint8_t channel, float percent);
 
   /**
    * @brief Set HOLD duty cycle in percent (VDR mode)
+   *
+   * @return DriverStatus::INVALID_PARAMETER if the channel is not in VDR
    */
   DriverStatus SetHoldDutyPercent(uint8_t channel, float percent);
 
   /**
    * @brief Get HIT duty cycle in percent (VDR mode)
    *
-   * Reads channel config: percent = (hit_current / 127.0) × 100
+   * Reads channel config: percent = HIT[6:0] (datasheet Table 3; 100 and above read as 100)
    */
   DriverStatus GetHitDutyPercent(uint8_t channel, float &percent) const;
 
@@ -967,6 +1004,11 @@ private:
   StateChangeCallback state_callback_;
   void *state_user_data_;
 
+  /** @brief Call the fault callback once per set bit of a FAULT read */
+  void notifyFaults(const FaultStatus &faults) const;
+  /** @brief Call the fault callback for the chip-wide flags (OVT, UVM, COMER) of a STATUS read */
+  void notifyStatusFaults(const StatusConfig &status) const;
+
   // ── Core SPI protocol (two-phase) ──────────────────────────────────────
 
   /**
@@ -1066,5 +1108,10 @@ inline const char* GetDriverVersion() noexcept {
 
 } // namespace max22200
 
-// Include implementation
+// Include implementation: from the source tree (inc/ next to src/), or from an installed tree where
+// `cmake --install` puts max22200.ipp next to this header.
+#if __has_include("../src/max22200.ipp")
 #include "../src/max22200.ipp"
+#else
+#include "max22200.ipp"
+#endif
