@@ -1,0 +1,30 @@
+{
+  "featured": [
+    "Initialize",
+    "ConfigureChannel",
+    "EnableChannel",
+    "SetChannelsOn",
+    "SetFullBridgeState",
+    "SetHoldCurrentMa",
+    "ReadStatus",
+    "ReadFaultRegister",
+    "ClearChannelFaults",
+    "ConfigureDpm",
+    "ReadRegister32"
+  ],
+  "more": 42,
+  "port_hooks": [
+    "Initialize",
+    "Transfer",
+    "SetChipSelect",
+    "Configure",
+    "IsReady",
+    "DelayUs",
+    "GpioSet",
+    "GpioRead"
+  ],
+  "sources": [
+    "inc/max22200.hpp:MAX22200 public calls",
+    "inc/max22200_spi_interface.hpp:SpiInterface"
+  ]
+}

@@ -1,114 +1,73 @@
----
-layout: default
-title: "🛠️ Installation"
-description: "Installation and integration instructions for the MAX22200 driver"
-nav_order: 1
-parent: "📚 Documentation"
-permalink: /docs/installation/
----
-
 # Installation
 
-This guide covers how to obtain and integrate the MAX22200 driver library into your project.
+Add the driver to a CMake or ESP-IDF project. It is a header-only C++20 library with no dependencies.
 
-## Prerequisites
+## Requirements
 
-Before installing the driver, ensure you have:
+- A C++20 compiler: GCC 10+, Clang 12+ or a current MSVC.
+- No RTOS, heap or exceptions: every call returns a `max22200::DriverStatus` and never throws.
 
-- **C++20 Compiler**: GCC 10+, Clang 12+, or MSVC 2019+
-- **Build System**: Make, CMake, or ESP-IDF (depending on your platform)
-- **Platform SDK**: ESP-IDF, STM32 HAL, Arduino, or your platform's SPI driver
+## Get the source
 
-## Obtaining the Source
-
-### Option 1: Git Clone
+A git submodule keeps the driver pinned to a version you chose:
 
 ```bash
-git clone https://github.com/n3b3x/hf-max22200-driver.git
-cd hf-max22200-driver
+git submodule add https://github.com/hardfoc/hf-max22200-driver.git external/hf-max22200-driver
+git submodule update --init external/hf-max22200-driver
 ```
 
-### Option 2: Copy Files
+Only `inc/`, `src/`, `cmake/` and `CMakeLists.txt` are needed to build. The examples have their own submodule
+(`examples/esp32/scripts`); you do not need it to use the driver.
 
-Copy the following files into your project:
-
-```
-inc/
-  ├── max22200.hpp
-  ├── max22200_spi_interface.hpp
-  ├── max22200_registers.hpp
-  ├── max22200_types.hpp
-  └── max22200_version.h
-src/
-  └── max22200.ipp
-```
-
-The driver is **header-only**: `max22200.hpp` includes `max22200.ipp` at the end. No separate `.cpp` compilation unit is required.
-
-## Integration Methods
-
-### Using CMake
-
-Add the driver as a subdirectory in your `CMakeLists.txt`:
+## CMake
 
 ```cmake
 add_subdirectory(external/hf-max22200-driver)
-target_link_libraries(your_target PRIVATE hf_max22200)
-target_include_directories(your_target PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/hf-max22200-driver/inc
-)
+target_link_libraries(my_app PRIVATE hf::max22200)
 ```
 
-### Using ESP-IDF Component
+`hf::max22200` is an alias of the `hf_max22200` interface target. It carries the include directories (`inc/` and
+the generated version header) and requires C++20 (`cxx_std_20`), so your target does not need to set either.
 
-The driver can be used as an ESP-IDF component. Add it to your `components` directory:
+| Option | Default | Effect |
+| --- | --- | --- |
+| `HF_MAX22200_ENABLE_WARNINGS` | `OFF` | Adds `-Wall -Wextra -Wpedantic` to targets that link the driver |
+| `HF_MAX22200_BUILD_TESTS` | `OFF` | Builds the host unit tests in `tests/` ([Testing and CI](testing.md)) |
 
-```cmake
-# In your main CMakeLists.txt
-idf_component_register(
-    SRCS "your_code.cpp"
-    INCLUDE_DIRS "."
-    REQUIRES hf_max22200
-)
+!!! note "Use the source tree, not `cmake --install`"
+    The install rules copy `inc/` but not `src/max22200.ipp`, which `max22200.hpp` includes. Until that is fixed,
+    consume the driver with `add_subdirectory()` or the ESP-IDF component.
+
+## ESP-IDF
+
+The ESP-IDF component wrapper is
+[`examples/esp32/components/hf_max22200/`](../examples/esp32/components/hf_max22200/CMakeLists.txt). Copy that
+folder into your project's `components/` (or point `EXTRA_COMPONENT_DIRS` at it) and set the `HF_MAX22200_ROOT`
+cache variable to the driver checkout; the wrapper stops with a clear message when the path is wrong. Your
+component then declares `REQUIRES hf_max22200`.
+
+## Without CMake
+
+Add `inc/` to the include path and generate `max22200_version.h` from
+[`inc/max22200_version.h.in`](../inc/max22200_version.h.in) once (replace the four `@...@` fields with the
+version). `max22200.hpp` includes `src/max22200.ipp` by relative path, so keep `inc/` and `src/` side by side.
+
+## How the build is organised
+
+| File | Role |
+| --- | --- |
+| [`cmake/hf_max22200_build_settings.cmake`](../cmake/hf_max22200_build_settings.cmake) | Target name, include directories, version: the single source of truth |
+| [`CMakeLists.txt`](../CMakeLists.txt) | Interface library for host builds and CI |
+| [`examples/esp32/components/hf_max22200/CMakeLists.txt`](../examples/esp32/components/hf_max22200/CMakeLists.txt) | ESP-IDF component over the same settings |
+
+The version is set once in the settings file and written into `max22200_version.h` at configure time. Read it at
+run time:
+
+```cpp
+const char* v = max22200::MAX22200<MySpi>::GetDriverVersion();   // "1.0.0"
 ```
 
-### Manual Integration
+## Next
 
-1. Copy the driver files to your project
-2. Add the `inc/` directory to your include path
-3. Include the header:
-   ```cpp
-   #include "max22200.hpp"
-   ```
-4. Compile with C++20 support (include path must cover `inc/`; implementation is in `max22200.ipp` via the header):
-   ```bash
-   g++ -std=c++20 -I inc/ your_code.cpp
-   ```
-
-## Verification
-
-To verify the installation:
-
-1. Include the header in a test file:
-   ```cpp
-   #include "max22200.hpp"
-   ```
-
-2. Compile a simple test (header-only — no separate driver object file):
-   ```bash
-   g++ -std=c++20 -I inc/ -c your_test.cpp -o test.o
-   ```
-
-3. If compilation succeeds, the library is properly installed.
-
-## Next Steps
-
-- Follow the [Quick Start](quickstart.md) guide to create your first application
-- Review [Hardware Setup](hardware_setup.md) for wiring instructions
-- Check [Platform Integration](platform_integration.md) to implement the SPI interface
-
----
-
-**Navigation**
-⬅️ [Back to Index](index.md) | [Next: Quick Start ➡️](quickstart.md)
-
+[Quickstart](quickstart.md) wires the chip and drives a solenoid; [Porting](porting.md) writes the SPI interface
+for your MCU.

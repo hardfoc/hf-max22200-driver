@@ -1,0 +1,14 @@
+{
+  "driver-layers": {
+    "title": "Three layers, one of them yours",
+    "alt": "Layer diagram: the application calls the hardware-agnostic MAX22200 driver, which uses the CRTP SPI interface, which calls the platform port you write, which drives the SPI bus and the ENABLE, CMD and FAULT pins of the MAX22200.",
+    "description": "From top to bottom. Your application talks to one MAX22200<SpiType> object; its main calls (listed from inc/max22200.hpp) configure channels, switch them, and read faults. Each call becomes the chip's two-phase SPI access: a command byte with CMD high, then 8 or 32 data bits with CMD low. The communication interface (SpiInterface in inc/max22200_spi_interface.hpp) is a CRTP base that forwards those transfers and the ENABLE, CMD and FAULT pins to your class. The platform port is the only code you write. Below it is the hardware.",
+    "profile": "overview",
+    "width": 1200,
+    "source": "docs/diagrams/figures/driver-layers.py",
+    "sources": [
+      "inc/max22200.hpp:MAX22200 public calls",
+      "inc/max22200_spi_interface.hpp:SpiInterface"
+    ]
+  }
+}
