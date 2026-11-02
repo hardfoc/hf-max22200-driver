@@ -61,9 +61,9 @@ DriverStatus MAX22200<SpiType>::Initialize() {
     return DriverStatus::INITIALIZATION_ERROR;
   }
 
-  // Step 1: ENABLE pin HIGH, power-up delay
+  // Step 1: ENABLE pin HIGH, then tEN (0.5 ms, ENABLE rising edge to SPI ready) before the first access
   spi_interface_.GpioSetActive(CtrlPin::ENABLE);
-  spi_interface_.DelayUs(500); // 0.5ms power-up delay
+  spi_interface_.DelayUs(ENABLE_TIME_US_);
 
   constexpr int kMaxInitRetries = 3;
   StatusConfig status;
@@ -99,6 +99,10 @@ DriverStatus MAX22200<SpiType>::Initialize() {
 
     // Cache the status for ONCH updates
     cached_status_ = status;
+
+    // Wake-up: tWU (2.5 ms) from ACTIVE = 1 to normal operation, the "wake-up completed?" step of
+    // Figure 6. Without it a channel switched on right after Initialize() would not drive its output.
+    spi_interface_.DelayUs(WAKE_UP_TIME_US_);
 
     // Step 4: Read STATUS again to verify UVM is cleared
     result = ReadStatus(status);

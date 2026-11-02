@@ -101,8 +101,9 @@ sequenceDiagram
 | ACTIVE = 1 to outputs active | t<sub>WU</sub> | 2.5 ms |
 | ENABLE low to outputs off | t<sub>DIS</sub> | 2.5 ms |
 
-`Initialize()` waits t<sub>EN</sub> through your port's `DelayUs()`. It does not wait t<sub>WU</sub>: give the chip
-2.5 ms after `Initialize()` before you expect an output to switch.
+`Initialize()` waits t<sub>EN</sub> after raising ENABLE and t<sub>WU</sub> after writing ACTIVE = 1, both through
+your port's `DelayUs()`, so the outputs are active when it returns. If you set ACTIVE yourself with
+`WriteStatus()`, wait t<sub>WU</sub> before you expect an output to switch.
 
 ## Power
 

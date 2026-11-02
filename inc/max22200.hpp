@@ -185,7 +185,8 @@ public:
    *    - All channels OFF (ONCH = 0)
    *    - All channel pairs in INDEPENDENT mode
    *    - Fault masks set to defaults (M_COMF = 1, others = 0)
-   * 5. **Cache STATUS**: Store STATUS for fast ONCH updates
+   * 5. **Wake-up**: wait tWU (2.5 ms) after ACTIVE = 1, then read STATUS again
+   * 6. **Cache STATUS**: Store STATUS for fast ONCH updates
    *
    * @return DriverStatus::OK on success
    * @return DriverStatus::COMMUNICATION_ERROR if COMER flag detected
@@ -193,8 +194,9 @@ public:
    *
    * @note After Initialize(), channels must be configured with ConfigureChannel()
    *       before they can be enabled.
-   * @note The device enters normal operation after ACTIVE=1 with a wake-up time
-   *       of 2.5ms (tWU). Channels can be enabled immediately after Initialize().
+   * @note The device enters normal operation 2.5 ms (tWU) after ACTIVE=1. Initialize() waits
+   *       tWU through the port's DelayUs() before it returns, so channels can be enabled as
+   *       soon as it returns OK. Initialize() therefore takes at least 3 ms (tEN + tWU).
    *
    * @see MAX22200 datasheet Figure 6: Programming Flow Chart
    */

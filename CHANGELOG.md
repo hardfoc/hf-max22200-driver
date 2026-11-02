@@ -29,6 +29,9 @@ code that used the affected API; together they call for a major version bump at 
 - VDR duty cycle is written as percent, as datasheet Table 3 defines HIT[6:0] / HOLD[6:0] in VDR: 40 % is now
   HIT[6:0] = 40 (1.0.0 wrote round(40 × 127 / 100) = 51, so the output ran at 51 %). Reading back returns the
   field as percent (100 and above read as 100 %). If you compensated with the 100 / 127 workaround, remove it.
+- `Initialize()` waits the 2.5 ms wake-up time tWU after writing ACTIVE = 1 (datasheet Electrical
+  Characteristics, "wake-up completed?" in Figure 6), so a channel switched on right after it drives its output.
+  `Initialize()` now takes at least 3 ms.
 
 ### Added
 

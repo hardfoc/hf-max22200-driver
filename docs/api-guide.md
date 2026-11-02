@@ -40,11 +40,11 @@ value was rejected or the transfer failed ([Architecture](architecture.md#errors
 `Initialize()` follows the datasheet's programming flow (Figure 6): it calls your port's `Initialize()` and
 `Configure(10 MHz, mode 0, MSB first)`, raises ENABLE, waits 0.5 ms, reads STATUS to clear the power-up UVM flag,
 writes STATUS with ACTIVE = 1, every channel off and COMER masked (other masks and pair modes as read: their reset
-values after power-up), then reads STATUS again. A COMER reply restarts the sequence, up to three times.
+values after power-up), waits 2.5 ms (t<sub>WU</sub>, ACTIVE = 1 to outputs active), then reads STATUS again. A COMER reply restarts the sequence, up to three times.
 
 Set the board's full-scale current before you configure a CDR channel. `BoardConfig()` without arguments assumes
-1000 mA (RREF = 15 kΩ); a wrong IFS scales every current by the same error. The outputs need 2.5 ms (t<sub>WU</sub>)
-after `Initialize()` before they switch.
+1000 mA (RREF = 15 kΩ); a wrong IFS scales every current by the same error. Because `Initialize()` waits
+t<sub>WU</sub>, the outputs switch as soon as it returns; it takes at least 3 ms.
 
 `Deinitialize()`, also called by the destructor, turns every channel off, clears ACTIVE and lowers ENABLE.
 

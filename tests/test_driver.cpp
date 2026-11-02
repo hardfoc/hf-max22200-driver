@@ -235,3 +235,13 @@ TEST_CASE("Current setters do not switch a VDR channel to CDR, duty setters not 
   REQUIRE(driver.SetHoldCurrentMa(1, 100) == DriverStatus::OK);
   CHECK_EQ((chip.regs[2] >> 7) & 1u, 0u);
 }
+
+TEST_CASE("Initialize waits tWU = 2.5 ms after ACTIVE = 1 before it returns") {
+  MockMax22200 chip;
+  Driver driver(chip, board1A());
+  REQUIRE(driver.Initialize() == DriverStatus::OK);
+  REQUIRE(chip.commands.size() == 3u);
+  CHECK(chip.command_delay_us[0] >= 500u);                          // tEN before the first access
+  CHECK(chip.command_delay_us[2] - chip.command_delay_us[1] >= 2500u);   // tWU after the ACTIVE write
+  CHECK(chip.delay_us_total >= 3000u);
+}

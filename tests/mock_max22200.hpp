@@ -27,6 +27,7 @@ public:
   // ---- What a test inspects ----
   std::array<uint32_t, 11> regs{};   ///< STATUS, CFG_CH0..7, FAULT, CFG_DPM
   std::vector<uint8_t> commands;     ///< every Command Register byte received
+  std::vector<uint32_t> command_delay_us;  ///< delay_us_total when each command byte arrived
   bool enable = false;               ///< ENABLE pin, as the driver left it
   bool cmd = false;                  ///< CMD pin
   uint32_t delay_us_total = 0;       ///< sum of DelayUs() calls
@@ -66,6 +67,7 @@ public:
     if (cmd) {                                   // Command Register write
       if (len != 1) return false;
       commands.push_back(tx[0]);
+      command_delay_us.push_back(delay_us_total);
       bank_ = (tx[0] >> 1) & 0x0Fu;
       write_ = (tx[0] & 0x80u) != 0;
       mode8_ = (tx[0] & 0x01u) != 0;
