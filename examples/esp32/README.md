@@ -18,7 +18,7 @@ there for another board.
 | ENABLE | GPIO2 | Active high |
 | CMD | GPIO39 | High for the command byte |
 | FAULT | GPIO42 | Open drain, active low; internal pull-up enabled |
-| TRIGA, TRIGB | GPIO40, GPIO41 | Used by the trigger-pin tests only |
+| TRIGA, TRIGB | GPIO40, GPIO41 | Active high; driven low (inactive) at start-up, pulsed by the trigger-pin test only |
 | GND | GND | Common with the VM supply |
 
 The board configuration assumes RREF = 15 kΩ (IFS = 1000 mA). VM must be 4.5 V to 36 V; the solenoid tests use

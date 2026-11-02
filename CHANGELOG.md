@@ -53,6 +53,12 @@ code that used the affected API; together they call for a major version bump at 
   absent) and the package exports the target as `hf::max22200`, the name `add_subdirectory()` users link (1.0.0
   exported `hf::hf_max22200`, which could not be used).
 
+- The ESP32 example bus started TRIGA and TRIGB high. They are active-high inputs with internal pull-downs
+  (datasheet Pin Description), and the chip ignores VDRnCDR / HSnLS changes while either is high (Programming
+  Procedure step 5c), so the examples' drive mode and side settings could be ignored. They now start low, and the
+  trigger-pin test pulses low -> high -> low. `SetTrigA()` / `SetTrigB()` documentation now says true = high =
+  trigger asserted.
+
 ### Added
 
 - `ConfigureDpm(start_ma, threshold_ma, debounce_ms, chop_freq)` overload that takes the chopping frequency.

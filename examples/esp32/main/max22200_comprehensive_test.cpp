@@ -474,7 +474,7 @@ static bool test_control_pins() noexcept {
 /**
  * @brief Test TRIGA/TRIGB pin toggling
  *
- * If the SPI interface has TRIGA/TRIGB, cycles each high → low → high and logs.
+ * If the SPI interface has TRIGA/TRIGB, pulses each low -> high -> low (ending inactive) and logs.
  * @return true (no failure path; skipped if interface has no trigger pins)
  */
 static bool test_trigger_pins() noexcept {
@@ -484,16 +484,16 @@ static bool test_trigger_pins() noexcept {
   }
 
   if (g_spi_interface->HasTrigA()) {
-    g_spi_interface->SetTrigA(true);
     g_spi_interface->SetTrigA(false);
     g_spi_interface->SetTrigA(true);
-    ESP_LOGI(TAG, "[trig] TRIGA cycled (high -> low -> high)");
+    g_spi_interface->SetTrigA(false);
+    ESP_LOGI(TAG, "[trig] TRIGA pulsed (low -> high -> low)");
   }
   if (g_spi_interface->HasTrigB()) {
-    g_spi_interface->SetTrigB(true);
     g_spi_interface->SetTrigB(false);
     g_spi_interface->SetTrigB(true);
-    ESP_LOGI(TAG, "[trig] TRIGB cycled (high -> low -> high)");
+    g_spi_interface->SetTrigB(false);
+    ESP_LOGI(TAG, "[trig] TRIGB pulsed (low -> high -> low)");
   }
   ESP_LOGI(TAG, "[trig] Trigger pins test passed");
   return true;
