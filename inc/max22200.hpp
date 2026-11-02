@@ -783,7 +783,7 @@ public:
   /**
    * @brief Set HIT duty cycle in percent (VDR mode)
    *
-   * Converts percent to 7-bit: raw = round((pct / 100) × 127).
+   * Writes the duty cycle as percent: raw = round(pct) (datasheet Table 3).
    * Clamps to max_duty_percent if set, then to [δMIN, δMAX] based on FREQM,
    * FREQ_CFG, and SRC settings.
    *
@@ -801,7 +801,7 @@ public:
   /**
    * @brief Get HIT duty cycle in percent (VDR mode)
    *
-   * Reads channel config: percent = (hit_current / 127.0) × 100
+   * Reads channel config: percent = HIT[6:0] (datasheet Table 3; 100 and above read as 100)
    */
   DriverStatus GetHitDutyPercent(uint8_t channel, float &percent) const;
 

@@ -25,7 +25,7 @@ They tell bus problems (no reply, COMER) apart from chip problems (the chip answ
 | `ConfigureChannel()` returns `INVALID_PARAMETER` | IFS is 0, SRC at 50 kHz or more, or channel above 7 | `SetBoardConfig()`, a lower `chop_freq`, the channel number |
 | Drive mode or side does not change | A channel is on, or TRIGA / TRIGB is high | Switch every channel off and hold both TRIG pins low first |
 | Current is off by a constant factor | IFS does not match RREF, or `BoardConfig(r, true)` and `half_full_scale` both set | `BoardConfig(rref_kohm, false)` with the real RREF |
-| VDR duty is higher than requested | The driver scales VDR percent by 127 / 100 | See [Drive modes](drive-modes.md#voltage-drive-vdr) |
+| VDR duty is higher than requested | Driver 1.0.0, which scaled VDR percent by 127 / 100 | Update the driver; see [Drive modes](drive-modes.md#voltage-drive-vdr) |
 | HIT time reads back shorter or longer | HIT_T is an 8-bit count of 40 chopping periods | Expected; compare raw register values |
 | Another channel turns off when you enable one | STATUS was written outside the driver; the ONCH cache is stale | `ReadStatus()` after any raw STATUS write |
 

@@ -70,10 +70,6 @@ presets `makeSolenoidCdr(hit_ma, hold_ma, hit_ms)` and `makeSolenoidVdr(hit_pct,
 channel at `FMAIN_DIV4`; `ConfigureChannelCdr()` and `ConfigureChannelVdr()` do the same in one call with the other
 fields as arguments.
 
-!!! warning "VDR percentages"
-    The driver scales VDR duty by 127 / 100 before writing it, but the chip reads the field as percent: 40 %
-    runs at 51 %. [Drive modes](drive-modes.md#voltage-drive-vdr) explains it and the workaround.
-
 ## Switch channels
 
 ```cpp

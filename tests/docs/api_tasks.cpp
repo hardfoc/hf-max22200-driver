@@ -46,7 +46,7 @@ bool configure_cdr(Driver& driver) {
 
 bool configure_vdr(Driver& driver) {
   // --8<-- [start:configure-vdr]
-  // High-side load (to GND): VDR only. Setpoints are duty cycle; see the note on VDR scaling.
+  // High-side load (to GND): VDR only. Setpoints are duty cycle in percent, written as HIT[6:0] = percent.
   auto cfg = max22200::ChannelConfig::makeSolenoidVdr(100.0f, 40.0f, 50.0f);
   cfg.side_mode = max22200::SideMode::HIGH_SIDE;
   if (driver.ConfigureChannel(1, cfg) != DriverStatus::OK) {

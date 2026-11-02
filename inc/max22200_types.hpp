@@ -245,6 +245,31 @@ inline uint8_t currentMaToRaw(uint32_t full_scale_current_ma, uint32_t ma) {
 }
 
 /**
+ * @brief Convert a VDR duty cycle in percent to the 7-bit HIT/HOLD field
+ *
+ * In VDR the HIT[6:0] and HOLD[6:0] fields hold the duty cycle in percent (datasheet Table 3,
+ * "VDR Duty Cycle"): 0 is 0 %, values from δMIN to δMAX are that duty in 1 % steps, 100 and
+ * above is 100 %. The chip clamps 1..δMIN and δMAX..99 to δMIN / δMAX itself.
+ * @param percent Duty cycle in percent
+ * @return Raw 7-bit value: round(percent), 0 for percent <= 0, 100 for percent >= 100
+ */
+inline uint8_t dutyPercentToRaw(float percent) {
+  if (!(percent > 0.0f)) return 0;  // also catches NaN
+  if (percent >= 100.0f) return 100;
+  const uint32_t raw = static_cast<uint32_t>(percent + 0.5f);
+  return raw > 100u ? 100u : static_cast<uint8_t>(raw);
+}
+
+/**
+ * @brief Convert the 7-bit VDR HIT/HOLD field to a duty cycle in percent (datasheet Table 3)
+ * @param raw HIT[6:0] or HOLD[6:0]
+ * @return Duty cycle in percent; raw values of 100 and above read as 100 %
+ */
+inline float dutyRawToPercent(uint8_t raw) {
+  return raw >= 100u ? 100.0f : static_cast<float>(raw);
+}
+
+/**
  * @brief Convert HIT time in ms to 8-bit raw value (0–255)
  * @param ms     HIT time in ms (0 = no HIT; < 0 or very large = continuous, 255)
  * @param master_clock_80khz false = 100 kHz base, true = 80 kHz base
@@ -472,14 +497,7 @@ struct ChannelConfig {
       }
     } else {
       // VDR: hit_setpoint is duty percent (0-100)
-      if (hit_setpoint <= 0.0f) {
-        hit_raw = 0;
-      } else if (hit_setpoint >= 100.0f) {
-        hit_raw = 127;
-      } else {
-        uint32_t r = static_cast<uint32_t>((hit_setpoint / 100.0f) * 127.0f + 0.5f);
-        hit_raw = (r > 127u) ? 127u : static_cast<uint8_t>(r);
-      }
+      hit_raw = dutyPercentToRaw(hit_setpoint);
     }
 
     // Convert hold_setpoint to raw 7-bit
@@ -496,14 +514,7 @@ struct ChannelConfig {
       }
     } else {
       // VDR: hold_setpoint is duty percent (0-100)
-      if (hold_setpoint <= 0.0f) {
-        hold_raw = 0;
-      } else if (hold_setpoint >= 100.0f) {
-        hold_raw = 127;
-      } else {
-        uint32_t r = static_cast<uint32_t>((hold_setpoint / 100.0f) * 127.0f + 0.5f);
-        hold_raw = (r > 127u) ? 127u : static_cast<uint8_t>(r);
-      }
+      hold_raw = dutyPercentToRaw(hold_setpoint);
     }
 
     // Convert hit_time_ms to raw 8-bit (master_clock_80khz from parameter, not stored on config)
@@ -564,9 +575,9 @@ struct ChannelConfig {
         hold_setpoint = 0.0f;
       }
     } else {
-      // VDR: raw → duty percent
-      hit_setpoint = (static_cast<float>(hit_raw) / 127.0f) * 100.0f;
-      hold_setpoint = (static_cast<float>(hold_raw) / 127.0f) * 100.0f;
+      // VDR: the field is the duty cycle in percent (datasheet Table 3); 100 and above is 100 %
+      hit_setpoint = dutyRawToPercent(hit_raw);
+      hold_setpoint = dutyRawToPercent(hold_raw);
     }
 
     // Convert hit_time raw → ms

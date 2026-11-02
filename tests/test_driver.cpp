@@ -188,3 +188,25 @@ TEST_CASE("Deinitialize clears ACTIVE and releases ENABLE") {
   CHECK_EQ(chip.regs[kStatus] & 0x01u, 0u);
   CHECK_EQ(chip.regs[kStatus] >> 24, 0u);
 }
+
+TEST_CASE("VDR duty is written as percent per Table 3 (40 % -> HIT[6:0] = 40)") {
+  MockMax22200 chip;
+  Driver driver(chip, board1A());
+  REQUIRE(driver.Initialize() == DriverStatus::OK);
+  const auto cfg = max22200::ChannelConfig::makeSolenoidVdr(40.0f, 25.0f, 0.0f);
+  REQUIRE(driver.ConfigureChannel(0, cfg) == DriverStatus::OK);
+  CHECK_EQ((chip.regs[1] >> 16) & 0x7Fu, 40u);      // HIT[6:0]
+  CHECK_EQ((chip.regs[1] >> 24) & 0x7Fu, 25u);      // HOLD[6:0]
+  CHECK_EQ((chip.regs[1] >> 7) & 1u, 1u);           // VDRnCDR
+
+  max22200::ChannelConfig back;
+  REQUIRE(driver.GetChannelConfig(0, back) == DriverStatus::OK);
+  CHECK(back.isVdr());
+  CHECK(back.hit_duty_percent() > 39.9f && back.hit_duty_percent() < 40.1f);
+  CHECK(back.hold_duty_percent() > 24.9f && back.hold_duty_percent() < 25.1f);
+
+  // 100 % and above is full duty; a raw value of 100..127 reads back as 100 %.
+  chip.regs[1] = (chip.regs[1] & ~(0x7Fu << 16)) | (110u << 16);
+  REQUIRE(driver.GetChannelConfig(0, back) == DriverStatus::OK);
+  CHECK(back.hit_duty_percent() > 99.9f && back.hit_duty_percent() < 100.1f);
+}
