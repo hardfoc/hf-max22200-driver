@@ -1,206 +1,76 @@
-# Quick Start
+# Quickstart
 
-This guide will get you up and running with the MAX22200 driver in just a few steps.
+Pull in a solenoid from your MCU: wire seven signals, write a small port class, call four driver functions.
 
-## Prerequisites
+!!! warning "Before you power the load"
+    Use a current-limited VM supply for the first run. The example turns channel 0 on at 400 mA as soon as the
+    chip is up, and `ChannelConfig` defaults to low-side drive: the coil goes from OUT0 to VM.
 
-- [Driver installed](installation.md)
-- [Hardware wired](hardware_setup.md)
-- [SPI interface implemented](platform_integration.md)
+## 1. Wire it
 
-## Minimal Example
+| MCU | MAX22200 | Notes |
+| --- | --- | --- |
+| SPI SCLK, MOSI, CS | SCK, SDI, CSB | SPI mode 0; start at 1 MHz |
+| SPI MISO | SDO | Open drain: pull it up to the MCU's I/O voltage |
+| GPIO out | ENABLE | High enables the chip; internal pull-down |
+| GPIO out | CMD | High while the command byte is sent |
+| GPIO in | FAULT | Open drain, low on a fault: pull it up |
+| GND | GND, EP | Common ground between the MCU and VM |
 
-Here's a complete working example:
+Tie TRIGA and TRIGB low (or leave them to their internal pull-downs) unless you trigger channels from pins. Put a
+resistor of 15 kΩ to 100 kΩ from IREF to GND: it sets the full-scale current for CDR. The
+[Hardware](hardware.md) page has the full pin list, the external parts and the timing.
 
-```cpp
-#include "max22200.hpp"
+## 2. Add the driver
 
-// 1. Implement the SPI interface
-class MySpi : public max22200::SpiInterface<MySpi> {
-public:
-    bool Transfer(const uint8_t* tx_data, uint8_t* rx_data, size_t length) {
-        // Assert CS, perform full-duplex SPI transfer, deassert CS
-        (void)tx_data; (void)rx_data; (void)length;
-        return true;
-    }
-    // ... also implement Initialize, SetChipSelect, Configure, IsReady,
-    //     DelayUs, GpioSet, GpioRead (see platform_integration.md)
-};
+Add the repository as a submodule and link the `hf::max22200` CMake target (or add `inc/` to your include path and
+build with C++20). [Installation](installation.md) covers CMake and ESP-IDF.
 
-// 2. Create instances
-MySpi spi;
-max22200::MAX22200<MySpi> driver(spi);
-
-// 3. Set board config (IFS from RREF; required for CDR)
-driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
-
-// 4. Initialize
-if (driver.Initialize() == max22200::DriverStatus::OK) {
-    // 5. Configure channel 0 (CDR, low-side; user units: mA and ms)
-    max22200::ChannelConfig config;
-    config.drive_mode = max22200::DriveMode::CDR;
-    config.side_mode = max22200::SideMode::LOW_SIDE;
-    config.hit_setpoint = 500.0f;   // 500 mA
-    config.hold_setpoint = 200.0f;  // 200 mA
-    config.hit_time_ms = 10.0f;          // 10 ms
-    // IFS from SetBoardConfig; driver uses STATUS FREQM for hit time
-    config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-    config.hit_current_check_enabled = true;                // Enable HIT current check
-
-    driver.ConfigureChannel(0, config);
-    driver.EnableChannel(0);
-}
+```bash
+git submodule add https://github.com/hardfoc/hf-max22200-driver.git external/hf-max22200-driver
 ```
 
-## Step-by-Step Explanation
+## 3. Write the port
 
-### Step 1: Include the Header
+The port is the only platform code. It runs one blocking SPI transaction per call, drives ENABLE and CMD, reads
+FAULT and waits. Replace the `platform_*` calls with your SDK's.
 
-```cpp
-#include "max22200.hpp"
+```cpp title="my_spi.hpp"
+--8<-- "tests/docs/my_spi.hpp:port"
 ```
 
-This includes the main driver class and all necessary types.
+`Transfer()` must hold CS low for the whole buffer and return only after CS is high again: the driver drops CMD
+right after it returns. [Porting](porting.md) explains each method.
 
-### Step 2: Implement the SPI Interface
+## 4. Pull in the solenoid
 
-You need to implement the `SpiInterface` for your platform. See [Platform Integration](platform_integration.md) for detailed examples.
-
-```cpp
-class MySpi : public max22200::SpiInterface<MySpi> {
-public:
-    bool Transfer(const uint8_t* tx_data, uint8_t* rx_data, size_t length) {
-        // Assert chip select
-        // Perform SPI transfer
-        // Deassert chip select
-        (void)tx_data; (void)rx_data; (void)length;
-        return true;
-    }
-    // ... implement remaining SpiInterface methods
-};
+```cpp title="main.cpp"
+--8<-- "tests/docs/quickstart.cpp:quickstart"
 ```
 
-### Step 3: Create Driver Instance
+What each step does:
 
-```cpp
-MySpi spi;
-max22200::MAX22200<MySpi> driver(spi);
-driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));  // IFS from RREF (CDR)
-```
+1. `BoardConfig(30.0f, false)` gives the driver the full-scale current from your RREF: IFS = 15 000 × 1 V / RREF,
+   so 30 kΩ is 500 mA. Every milliamp value is converted against it.
+2. `Initialize()` raises ENABLE, waits 0.5 ms, reads STATUS (clearing the power-up UVM flag) and writes STATUS
+   with ACTIVE = 1 and every channel off.
+3. `makeSolenoidCdr()` builds a low-side, current-regulated channel: 400 mA until the HIT time ends, then
+   150 mA. `ConfigureChannel()` encodes it into CFG_CH0.
+4. `EnableChannel()` sets ONCH0 with one 8-bit write. The HIT phase starts, then the chip drops to HOLD by itself.
 
-The constructor takes a reference to your SPI interface implementation.
+This example is built by the host CI, so it compiles against the current headers.
 
-### Step 4: Initialize
+## If it does not work
 
-```cpp
-if (driver.Initialize() == max22200::DriverStatus::OK) {
-    // Driver is ready
-}
-```
+| Symptom | First thing to check |
+| --- | --- |
+| `Initialize()` returns `COMMUNICATION_ERROR` | CMD wiring and level, SPI mode 0, `Transfer()` blocking |
+| Every read is `0xFF` | SDO pull-up missing or too weak, ENABLE low, VM off |
+| Initialises, but the output never switches | Load wiring (low side: coil to VM), VM above 4.5 V, ACTIVE in STATUS |
+| FAULT stays low | Read STATUS and FAULT ([Troubleshooting](troubleshooting.md)) |
 
-### Step 5: Configure Channel
+## Next
 
-```cpp
-max22200::ChannelConfig config;
-config.drive_mode = max22200::DriveMode::CDR;
-config.side_mode = max22200::SideMode::LOW_SIDE;
-config.hit_setpoint = 500.0f;   // 500 mA (CDR)
-config.hold_setpoint = 200.0f; // 200 mA
-config.hit_time_ms = 10.0f;         // 10 ms
-// IFS from SetBoardConfig; driver uses cached STATUS for hit time
-config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-config.hit_current_check_enabled = true;
-
-driver.ConfigureChannel(0, config);
-```
-
-Alternatively, set board config first then use convenience APIs:
-
-```cpp
-max22200::BoardConfig board(30.0f, false); // IFS from RREF
-driver.SetBoardConfig(board);
-driver.SetHitCurrentMa(0, 500);  // Channel 0, 500 mA
-driver.SetHoldCurrentMa(0, 200);
-```
-
-### Step 6: Enable Channel
-
-```cpp
-driver.EnableChannel(0);
-```
-
-## Complete Example with Error Handling
-
-```cpp
-#include "max22200.hpp"
-
-class MySpi : public max22200::SpiInterface<MySpi> {
-    // ... SPI implementation
-};
-
-void app_main() {
-    MySpi spi;
-    max22200::MAX22200<MySpi> driver(spi);
-    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
-    
-    // Initialize
-    max22200::DriverStatus status = driver.Initialize();
-    if (status != max22200::DriverStatus::OK) {
-        printf("Initialization failed\n");
-        return;
-    }
-    
-    // Configure channel (user units: mA and ms)
-    max22200::ChannelConfig config;
-    config.drive_mode = max22200::DriveMode::CDR;
-    config.side_mode = max22200::SideMode::LOW_SIDE;
-    config.hit_setpoint = 500.0f;
-    config.hold_setpoint = 200.0f;
-    config.hit_time_ms = 10.0f;
-    config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-
-    status = driver.ConfigureChannel(0, config);
-    if (status != max22200::DriverStatus::OK) {
-        printf("Channel configuration failed\n");
-        return;
-    }
-
-    // Enable channel
-    driver.EnableChannel(0);
-
-    // Read configured current in mA (requires SetBoardConfig with IFS)
-    uint32_t current_ma = 0;
-    if (driver.GetHitCurrentMa(0, current_ma) == max22200::DriverStatus::OK) {
-        printf("Channel 0 hit current: %" PRIu32 " mA\n", current_ma);
-    }
-}
-```
-
-## Expected Output
-
-When running this example (with `SetBoardConfig` set for your IFS), you should see the configured current in mA, for example:
-
-```
-Channel 0 hit current: 500 mA
-```
-
-## Troubleshooting
-
-If you encounter issues:
-
-- **Compilation errors**: Check that you've implemented all `SpiInterface` methods, especially `Transfer()`
-- **Initialization fails**: Verify SPI connections and hardware setup
-- **Channel not working**: Check channel configuration and enable state
-- **See**: [Troubleshooting](troubleshooting.md) for common issues
-
-## Next Steps
-
-- Explore [Examples](examples.md) for more advanced usage
-- Review the [API Reference](api_reference.md) for all available methods
-- Check [Configuration](configuration.md) for customization options
-
----
-
-**Navigation**
-⬅️ [Installation](installation.md) | [Next: Hardware Setup ➡️](hardware_setup.md) | [Back to Index](index.md)
-
+- [API guide](api-guide.md): CDR and VDR channels, switching, bridges, faults and plunger-movement detection.
+- [Drive modes](drive-modes.md): how HIT, HOLD, the HIT time and the chopping frequency map to registers.
+- [Examples](examples.md): ESP32 applications for valves and diagnostics.

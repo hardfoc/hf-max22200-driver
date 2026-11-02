@@ -1,248 +1,57 @@
 # Examples
 
-Working examples using the current driver API (STATUS, CFG_CHx, FAULT, CFG_DPM, and types in `max22200_types.hpp`).
+Complete ESP32-S3 applications that exercise the driver on a MAX22200 board, from a full test suite to solenoid
+cycling and plunger-movement tuning.
 
-## Example 1: Basic Solenoid Control (CDR)
+They run on an ESP32-S3 wired to a MAX22200 at 1 MHz SPI (SDO on GPIO35, SDI on GPIO37, SCK on GPIO36, CSB on
+GPIO38; ENABLE on GPIO2, FAULT on GPIO42, CMD on GPIO39) with RREF = 15 kΩ. The pins are in
+[`esp32_max22200_test_config.hpp`](../examples/esp32/main/esp32_max22200_test_config.hpp) and the port in
+[`esp32_max22200_bus.hpp`](../examples/esp32/main/esp32_max22200_bus.hpp). CI builds the apps marked "yes" on each
+pull request.
 
-CDR mode, low-side, with hit/hold current and HIT time.
+## The apps
 
-```cpp
-#include "max22200.hpp"
+<!-- generated: examples -->
+| App | What it shows | Source | CI |
+| --- | --- | --- | --- |
+| `max22200_comprehensive_test` :material-star:{ title="featured" } | Comprehensive MAX22200 driver test suite covering all functionality | [`max22200_comprehensive_test.cpp`](../examples/esp32/main/max22200_comprehensive_test.cpp) | yes |
+| `max22200_solenoid_valve_test` :material-star:{ title="featured" } | Solenoid/valve test: all 8 channels, C21 hit/hold, sequential and parallel patterns, full diagnostics | [`max22200_solenoid_valve_test.cpp`](../examples/esp32/main/max22200_solenoid_valve_test.cpp) | no |
+| `max22200_diagnostic` | Fault-isolation diagnostic: round-trips CFG_CH0, dumps STATUS+FAULT raw, tries both ACTIVE=1 write paths, then 5 Hz continuous STATUS dump for scope probing | [`max22200_diagnostic.cpp`](../examples/esp32/main/max22200_diagnostic.cpp) | no |
+| `c21_cycle_test` | Cycle a Parker C21 24V solenoid on CH0 (102 mA hit / 51 mA hold) with continuous STATUS+FAULT telemetry and DPM detection | [`c21_cycle_test.cpp`](../examples/esp32/main/c21_cycle_test.cpp) | no |
+| `c21_dpm_tuning_test` | Cycle C21 with DPM enabled, poll FAULT @ 1 kHz during HIT window, emit CSV stream + summary stats so DPM ISTART/IPTH/TDEB can be tuned against real plunger movement | [`c21_dpm_tuning_test.cpp`](../examples/esp32/main/c21_dpm_tuning_test.cpp) | no |
 
-void app_main() {
-    // SPI setup (implement SpiInterface for your platform)
-    MySpi spi;
-    max22200::MAX22200<MySpi> driver(spi);
-    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
-
-    if (driver.Initialize() != max22200::DriverStatus::OK) {
-        printf("Initialization failed\n");
-        return;
-    }
-
-    max22200::ChannelConfig config;
-    config.drive_mode = max22200::DriveMode::CDR;
-    config.side_mode = max22200::SideMode::LOW_SIDE;
-    config.hit_setpoint = 800.0f;  // mA
-    config.hold_setpoint = 200.0f;
-    config.hit_time_ms = 50.0f;
-    // IFS from SetBoardConfig; driver uses cached STATUS for hit time
-    config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-    config.hit_current_check_enabled = true;
-
-    driver.ConfigureChannel(0, config);
-    driver.EnableChannel(0);
-
-    printf("Solenoid enabled\n");
-}
-```
-
-## Example 2: Motor with H-Bridge Pair
-
-Use channel-pair mode HBRIDGE and set full-bridge state.
-
-```cpp
-#include "max22200.hpp"
-
-void app_main() {
-    MySpi spi;
-    max22200::MAX22200<MySpi> driver(spi);
-    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
-    driver.Initialize();
-
-    // Set pair 0 (ch0–ch1) to H-bridge; both channels must be off first
-    max22200::StatusConfig status;
-    driver.ReadStatus(status);
-    status.channels_on_mask = 0;
-    status.channel_pair_mode_10 = max22200::ChannelMode::HBRIDGE;
-    driver.WriteStatus(status);
-
-    // Configure both channels (forward uses ch1 config, reverse uses ch0)
-    max22200::ChannelConfig cfg;
-    cfg.drive_mode = max22200::DriveMode::CDR;
-    cfg.side_mode = max22200::SideMode::LOW_SIDE;
-    cfg.hit_setpoint = 500.0f;
-    cfg.hold_setpoint = 500.0f;
-    cfg.hit_time_ms = -1.0f;  // Continuous
-    // IFS from SetBoardConfig
-    cfg.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-    driver.ConfigureChannel(0, cfg);
-    driver.ConfigureChannel(1, cfg);
-
-    // Drive forward
-    driver.SetFullBridgeState(0, max22200::FullBridgeState::Forward);
-}
-```
-
-## Example 3: Fault Handling and Human-Readable Fault Names
-
-Use `ReadFaultRegister`, probe helpers, and `FaultTypeToStr()` for logging.
-
-```cpp
-#include "max22200.hpp"
-
-void fault_handler(uint8_t channel, max22200::FaultType fault_type, void *user_data) {
-    printf("Fault on channel %u: %s\n", channel, max22200::FaultTypeToStr(fault_type));
-}
-
-void app_main() {
-    MySpi spi;
-    max22200::MAX22200<MySpi> driver(spi);
-    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
-    driver.Initialize();
-    driver.SetFaultCallback(fault_handler);
-
-    max22200::ChannelConfig config;
-    config.drive_mode = max22200::DriveMode::CDR;
-    config.side_mode = max22200::SideMode::LOW_SIDE;
-    config.hit_setpoint = 500.0f;
-    config.hold_setpoint = 200.0f;
-    config.hit_time_ms = 10.0f;
-    // IFS from SetBoardConfig; driver uses cached STATUS for hit time
-    config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-    driver.ConfigureChannel(0, config);
-    driver.EnableChannel(0);
-
-    for (;;) {
-        max22200::FaultStatus faults;
-        driver.ReadFaultRegister(faults);
-
-        if (faults.hasFault()) {
-            printf("Faults: %u (mask 0x%02X)\n", faults.getFaultCount(), faults.channelsWithAnyFault());
-            if (faults.hasOvercurrent()) printf("  Overcurrent\n");
-            if (faults.hasHitNotReached()) printf("  HIT not reached\n");
-            if (faults.hasOpenLoadFault()) printf("  Open-load\n");
-            if (faults.hasPlungerMovementFault()) printf("  Plunger movement\n");
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
-}
-```
-
-## Example 4: Multiple Channels and Status
-
-Use `ReadStatus()` for channel on/off and `ReadFaultRegister()` for per-channel faults.
-
-```cpp
-#include "max22200.hpp"
-
-void app_main() {
-    MySpi spi;
-    max22200::MAX22200<MySpi> driver(spi);
-    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
-    driver.Initialize();
-
-    for (uint8_t ch = 0; ch < 8; ch++) {
-        max22200::ChannelConfig config;
-        config.drive_mode = max22200::DriveMode::CDR;
-        config.side_mode = max22200::SideMode::LOW_SIDE;
-        config.hit_setpoint = 400.0f;
-        config.hold_setpoint = 150.0f;
-        config.hit_time_ms = 10.0f;
-        // IFS from SetBoardConfig; driver uses cached STATUS for hit time
-        config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-        driver.ConfigureChannel(ch, config);
-    }
-
-    driver.SetChannelsOn(0x0F);  // Channels 0–3 on
-
-    max22200::StatusConfig status;
-    driver.ReadStatus(status);
-    printf("Channels on: %u\n", status.channelCountOn());
-    for (uint8_t ch = 0; ch < 8; ch++) {
-        if (status.isChannelOn(ch)) printf("  Channel %u on\n", ch);
-    }
-
-    max22200::FaultStatus faults;
-    driver.ReadFaultRegister(faults);
-    for (uint8_t ch = 0; ch < 8; ch++) {
-        if (faults.hasFaultOnChannel(ch)) {
-            printf("  Channel %u fault (OCP=%d HHF=%d OLF=%d DPM=%d)\n",
-                   ch, faults.hasOvercurrentOnChannel(ch), faults.hasHitNotReachedOnChannel(ch),
-                   faults.hasOpenLoadFaultOnChannel(ch), faults.hasPlungerMovementFaultOnChannel(ch));
-        }
-    }
-}
-```
-
-## Example 5: Board Config and Current in mA
-
-Set IFS via `BoardConfig`, then use mA and ms APIs.
-
-```cpp
-#include "max22200.hpp"
-
-void app_main() {
-    MySpi spi;
-    max22200::MAX22200<MySpi> driver(spi);
-    driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
-    driver.Initialize();
-
-    max22200::BoardConfig board(30.0f, false);
-    board.max_current_ma = 800;
-    driver.SetBoardConfig(board);
-
-    driver.ConfigureChannelCdr(0, 500, 200, 10.0f);  // 500 mA hit, 200 mA hold, 10 ms
-    driver.EnableChannel(0);
-
-    uint32_t hit_ma = 0, hold_ma = 0;
-    driver.GetHitCurrentMa(0, hit_ma);
-    driver.GetHoldCurrentMa(0, hold_ma);
-    printf("Channel 0: hit=%" PRIu32 " mA, hold=%" PRIu32 " mA\n", hit_ma, hold_ma);
-}
-```
-
-## Example 6: ESP32 Solenoid / Valve Test (All 8 Channels)
-
-The **solenoid valve test** app (`max22200_solenoid_valve_test`) is a dedicated ESP32 application that exercises the driver on valves with full diagnostics. It uses the same C21-style profile on all 8 channels and runs sequential (follow-up) and parallel clicking patterns.
-
-**What it does:**
-
-- Configures all 8 channels with the same valve profile (C21: 100 ms hit, 50% hold, low-side CDR or VDR per `C21ValveConfig`).
-- **Sequential pattern**: Enables channel 0, holds 200 ms, disables; then ch1 … ch7 with 80 ms gap between channels.
-- **Parallel pattern**: Turns all channels on for 500 ms, then all off.
-- Logs **full diagnostics** after init and after each pattern:
-  - STATUS (ACTIVE, fault flags, channels on mask)
-  - FAULT register (OCP, HHF, OLF, DPM per channel)
-  - Last fault byte from Command Register (hex + bit decode)
-  - nFAULT pin state
-  - Per-channel config readback (raw register + hit/hold/hit_time, CDR/VDR, LS/HS)
-  - BoardConfig (IFS, max current, max duty)
-  - Driver statistics (transfers, failed, faults, uptime, success %)
-
-**Build and run (from `examples/esp32`):**
+Build and flash one (from `examples/esp32`, ESP-IDF environment loaded):
 
 ```bash
-./scripts/build_app.sh max22200_solenoid_valve_test Debug
-./scripts/flash_app.sh max22200_solenoid_valve_test Debug
+./scripts/build_app.sh max22200_comprehensive_test Release
+./scripts/flash_app.sh flash_monitor max22200_comprehensive_test Release
 ```
 
-Valve profile (CDR vs VDR, hit/hold, hit time) is set in `esp32_max22200_test_config.hpp` via `C21ValveConfig`. See `examples/esp32/README.md` for the full **Solenoid / Valve Test** section.
+Source of this table: [`examples/esp32/app_config.yml`](../examples/esp32/app_config.yml).
+<!-- /generated -->
 
----
-
-## Running the Examples
-
-### ESP32
+## Set up once
 
 ```bash
+git submodule update --init examples/esp32/scripts   # the HardFOC ESP-IDF build scripts
 cd examples/esp32
-./scripts/build_app.sh max22200_comprehensive_test Debug   # or max22200_solenoid_valve_test
-./scripts/flash_app.sh max22200_comprehensive_test Debug
+. $IDF_PATH/export.sh                                 # ESP-IDF v5.5
+./scripts/build_app.sh list                           # every app and build type
 ```
 
-### Other Platforms
+The scripts read [`app_config.yml`](../examples/esp32/app_config.yml) (the same file this page's table comes
+from) and build each app as its own firmware image.
 
-Implement `max22200::SpiInterface<YourSpi>` for your platform and build with C++20. See [Platform Integration](platform_integration.md).
+## What to read in an example
 
-## Next Steps
+| You want to | Read |
+| --- | --- |
+| See every driver call exercised, with pass / fail output | `max22200_comprehensive_test.cpp` |
+| Drive all eight channels with HIT / HOLD patterns | `max22200_solenoid_valve_test.cpp` |
+| Find out why a board does not respond: raw STATUS, FAULT and CFG_CH0 round trips | `max22200_diagnostic.cpp` |
+| Cycle one solenoid with STATUS and FAULT telemetry | `c21_cycle_test.cpp` |
+| Tune DPM start current, threshold and debounce against a real valve | `c21_dpm_tuning_test.cpp` |
+| Write an ESP-IDF port | `esp32_max22200_bus.hpp` |
 
-- [API Reference](api_reference.md) for all methods and types
-- [Configuration](configuration.md) for STATUS, fault masks, and DPM
-- [Troubleshooting](troubleshooting.md) for common issues
-
----
-
-**Navigation**
-⬅️ [API Reference](api_reference.md) | [Next: Troubleshooting ➡️](troubleshooting.md) | [Back to Index](index.md)
+The [example folder's README](../examples/esp32/README.md) has the wiring, the build options and what each app
+prints.

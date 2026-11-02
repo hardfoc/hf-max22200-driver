@@ -1,221 +1,97 @@
 # Configuration
 
-This guide covers configuration options for the MAX22200 driver, aligned with the device registers (STATUS, CFG_CHx, CFG_DPM) and types in `max22200_types.hpp`.
+Every field of the four configuration structs, the register bits it maps to and its default.
 
-## Channel Configuration (CFG_CHx)
+The structs are in [`inc/max22200_types.hpp`](../inc/max22200_types.hpp); register bit positions are in
+[`inc/max22200_registers.hpp`](../inc/max22200_registers.hpp). [Drive modes](drive-modes.md) explains what the
+channel settings do on the output.
 
-### Basic Channel Setup
+## BoardConfig
 
-Channels are configured via `ChannelConfig` and written with `ConfigureChannel()`. **ChannelConfig stores user units** (mA for CDR, % for VDR, ms for hit time). For CDR, **IFS comes from the board** (SetBoardConfig with RREF)—you do not set it per channel. Call `SetBoardConfig(BoardConfig(rref_kohm, hfs))` first; the driver uses that IFS when writing. The driver gets the master clock (FREQM) from STATUS for hit_time conversion—you do not set it on ChannelConfig. Channels are turned on/off via the STATUS register channels_on_mask (ONCH bits) (see [Channel Control](#channel-control)).
+The board's full-scale current and optional safety limits. Pass it to the constructor or `SetBoardConfig()`.
 
-```cpp
-driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));  // IFS from RREF (required for CDR)
+| Field | Meaning |
+| --- | --- |
+| `full_scale_current_ma` | Default 1000. IFS in mA. `BoardConfig(rref_kohm, hfs)` sets it to KFS / RREF |
+| `max_current_ma` | Default 0 (none). Upper clamp for the `Set...Current...()` calls |
+| `max_duty_percent` | Default 0 (none). Upper clamp for `SetHitDutyPercent()` and `SetHoldDutyPercent()` |
 
-max22200::ChannelConfig config;
-config.drive_mode = max22200::DriveMode::CDR;
-config.side_mode = max22200::SideMode::LOW_SIDE;
-config.hit_setpoint = 500.0f;   // desired current, mA
-config.hold_setpoint = 200.0f;  // mA
-config.hit_time_ms = 10.0f;     // 10 ms
-config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-config.hit_current_check_enabled = true;
-config.open_load_detection_enabled = false;
-config.plunger_movement_detection_enabled = false;
+The limits apply to the per-setting calls only, not to `ConfigureChannel()`. Construct with `hfs = false` and use
+each channel's `half_full_scale` for HFS; passing `true` halves IFS for every channel and HFS halves it again.
 
-driver.ConfigureChannel(0, config);
-```
+## ChannelConfig
 
-### Drive Modes
+One CFG_CHx register (datasheet Table 11). Defaults are the chip's reset values: CDR, low side, SPI-triggered,
+every check off.
 
-- **CDR (Current Drive Regulation)**  
-  `config.drive_mode = max22200::DriveMode::CDR;`  
-  Regulates current to hit/hold levels. Only supported in low-side mode.
+| Field | Meaning |
+| --- | --- |
+| `half_full_scale` | Bit 31 (HFS). IFS / 2 and doubled low-side RON for this channel; low side only |
+| `hold_setpoint` | Bits 30:24 (HOLD). CDR: mA. VDR: duty percent |
+| `trigger_from_pin` | Bit 23 (TRGnSPI). `true`: the TRIG pin switches the channel instead of ONCH |
+| `hit_setpoint` | Bits 22:16 (HIT). CDR: mA. VDR: duty percent |
+| `hit_time_ms` | Bits 15:8 (HIT_T). HIT time in ms; 0 = none, negative = continuous |
+| `drive_mode` | Bit 7 (VDRnCDR). `DriveMode::CDR` or `VDR`; change only with every channel off |
+| `side_mode` | Bit 6 (HSnLS). `SideMode::LOW_SIDE` (load to VM) or `HIGH_SIDE` (load to GND, VDR only) |
+| `chop_freq` | Bits 5:4 (FREQ_CFG). `ChopFreq::FMAIN_DIV4` (default), `FMAIN_DIV3`, `FMAIN_DIV2`, `FMAIN` |
+| `slew_rate_control_enabled` | Bit 3 (SRC). Slow edges; low side, below 50 kHz only |
+| `open_load_detection_enabled` | Bit 2 (OL_EN). OLF flag when the load is disconnected |
+| `plunger_movement_detection_enabled` | Bit 1 (DPM_EN). DPM on this channel; low side only |
+| `hit_current_check_enabled` | Bit 0 (HHF_EN). HHF flag when the HIT current is not reached in the HIT time |
 
-- **VDR (Voltage Drive Regulation)**  
-  `config.drive_mode = max22200::DriveMode::VDR;`  
-  Duty-cycle control. Supported in both low-side and high-side.
 
-### Side Mode (Low-Side vs High-Side)
+`toRegister(ifs_ma, freqm)` and `fromRegister(value, ifs_ma, freqm)` convert between the struct and the raw
+register; the driver calls them with the board IFS and the cached FREQM. Accessors such as `isCdr()`,
+`hasHitTime()` and `isContinuousHit()` read the fields by intent.
 
-- **Low-side**  
-  `config.side_mode = max22200::SideMode::LOW_SIDE;`  
-  Load between OUT and VM. Supports CDR and VDR, HFS, SRC, DPM. When `half_full_scale` is true, effective IFS for that channel is half of board IFS (driver uses it for mA ↔ raw conversion).
+## StatusConfig
 
-- **High-side**  
-  `config.side_mode = max22200::SideMode::HIGH_SIDE;`  
-  Load between OUT and GND. VDR only; no CDR, HFS, SRC, or DPM.
+The STATUS register (datasheet Table 10). Read it with `ReadStatus()`, change it, write it with `WriteStatus()`.
 
-### Current and Timing in Real Units
+| Field | Meaning |
+| --- | --- |
+| `channels_on_mask` | Bits 31:24 (ONCH). Bit n switches channel n on |
+| `overtemperature_masked` ... `undervoltage_masked` | Bits 23:17 (M_*). `true`: that fault does not pull FAULT low. `communication_error_masked` resets to `true` |
+| `master_clock_80khz` | Bit 16 (FREQM). `false`: 100 kHz oscillator, `true`: 80 kHz |
+| `channel_pair_mode_76` ... `_10` | Bits 15:8 (CMxy). `ChannelMode::INDEPENDENT`, `PARALLEL` or `HBRIDGE`; change only with both channels off |
+| `overtemperature` ... `undervoltage` | Bits 7:1. Fault flags, read-only; reading STATUS clears OVT and UVM |
+| `active` | Bit 0 (ACTIVE). `true`: normal operation; `false`: low power, outputs Hi-Z |
 
-**Option A — Driver APIs (recommended):** Set IFS with `BoardConfig`, then use mA/ms APIs:
 
-```cpp
-max22200::BoardConfig board(30.0f, false);
-board.max_current_ma = 800;      // Optional safety limit (0 = no limit)
-board.max_duty_percent = 90;    // Optional for VDR (0 = no limit)
-driver.SetBoardConfig(board);
+## FaultStatus
 
-driver.SetHitCurrentMa(0, 500);   // Channel 0, 500 mA
-driver.SetHoldCurrentMa(0, 200);
-driver.SetHitTimeMs(0, 10.0f);   // 10 ms (converted from fCHOP)
-```
+The FAULT register (datasheet Table 12), one bitmask per fault type, bit n for channel n.
 
-**Option B — Set user units on ChannelConfig directly:** Call `SetBoardConfig()` first (IFS from RREF). Set `hit_setpoint`, `hold_setpoint`, `hit_time_ms`, and `chop_freq`. The driver uses board IFS (and STATUS FREQM for hit time) when writing; ChannelConfig does not store IFS or master clock.
+| Field | Meaning |
+| --- | --- |
+| `overcurrent_channel_mask` | Bits 31:24 (OCP). The output exceeded the OCP threshold; the channel is off |
+| `hit_not_reached_channel_mask` | Bits 23:16 (HHF). The HIT current was not reached in the HIT time |
+| `open_load_fault_channel_mask` | Bits 15:8 (OLF). The load is disconnected |
+| `plunger_movement_fault_channel_mask` | Bits 7:0 (DPM). No valid current dip was seen in the HIT phase |
 
-```cpp
-driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));  // IFS from RREF
+`hasFault()`, `hasOvercurrentOnChannel(ch)`, `channelsWithAnyFault()` and `getFaultCount()` summarise it.
 
-max22200::ChannelConfig config;
-config.drive_mode = max22200::DriveMode::CDR;
-config.side_mode = max22200::SideMode::LOW_SIDE;
-config.hit_setpoint = 500.0f;   // mA
-config.hold_setpoint = 200.0f;  // mA
-config.hit_time_ms = 10.0f;
-config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-driver.ConfigureChannel(0, config);
-```
+## DpmConfig
 
-For VDR, set `hit_setpoint` and `hold_setpoint` as duty percent (0–100). Helpers `currentMaToRaw()`, `hitTimeMsToRaw()`, and `getChopFreqKhz()` are in `max22200_types.hpp` for custom conversion.
+The CFG_DPM register, global for every channel with DPM enabled. `ConfigureDpm(start_ma, threshold_ma,
+debounce_ms)` fills it from real units.
 
-### Human-Readable Probes on ChannelConfig
+| Field | Meaning |
+| --- | --- |
+| `plunger_movement_start_current` | Bits 14:8. Start current = value × IFS / 127 |
+| `plunger_movement_debounce_time` | Bits 7:4. Minimum dip length = value / fCHOP |
+| `plunger_movement_current_threshold` | Bits 3:0. Minimum dip depth = value × IFS / 127 |
 
-You can query config with inline helpers (see `max22200_types.hpp`):
+## Recommended setups
 
-- `config.isCdr()` / `config.isVdr()`, `config.isLowSide()` / `config.isHighSide()`
-- `config.hasHitTime()`, `config.isContinuousHit()` (hit_time_ms > 0 or continuous)
-- `config.isHalfFullScale()`, `config.isSlewRateControlEnabled()`, `config.isOpenLoadDetectionEnabled()`, `config.isPlungerMovementDetectionEnabled()`, `config.isHitCurrentCheckEnabled()`
+| Load | Mode | Notes |
+| --- | --- | --- |
+| Solenoid valve or relay to VM | CDR, low side | `makeSolenoidCdr()`; enable HHF and DPM for diagnostics |
+| Load to GND | VDR, high side | No CDR, HFS, SRC or DPM on the high side |
+| Coil under half of IFS | CDR, `half_full_scale` | Twice the current resolution |
+| Brushed DC motor, latching valve | `HBRIDGE` pair | `SetFullBridgeState()`; different settings per direction |
+| Load above 1 A | `PARALLEL` pair | Wire both outputs together; the even channel's settings apply |
 
-## STATUS Register (StatusConfig)
+## Next
 
-The STATUS register holds channel on/off bits (ONCH), fault masks, channel-pair mode (CMxy), and the ACTIVE bit. Read/write with `ReadStatus()` and `WriteStatus()`. The driver keeps an internal cache of STATUS (updated on ReadStatus, WriteStatus, and Initialize) for hit-time and duty-limit conversions. If you write STATUS via `WriteRegister32(RegBank::STATUS, ...)`, that cache is not updated—prefer `WriteStatus(StatusConfig)` when changing STATUS.
-
-### Channel On/Off (ONCH)
-
-- `status.channels_on_mask` — bitmask: bit N = channel N on (1) or off (0).
-- Helpers: `status.isChannelOn(ch)`, `status.channelCountOn()`, `status.getChannelsOnMask()`.
-
-### Fault Masks (M_OVT, M_OCP, …)
-
-When a mask bit is 1, that fault does not assert the nFAULT pin. Use the human-readable helpers:
-
-- `status.isOvertemperatureMasked()`, `status.isOvercurrentMasked()`, `status.isOpenLoadFaultMasked()`, `status.isHitNotReachedMasked()`, `status.isPlungerMovementFaultMasked()`, `status.isCommunicationErrorMasked()`, `status.isUndervoltageMasked()`.
-
-### Fault Flags (Read-Only)
-
-After `ReadStatus(status)` or `ReadFaultFlags(status)`:
-
-- `status.hasOvertemperature()`, `status.hasOvercurrent()`, `status.hasOpenLoadFault()`, `status.hasHitNotReached()`, `status.hasPlungerMovementFault()`, `status.hasCommunicationError()`, `status.hasUndervoltage()`, `status.hasFault()`, `status.isActive()`.
-
-### Channel-Pair Mode (CM10, CM32, CM54, CM76)
-
-Pairs (0–1, 2–3, 4–5, 6–7) can be INDEPENDENT, PARALLEL, or HBRIDGE. Change only when both channels in the pair are off.
-
-- `status.getChannelPairMode10()`, `getChannelPairMode32()`, `getChannelPairMode54()`, `getChannelPairMode76()` return `ChannelMode`.
-
-### Master Frequency (FREQM)
-
-- `status.is100KHzBase()` / `status.is80KHzBase()` — base clock for chopping frequency.
-
-## FAULT Register (FaultStatus)
-
-Per-channel fault bits (OCP, HHF, OLF, DPM) are read with `ReadFaultRegister(faults)`. Reading clears flags (and deasserts nFAULT when no other faults remain). Use human-readable probes:
-
-- `faults.hasOvercurrent()`, `faults.hasHitNotReached()`, `faults.hasOpenLoadFault()`, `faults.hasPlungerMovementFault()`
-- `faults.hasFaultOnChannel(ch)`, `faults.hasOvercurrentOnChannel(ch)`, etc.
-- `faults.channelsWithAnyFault()` — bitmask of channels with any fault.
-- `FaultTypeToStr(fault_type)` for logging (e.g. "Overcurrent", "HIT not reached").
-
-Clearing:
-
-- `ClearAllFaults()` — clear all and discard.
-- `ClearChannelFaults(channel_mask, &faults)` — clear selected channels (MAX22200A); optional snapshot in `faults`.
-
-## DPM Configuration (CFG_DPM)
-
-Plunger movement detection is global; enable per channel with `config.plunger_movement_detection_enabled = true` (low-side only), or in one call with `SetDpmEnabledChannels(channel_mask)` (bit N = 1 enables DPM on channel N). Configure algorithm in real units:
-
-```cpp
-driver.ConfigureDpm(200.0f, 50.0f, 2.0f);
-// start_current_ma, dip_threshold_ma, debounce_ms (debounce uses cached STATUS FREQM + FMAIN_DIV4 fCHOP)
-```
-
-Or read/write raw `DpmConfig` (plunger_movement_start_current, plunger_movement_debounce_time, plunger_movement_current_threshold) with `ReadDpmConfig()` / `WriteDpmConfig()`. Use `getPlungerMovementStartCurrent()`, `getPlungerMovementDebounceTime()`, `getPlungerMovementCurrentThreshold()` for readable access.
-
-## Channel Control
-
-### Enable/Disable Channels
-
-```cpp
-driver.EnableChannel(0);
-driver.DisableChannel(0);
-driver.SetChannelEnabled(0, true);   // or false
-
-driver.EnableAllChannels();
-driver.DisableAllChannels();
-driver.SetAllChannelsEnabled(true); // or false
-driver.SetChannelsOn((1u << 0) | (1u << 2));  // Channels 0 and 2 on
-```
-
-### Full-Bridge Pairs
-
-When a pair is configured as HBRIDGE in STATUS (e.g. `status.channel_pair_mode_10 = ChannelMode::HBRIDGE`), use:
-
-```cpp
-driver.SetFullBridgeState(0, max22200::FullBridgeState::Forward);  // pair 0 = ch0–ch1
-```
-
-## Device Enable (ENABLE Pin)
-
-```cpp
-driver.EnableDevice();   // ENABLE pin high — SPI and channels active
-driver.DisableDevice();  // ENABLE pin low — low power
-driver.SetDeviceEnable(true);  // or false
-```
-
-Initialization sets ACTIVE=1 and ENABLE high; `Deinitialize()` sets ACTIVE=0 and ENABLE low.
-
-## Recommended Setups
-
-### Solenoid (CDR, low-side)
-
-```cpp
-max22200::ChannelConfig config;
-config.drive_mode = max22200::DriveMode::CDR;
-config.side_mode = max22200::SideMode::LOW_SIDE;
-config.hit_setpoint = 800.0f;  // mA (IFS from SetBoardConfig)
-config.hold_setpoint = 200.0f;
-config.hit_time_ms = 50.0f;
-config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-config.hit_current_check_enabled = true;
-driver.ConfigureChannel(0, config);
-driver.EnableChannel(0);
-```
-
-Or use the preset: `auto config = max22200::ChannelConfig::makeSolenoidCdr(800.0f, 200.0f, 50.0f); config.hit_current_check_enabled = true; driver.ConfigureChannel(0, config);`
-
-### Motor (H-bridge pair)
-
-Set channel pair to `ChannelMode::HBRIDGE` in STATUS (both channels off), configure both channels, then use `SetFullBridgeState(pair_index, Forward)` or `Reverse`, etc.
-
-### Low-Power (VDR)
-
-```cpp
-config.drive_mode = max22200::DriveMode::VDR;
-config.side_mode = max22200::SideMode::LOW_SIDE;
-config.hit_setpoint = 60.0f;   // duty %
-config.hold_setpoint = 20.0f;
-config.hit_time_ms = 100.0f;
-config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-```
-
-Or: `auto config = max22200::ChannelConfig::makeSolenoidVdr(60.0f, 20.0f, 100.0f); driver.ConfigureChannel(0, config);`
-
-## Next Steps
-
-- See [Examples](examples.md) for full code.
-- [API Reference](api_reference.md) for all methods and types.
-
----
-
-**Navigation**
-⬅️ [Platform Integration](platform_integration.md) | [Next: API Reference ➡️](api_reference.md) | [Back to Index](index.md)
+[API guide](api-guide.md) shows these structs in use; [Porting](porting.md) writes the SPI port.
