@@ -1363,7 +1363,7 @@
 <h1 id="porting">Porting<a class="headerlink" href="#porting" title="Permanent link">&para;</a></h1>
 <p>Run the driver on a new MCU by writing one class: the SPI interface.</p>
 <p>The driver never calls your SDK directly. It calls eight methods on a class you derive from
-<code>max22200::SpiInterface&lt;Self&gt;</code> (in <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a>). The base
+<code>max22200::SpiInterface&lt;Self&gt;</code> (in <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a>). The base
 class uses CRTP: the calls are resolved at compile time, so there are no virtual functions, no vtable and nothing
 to allocate.</p>
 <figure class="hf-figure">
@@ -1374,7 +1374,7 @@ to allocate.</p>
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>From top to bottom. Your application talks to one MAX22200<SpiType> object; its main calls (listed from inc/max22200.hpp) configure channels, switch them, and read faults. Each call becomes the chip's two-phase SPI access: a command byte with CMD high, then 8 or 32 data bits with CMD low. The communication interface (SpiInterface in inc/max22200_spi_interface.hpp) is a CRTP base that forwards those transfers and the ENABLE, CMD and FAULT pins to your class. The platform port is the only code you write. Below it is the hardware.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/inc/max22200.hpp"><code>inc/max22200.hpp</code></a> <code>MAX22200 public calls</code>; <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/inc/max22200.hpp"><code>inc/max22200.hpp</code></a> <code>MAX22200 public calls</code>; <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
 </details>
 <h2 id="what-you-implement">What you implement<a class="headerlink" href="#what-you-implement" title="Permanent link">&para;</a></h2>
 <table>
@@ -1509,12 +1509,13 @@ to allocate.</p>
 <code>ACTIVE</code> and <code>INACTIVE</code>. If ENABLE is tied high on your board, ignore it in <code>GpioSet()</code>; if FAULT is not wired,
 return <code>false</code> from <code>GpioRead()</code> and poll <code>ReadStatus()</code> instead.</p>
 <h2 id="reference-implementation">Reference implementation<a class="headerlink" href="#reference-implementation" title="Permanent link">&para;</a></h2>
-<p>The ESP32 examples use <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/examples/esp32/main/esp32_max22200_bus.hpp"><code>esp32_max22200_bus.hpp</code></a>: an ESP-IDF
+<p>The ESP32 examples use <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/examples/esp32/main/esp32_max22200_bus.hpp"><code>esp32_max22200_bus.hpp</code></a>: an ESP-IDF
 <code>spi_master</code> port with <code>spi_device_transmit()</code> (blocking, CS handled by the peripheral), <code>esp_rom_delay_us()</code> and
-GPIOs for ENABLE, CMD, FAULT, TRIGA and TRIGB. Start from it for any ESP-IDF target.</p>
+GPIOs for ENABLE, CMD, FAULT, TRIGA and TRIGB (TRIGA and TRIGB start low, inactive). Start from it for any ESP-IDF
+target.</p>
 <h2 id="check-your-port">Check your port<a class="headerlink" href="#check-your-port" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Build it: the port on this page is compiled by the host CI from <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/tests/docs/my_spi.hpp"><code>tests/docs/</code></a>, with
+<li>Build it: the port on this page is compiled by the host CI from <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/tests/docs/my_spi.hpp"><code>tests/docs/</code></a>, with
    the driver instantiated over it.</li>
 <li>Call <code>Initialize()</code>. <code>OK</code> proves the command and data phases work: the driver reads STATUS, writes it and reads
    it back.</li>

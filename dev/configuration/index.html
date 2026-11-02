@@ -1384,8 +1384,8 @@
 
 <h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h1>
 <p>Every field of the four configuration structs, the register bits it maps to and its default.</p>
-<p>The structs are in <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/inc/max22200_types.hpp"><code>inc/max22200_types.hpp</code></a>; register bit positions are in
-<a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/inc/max22200_registers.hpp"><code>inc/max22200_registers.hpp</code></a>. <a href="../drive-modes/">Drive modes</a> explains what the
+<p>The structs are in <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/inc/max22200_types.hpp"><code>inc/max22200_types.hpp</code></a>; register bit positions are in
+<a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/inc/max22200_registers.hpp"><code>inc/max22200_registers.hpp</code></a>. <a href="../drive-modes/">Drive modes</a> explains what the
 channel settings do on the output.</p>
 <h2 id="boardconfig">BoardConfig<a class="headerlink" href="#boardconfig" title="Permanent link">&para;</a></h2>
 <p>The board's full-scale current and optional safety limits. Pass it to the constructor or <code>SetBoardConfig()</code>.</p>
@@ -1544,7 +1544,8 @@ register; the driver calls them with the board IFS and the cached FREQM. Accesso
 <p><code>hasFault()</code>, <code>hasOvercurrentOnChannel(ch)</code>, <code>channelsWithAnyFault()</code> and <code>getFaultCount()</code> summarise it.</p>
 <h2 id="dpmconfig">DpmConfig<a class="headerlink" href="#dpmconfig" title="Permanent link">&para;</a></h2>
 <p>The CFG_DPM register, global for every channel with DPM enabled. <code>ConfigureDpm(start_ma, threshold_ma,
-debounce_ms)</code> fills it from real units.</p>
+debounce_ms)</code> fills it from real units, converting the debounce with the chopping frequency of the DPM channels;
+<code>ConfigureDpm(start_ma, threshold_ma, debounce_ms, chop_freq)</code> takes the frequency explicitly.</p>
 <table>
 <thead>
 <tr>

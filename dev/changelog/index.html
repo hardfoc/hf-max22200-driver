@@ -1183,6 +1183,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#added" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1275,6 +1297,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#added" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1338,10 +1382,58 @@ affected API.</p>
 <li>Corrected the hardware facts: the chip has no logic supply pin (VM 4.5 V to 36 V only), the outputs are eight
   single half-bridges <code>OUT0</code> to <code>OUT7</code>, SPI is mode 0 only, and there is no RESET pin; ENABLE, CMD and FAULT are
   the control pins.</li>
-<li>Documented that VDR duty-cycle setpoints are written scaled by 127 / 100 while the chip reads them as percent.</li>
+</ul>
+<h3 id="breaking-changes">Breaking changes<a class="headerlink" href="#breaking-changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>BREAKING</strong> (behaviour, no signature change): <code>SetHitCurrentMa()</code>, <code>SetHoldCurrentMa()</code>, their <code>...A()</code> and
+  <code>...CurrentPercent()</code> variants, <code>SetHitDutyPercent()</code> and <code>SetHoldDutyPercent()</code> no longer change the
+  channel's drive mode. A current setter on a VDR channel, or a duty setter on a CDR channel, now returns
+  <code>INVALID_PARAMETER</code> and writes nothing. 1.0.0 silently flipped VDRnCDR and reinterpreted the other setpoint in
+  the new unit (and the chip ignores a mode change while any channel is on or a TRIG pin is high). Select the
+  mode with <code>ConfigureChannel()</code>, <code>ConfigureChannelCdr()</code> or <code>ConfigureChannelVdr()</code> before using the setters.</li>
+<li><strong>BREAKING</strong> (behaviour, no signature change): <code>ConfigureDpm(start_ma, threshold_ma, debounce_ms)</code> converts the
+  debounce with the chopping frequency of the channels that have DPM enabled instead of always <code>FMAIN_DIV4</code>, so
+  the same <code>debounce_ms</code> gives a different DPM_TDEB code on channels not at <code>FMAIN_DIV4</code>. It reads CFG_CH0..7 to
+  find that frequency, and returns <code>INVALID_PARAMETER</code> (writing nothing) when DPM channels use different
+  frequencies or an argument is negative or NaN. Enable DPM on the channels before calling it, or use the new
+  overload that takes the frequency.</li>
+<li><strong>BREAKING</strong> (behaviour, no signature change): the callback registered with <code>SetFaultCallback()</code> is now called
+  by the driver. Code that called it itself after <code>ReadFaultRegister()</code> or <code>ReadStatus()</code> now sees each fault
+  twice; remove those calls.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>VDR duty cycle is written as percent, as datasheet Table 3 defines HIT[6:0] / HOLD[6:0] in VDR: 40 % is now
+  HIT[6:0] = 40 (1.0.0 wrote round(40 × 127 / 100) = 51, so the output ran at 51 %). Reading back returns the
+  field as percent (100 and above read as 100 %). If you compensated with the 100 / 127 workaround, remove it.</li>
+<li><code>Initialize()</code> waits the 2.5 ms wake-up time tWU after writing ACTIVE = 1 (datasheet Electrical
+  Characteristics, "wake-up completed?" in Figure 6), so a channel switched on right after it drives its output.
+  <code>Initialize()</code> now takes at least 3 ms.</li>
+<li><code>ConfigureDpm()</code> converted the DPM debounce with the <code>FMAIN_DIV4</code> chopping frequency whatever the channels
+  used; DPM_TDEB counts periods of the monitored channel's fCHOP (datasheet CFG_DPM, TDEB = DPM_TDEB / fCHOP). It
+  now uses the <code>chop_freq</code> of the channels with DPM enabled (exact fCHOP, e.g. 33.33 kHz), returns
+  <code>INVALID_PARAMETER</code> if they differ, and rejects negative or NaN arguments.</li>
+<li>
+<p>The fault callback set with <code>SetFaultCallback()</code> was stored but never called. The driver now calls it for each
+  OCP / HHF / OLF / DPM bit it reads from FAULT, and for OVT / UVM / COMER read from STATUS after <code>Initialize()</code>.</p>
+</li>
+<li>
+<p><code>cmake --install</code> left out <code>src/max22200.ipp</code>, which <code>max22200.hpp</code> includes, so an installed driver did not
+  compile. The <code>.ipp</code> is now installed next to the headers (the header includes it from there when <code>../src/</code> is
+  absent) and the package exports the target as <code>hf::max22200</code>, the name <code>add_subdirectory()</code> users link (1.0.0
+  exported <code>hf::hf_max22200</code>, which could not be used).</p>
+</li>
+<li>
+<p>The ESP32 example bus started TRIGA and TRIGB high. They are active-high inputs with internal pull-downs
+  (datasheet Pin Description), and the chip ignores VDRnCDR / HSnLS changes while either is high (Programming
+  Procedure step 5c), so the examples' drive mode and side settings could be ignored. They now start low, and the
+  trigger-pin test pulses low -&gt; high -&gt; low. <code>SetTrigA()</code> / <code>SetTrigB()</code> documentation now says true = high =
+  trigger asserted.</p>
+</li>
 </ul>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
+<li><code>ConfigureDpm(start_ma, threshold_ma, debounce_ms, chop_freq)</code> overload that takes the chopping frequency.</li>
 <li>Host unit tests (<code>HF_MAX22200_BUILD_TESTS</code>) that run the driver against a model of the MAX22200 SPI protocol.</li>
 </ul>
 <h2 id="100">1.0.0<a class="headerlink" href="#100" title="Permanent link">&para;</a></h2>

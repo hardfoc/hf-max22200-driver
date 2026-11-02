@@ -638,6 +638,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="CMake">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installed-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installed package
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1311,6 +1328,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="CMake">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installed-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installed package
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1423,20 +1457,25 @@ the generated version header) and requires C++20 (<code>cxx_std_20</code>), so y
 </tr>
 </tbody>
 </table>
-<div class="admonition note">
-<p class="admonition-title">Use the source tree, not <code>cmake --install</code></p>
-<p>The install rules copy <code>inc/</code> but not <code>src/max22200.ipp</code>, which <code>max22200.hpp</code> includes. Until that is fixed,
-consume the driver with <code>add_subdirectory()</code> or the ESP-IDF component.</p>
-</div>
+<h3 id="installed-package">Installed package<a class="headerlink" href="#installed-package" title="Permanent link">&para;</a></h3>
+<p><code>cmake --install</code> copies the headers, the generated <code>max22200_version.h</code> and the template implementation
+<code>max22200.ipp</code> into <code>&lt;prefix&gt;/include</code>, and a CMake package into <code>&lt;prefix&gt;/lib/cmake/hf_max22200</code>. A project
+then finds it by name and links the same target:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>external/hf-max22200-driver<span class="w"> </span>-B<span class="w"> </span>build-max22200
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>cmake<span class="w"> </span>--install<span class="w"> </span>build-max22200<span class="w"> </span>--prefix<span class="w"> </span>/opt/hardfoc
+</span></code></pre></div>
+<div class="language-cmake highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">find_package</span><span class="p">(</span><span class="s">hf_max22200</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span><span class="w">   </span><span class="c"># with CMAKE_PREFIX_PATH=/opt/hardfoc</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">my_app</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">hf::max22200</span><span class="p">)</span>
+</span></code></pre></div>
 <h2 id="esp-idf">ESP-IDF<a class="headerlink" href="#esp-idf" title="Permanent link">&para;</a></h2>
 <p>The ESP-IDF component wrapper is
-<a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/examples/esp32/components/hf_max22200/CMakeLists.txt"><code>examples/esp32/components/hf_max22200/</code></a>. Copy that
+<a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/examples/esp32/components/hf_max22200/CMakeLists.txt"><code>examples/esp32/components/hf_max22200/</code></a>. Copy that
 folder into your project's <code>components/</code> (or point <code>EXTRA_COMPONENT_DIRS</code> at it) and set the <code>HF_MAX22200_ROOT</code>
 cache variable to the driver checkout; the wrapper stops with a clear message when the path is wrong. Your
 component then declares <code>REQUIRES hf_max22200</code>.</p>
 <h2 id="without-cmake">Without CMake<a class="headerlink" href="#without-cmake" title="Permanent link">&para;</a></h2>
 <p>Add <code>inc/</code> to the include path and generate <code>max22200_version.h</code> from
-<a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/inc/max22200_version.h.in"><code>inc/max22200_version.h.in</code></a> once (replace the four <code>@...@</code> fields with the
+<a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/inc/max22200_version.h.in"><code>inc/max22200_version.h.in</code></a> once (replace the four <code>@...@</code> fields with the
 version). <code>max22200.hpp</code> includes <code>src/max22200.ipp</code> by relative path, so keep <code>inc/</code> and <code>src/</code> side by side.</p>
 <h2 id="how-the-build-is-organised">How the build is organised<a class="headerlink" href="#how-the-build-is-organised" title="Permanent link">&para;</a></h2>
 <table>
@@ -1448,22 +1487,22 @@ version). <code>max22200.hpp</code> includes <code>src/max22200.ipp</code> by re
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/cmake/hf_max22200_build_settings.cmake"><code>cmake/hf_max22200_build_settings.cmake</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/cmake/hf_max22200_build_settings.cmake"><code>cmake/hf_max22200_build_settings.cmake</code></a></td>
 <td>Target name, include directories, version: the single source of truth</td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/CMakeLists.txt"><code>CMakeLists.txt</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/CMakeLists.txt"><code>CMakeLists.txt</code></a></td>
 <td>Interface library for host builds and CI</td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/examples/esp32/components/hf_max22200/CMakeLists.txt"><code>examples/esp32/components/hf_max22200/CMakeLists.txt</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/examples/esp32/components/hf_max22200/CMakeLists.txt"><code>examples/esp32/components/hf_max22200/CMakeLists.txt</code></a></td>
 <td>ESP-IDF component over the same settings</td>
 </tr>
 </tbody>
 </table>
 <p>The version is set once in the settings file and written into <code>max22200_version.h</code> at configure time. Read it at
 run time:</p>
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;::</span><span class="n">GetDriverVersion</span><span class="p">();</span><span class="w">   </span><span class="c1">// "1.0.0"</span>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max22200</span><span class="o">::</span><span class="n">MAX22200</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;::</span><span class="n">GetDriverVersion</span><span class="p">();</span><span class="w">   </span><span class="c1">// "1.0.0"</span>
 </span></code></pre></div>
 <h2 id="next">Next<a class="headerlink" href="#next" title="Permanent link">&para;</a></h2>
 <p><a href="../quickstart/">Quickstart</a> wires the chip and drives a solenoid; <a href="../porting/">Porting</a> writes the SPI interface

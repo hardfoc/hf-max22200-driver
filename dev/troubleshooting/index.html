@@ -1348,8 +1348,8 @@ They tell bus problems (no reply, COMER) apart from chip problems (the chip answ
 <tbody>
 <tr>
 <td>Channel is on in ONCH but the output does not switch</td>
-<td>Less than 2.5 ms (t<sub>WU</sub>) since ACTIVE = 1, or ACTIVE = 0</td>
-<td>Wait after <code>Initialize()</code>; check <code>StatusConfig::active</code></td>
+<td>ACTIVE = 0, or less than 2.5 ms (t<sub>WU</sub>) since you set ACTIVE = 1 with <code>WriteStatus()</code></td>
+<td>Check <code>StatusConfig::active</code>; wait t<sub>WU</sub> after a raw ACTIVE write (<code>Initialize()</code> already waits); check your port's <code>DelayUs()</code></td>
 </tr>
 <tr>
 <td>Low-side channel does nothing, high side works (or the reverse)</td>
@@ -1360,6 +1360,11 @@ They tell bus problems (no reply, COMER) apart from chip problems (the chip answ
 <td><code>ConfigureChannel()</code> returns <code>INVALID_PARAMETER</code></td>
 <td>IFS is 0, SRC at 50 kHz or more, or channel above 7</td>
 <td><code>SetBoardConfig()</code>, a lower <code>chop_freq</code>, the channel number</td>
+</tr>
+<tr>
+<td>A current or duty setter returns <code>INVALID_PARAMETER</code></td>
+<td>The channel is in the other drive mode: current setters need CDR, duty setters VDR</td>
+<td>Configure the mode first with <code>ConfigureChannelCdr()</code> / <code>ConfigureChannelVdr()</code></td>
 </tr>
 <tr>
 <td>Drive mode or side does not change</td>
@@ -1373,8 +1378,8 @@ They tell bus problems (no reply, COMER) apart from chip problems (the chip answ
 </tr>
 <tr>
 <td>VDR duty is higher than requested</td>
-<td>The driver scales VDR percent by 127 / 100</td>
-<td>See <a href="../drive-modes/#voltage-drive-vdr">Drive modes</a></td>
+<td>Driver 1.0.0, which scaled VDR percent by 127 / 100</td>
+<td>Update the driver; see <a href="../drive-modes/#voltage-drive-vdr">Drive modes</a></td>
 </tr>
 <tr>
 <td>HIT time reads back shorter or longer</td>

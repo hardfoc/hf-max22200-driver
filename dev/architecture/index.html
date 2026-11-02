@@ -1370,7 +1370,7 @@
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>From top to bottom. Your application talks to one MAX22200<SpiType> object; its main calls (listed from inc/max22200.hpp) configure channels, switch them, and read faults. Each call becomes the chip's two-phase SPI access: a command byte with CMD high, then 8 or 32 data bits with CMD low. The communication interface (SpiInterface in inc/max22200_spi_interface.hpp) is a CRTP base that forwards those transfers and the ENABLE, CMD and FAULT pins to your class. The platform port is the only code you write. Below it is the hardware.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/inc/max22200.hpp"><code>inc/max22200.hpp</code></a> <code>MAX22200 public calls</code>; <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/inc/max22200.hpp"><code>inc/max22200.hpp</code></a> <code>MAX22200 public calls</code>; <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
 </details>
 <h2 id="the-three-layers">The three layers<a class="headerlink" href="#the-three-layers" title="Permanent link">&para;</a></h2>
 <table>
@@ -1384,12 +1384,12 @@
 <tbody>
 <tr>
 <td><strong>Hardware-agnostic core</strong>: <code>MAX22200&lt;SpiType&gt;</code></td>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/inc/max22200.hpp"><code>inc/max22200.hpp</code></a>, <a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/src/max22200.ipp"><code>src/max22200.ipp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/inc/max22200.hpp"><code>inc/max22200.hpp</code></a>, <a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/src/max22200.ipp"><code>src/max22200.ipp</code></a></td>
 <td>Never, for a new board</td>
 </tr>
 <tr>
 <td><strong>Communication interface</strong>: <code>SpiInterface&lt;Derived&gt;</code></td>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/5116a07ca1115ae705ae1aa1641bd2b97a5d2856/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/c3e9c1c9a7a552875e4cc20602c2c487df2eea99/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a></td>
 <td>Never</td>
 </tr>
 <tr>
