@@ -1,6 +1,0 @@
-var searchData=
-[
-  ['c21valveconfig_0',['C21ValveConfig',['../structMAX22200__TestConfig_1_1C21ValveConfig.html',1,'MAX22200_TestConfig']]],
-  ['channelconfig_1',['ChannelConfig',['../structmax22200_1_1ChannelConfig.html',1,'max22200']]],
-  ['controlpins_2',['ControlPins',['../structMAX22200__TestConfig_1_1ControlPins.html',1,'MAX22200_TestConfig']]]
-];

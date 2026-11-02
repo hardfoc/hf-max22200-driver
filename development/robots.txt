@@ -1,1 +1,0 @@
-Sitemap: https://hardfoc.github.io/hf-max22200-driver/development/sitemap.xml
