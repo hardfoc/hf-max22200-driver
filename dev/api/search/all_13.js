@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['rbw_5fpos_0',['RBW_POS',['../namespacemax22200_1_1_command_reg.html#a78cf3ba992bfd333f7d5e3ad5f7f70cb',1,'max22200::CommandReg']]],
+  ['rbw_5fread_1',['RBW_READ',['../namespacemax22200_1_1_command_reg.html#aa53dc719e51e24442a0a72adc5d89738',1,'max22200::CommandReg']]],
+  ['rbw_5fwrite_2',['RBW_WRITE',['../namespacemax22200_1_1_command_reg.html#a0d94b433814453a077e6422c41b00c9b',1,'max22200::CommandReg']]],
+  ['readdpmconfig_3',['ReadDpmConfig',['../classmax22200_1_1_m_a_x22200.html#a954e6242ee595056784164c23fc7caac',1,'max22200::MAX22200']]],
+  ['readfaultflags_4',['ReadFaultFlags',['../classmax22200_1_1_m_a_x22200.html#a5a5eb5138a9479f297eac31aad340811',1,'max22200::MAX22200']]],
+  ['readfaultregister_5',['ReadFaultRegister',['../classmax22200_1_1_m_a_x22200.html#aed74d2a7f8b4e3e4a8e4aaf0964b46f3',1,'max22200::MAX22200']]],
+  ['readfaultregisterselectiveclear_6',['ReadFaultRegisterSelectiveClear',['../classmax22200_1_1_m_a_x22200.html#abe470fcd29ca6359dcb30391b5c7ff30',1,'max22200::MAX22200']]],
+  ['reading_7',['FAULT Pin Reading',['../max22200__spi__interface_8hpp.html#autotoc_md31',1,'']]],
+  ['readregister32_8',['ReadRegister32',['../classmax22200_1_1_m_a_x22200.html#a5141e07605df7a60c47852dd13e8f29a',1,'max22200::MAX22200']]],
+  ['readregister8_9',['ReadRegister8',['../classmax22200_1_1_m_a_x22200.html#a036b8faa33340ace123f03195a58aff1',1,'max22200::MAX22200']]],
+  ['readstatus_10',['ReadStatus',['../classmax22200_1_1_m_a_x22200.html#affc8972a21ff78c0faeb71a553449126',1,'max22200::MAX22200']]],
+  ['reference_11',['MAX22200 Driver API reference',['../index.html',1,'']]],
+  ['register_20architecture_12',['MAX22200 Register Architecture',['../max22200__registers_8hpp.html#autotoc_md7',1,'']]],
+  ['register_20conversion_13',['Register Conversion',['../structmax22200_1_1_channel_config.html#autotoc_md48',1,'']]],
+  ['register_20layout_14',['register layout',['../structmax22200_1_1_fault_status.html#autotoc_md52',1,'Register Layout'],['../structmax22200_1_1_status_config.html#autotoc_md50',1,'Register Layout'],['../namespacemax22200_1_1_cfg_dpm_reg.html#autotoc_md22',1,'Register Layout'],['../namespacemax22200_1_1_fault_reg.html#autotoc_md20',1,'Register Layout'],['../namespacemax22200_1_1_cfg_ch_reg.html#autotoc_md14',1,'Register Layout'],['../namespacemax22200_1_1_status_reg.html#autotoc_md12',1,'Register Layout']]],
+  ['register_20map_15',['Register Map',['../max22200__registers_8hpp.html#autotoc_md8',1,'']]],
+  ['register_20protocol_16',['Command Register Protocol',['../max22200__registers_8hpp.html#autotoc_md9',1,'']]],
+  ['register_20write_17',['Phase 1: Command Register Write',['../max22200_8hpp.html#autotoc_md1',1,'']]],
+  ['regulation_18',['regulation',['../namespacemax22200.html#autotoc_md37',1,'CDR (Current Drive Regulation)'],['../max22200__types_8hpp.html#autotoc_md33',1,'CDR Mode (Current Drive Regulation)'],['../namespacemax22200.html#autotoc_md38',1,'VDR (Voltage Drive Regulation)'],['../max22200__types_8hpp.html#autotoc_md34',1,'VDR Mode (Voltage Drive Regulation)']]],
+  ['requirements_19',['MAX22200 SPI Requirements',['../max22200__spi__interface_8hpp.html#autotoc_md25',1,'']]],
+  ['resetstatistics_20',['ResetStatistics',['../classmax22200_1_1_m_a_x22200.html#a9defc6dbc606fb39a981ce7eacb13d28',1,'max22200::MAX22200']]],
+  ['restriction_20datasheet_21',['SRC + fCHOP restriction (datasheet)',['../namespacemax22200.html#autotoc_md46',1,'']]],
+  ['restrictions_22',['restrictions',['../namespacemax22200_1_1_cfg_ch_reg.html#autotoc_md19',1,'Restrictions'],['../structmax22200_1_1_channel_config.html#autotoc_md49',1,'Restrictions']]],
+  ['restrictions_20and_20limitations_23',['Restrictions and Limitations',['../max22200_8hpp.html#autotoc_md5',1,'']]],
+  ['reverse_24',['Reverse',['../namespacemax22200.html#a6635e7b8136acb977eb22ce7c6b46450a67f115c1fddc4ce1aeb1c754001585bc',1,'max22200']]]
+];
