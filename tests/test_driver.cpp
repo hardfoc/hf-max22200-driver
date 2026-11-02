@@ -245,3 +245,26 @@ TEST_CASE("Initialize waits tWU = 2.5 ms after ACTIVE = 1 before it returns") {
   CHECK(chip.command_delay_us[2] - chip.command_delay_us[1] >= 2500u);   // tWU after the ACTIVE write
   CHECK(chip.delay_us_total >= 3000u);
 }
+
+TEST_CASE("ConfigureDpm converts the debounce with the fCHOP of the DPM channels") {
+  MockMax22200 chip;
+  Driver driver(chip, board1A());
+  REQUIRE(driver.Initialize() == DriverStatus::OK);
+  // Channel 0 at FREQ_CFG = 11 (100 kHz with FREQM = 0), DPM on.
+  REQUIRE(driver.ConfigureChannelCdr(0, 500, 200, 10.0f, max22200::SideMode::LOW_SIDE,
+                                     max22200::ChopFreq::FMAIN, false, false, true) == DriverStatus::OK);
+  REQUIRE(driver.ConfigureDpm(300.0f, 50.0f, 0.1f) == DriverStatus::OK);
+  // TDEB = DPM_TDEB / fCHOP: 0.1 ms * 100 kHz = 10 periods (not 0.1 ms * 25 kHz = 3).
+  CHECK_EQ((chip.regs[kCfgDpm] >> 4) & 0x0Fu, 10u);
+
+  // Explicit frequency: 0.3 ms at FMAIN_DIV3 (33.33 kHz) = 10 periods.
+  REQUIRE(driver.ConfigureDpm(300.0f, 50.0f, 0.3f, max22200::ChopFreq::FMAIN_DIV3) == DriverStatus::OK);
+  CHECK_EQ((chip.regs[kCfgDpm] >> 4) & 0x0Fu, 10u);
+
+  // DPM channels at different frequencies: one TDEB code cannot fit both, so ask for the explicit form.
+  REQUIRE(driver.ConfigureChannelCdr(1, 500, 200, 10.0f, max22200::SideMode::LOW_SIDE,
+                                     max22200::ChopFreq::FMAIN_DIV2, false, false, true) == DriverStatus::OK);
+  const uint32_t before = chip.regs[kCfgDpm];
+  CHECK(driver.ConfigureDpm(300.0f, 50.0f, 0.1f) == DriverStatus::INVALID_PARAMETER);
+  CHECK_EQ(chip.regs[kCfgDpm], before);
+}

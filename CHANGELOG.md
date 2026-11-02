@@ -23,6 +23,12 @@ code that used the affected API; together they call for a major version bump at 
   `INVALID_PARAMETER` and writes nothing. 1.0.0 silently flipped VDRnCDR and reinterpreted the other setpoint in
   the new unit (and the chip ignores a mode change while any channel is on or a TRIG pin is high). Select the
   mode with `ConfigureChannel()`, `ConfigureChannelCdr()` or `ConfigureChannelVdr()` before using the setters.
+- **BREAKING** (behaviour, no signature change): `ConfigureDpm(start_ma, threshold_ma, debounce_ms)` converts the
+  debounce with the chopping frequency of the channels that have DPM enabled instead of always `FMAIN_DIV4`, so
+  the same `debounce_ms` gives a different DPM_TDEB code on channels not at `FMAIN_DIV4`. It reads CFG_CH0..7 to
+  find that frequency, and returns `INVALID_PARAMETER` (writing nothing) when DPM channels use different
+  frequencies or an argument is negative or NaN. Enable DPM on the channels before calling it, or use the new
+  overload that takes the frequency.
 
 ### Fixed
 
@@ -32,9 +38,14 @@ code that used the affected API; together they call for a major version bump at 
 - `Initialize()` waits the 2.5 ms wake-up time tWU after writing ACTIVE = 1 (datasheet Electrical
   Characteristics, "wake-up completed?" in Figure 6), so a channel switched on right after it drives its output.
   `Initialize()` now takes at least 3 ms.
+- `ConfigureDpm()` converted the DPM debounce with the `FMAIN_DIV4` chopping frequency whatever the channels
+  used; DPM_TDEB counts periods of the monitored channel's fCHOP (datasheet CFG_DPM, TDEB = DPM_TDEB / fCHOP). It
+  now uses the `chop_freq` of the channels with DPM enabled (exact fCHOP, e.g. 33.33 kHz), returns
+  `INVALID_PARAMETER` if they differ, and rejects negative or NaN arguments.
 
 ### Added
 
+- `ConfigureDpm(start_ma, threshold_ma, debounce_ms, chop_freq)` overload that takes the chopping frequency.
 - Host unit tests (`HF_MAX22200_BUILD_TESTS`) that run the driver against a model of the MAX22200 SPI protocol.
 
 ## 1.0.0

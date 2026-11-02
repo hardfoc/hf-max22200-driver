@@ -74,7 +74,8 @@ The FAULT register (datasheet Table 12), one bitmask per fault type, bit n for c
 ## DpmConfig
 
 The CFG_DPM register, global for every channel with DPM enabled. `ConfigureDpm(start_ma, threshold_ma,
-debounce_ms)` fills it from real units.
+debounce_ms)` fills it from real units, converting the debounce with the chopping frequency of the DPM channels;
+`ConfigureDpm(start_ma, threshold_ma, debounce_ms, chop_freq)` takes the frequency explicitly.
 
 | Field | Meaning |
 | --- | --- |

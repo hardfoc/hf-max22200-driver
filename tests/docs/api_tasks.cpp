@@ -134,10 +134,11 @@ void faults(Driver& driver) {
 
 bool dpm(Driver& driver) {
   // --8<-- [start:dpm]
+  // Per channel: DPM_EN on channels 0 and 1 (low-side only). Do this first: the debounce below is
+  // converted with these channels' chopping frequency.
+  if (driver.SetDpmEnabledChannels(0b0000'0011) != DriverStatus::OK) return false;
   // Global DPM settings: search for the dip above 150 mA, dip of at least 40 mA lasting 0.4 ms.
   if (driver.ConfigureDpm(150.0f, 40.0f, 0.4f) != DriverStatus::OK) return false;
-  // Per channel: DPM_EN on channels 0 and 1 (low-side only).
-  if (driver.SetDpmEnabledChannels(0b0000'0011) != DriverStatus::OK) return false;
   // A DPM flag in FAULT[7:0] after a HIT means no dip was seen: the plunger did not move.
   // --8<-- [end:dpm]
   return true;

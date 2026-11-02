@@ -232,6 +232,23 @@ inline uint32_t getChopFreqKhz(bool master_clock_80khz, ChopFreq cf) {
 }
 
 /**
+ * @brief Exact chopping frequency in kHz (FREQM + FREQ_CFG, datasheet Table 1)
+ * @param master_clock_80khz false = 100 kHz base, true = 80 kHz base
+ * @param cf    Channel ChopFreq (FREQ_CFG)
+ * @return fCHOP in kHz without rounding (e.g. 33.33 for FMAIN_DIV3 at 100 kHz)
+ */
+inline float getChopFreqKhzExact(bool master_clock_80khz, ChopFreq cf) {
+  const float fmain_khz = master_clock_80khz ? 80.0f : 100.0f;
+  switch (cf) {
+    case ChopFreq::FMAIN_DIV4: return fmain_khz / 4.0f;
+    case ChopFreq::FMAIN_DIV3: return fmain_khz / 3.0f;
+    case ChopFreq::FMAIN_DIV2: return fmain_khz / 2.0f;
+    case ChopFreq::FMAIN:      return fmain_khz;
+    default:                   return fmain_khz / 4.0f;
+  }
+}
+
+/**
  * @brief Convert current in mA to 7-bit raw value (0–127) for CDR
  * @param full_scale_current_ma Full-scale current in mA (must be > 0)
  * @param ma     Desired current in mA

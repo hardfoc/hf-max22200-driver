@@ -452,7 +452,40 @@ template <typename SpiType>
 DriverStatus MAX22200<SpiType>::ConfigureDpm(float start_current_ma,
                                               float dip_threshold_ma,
                                               float debounce_ms) {
-  if (board_config_.full_scale_current_ma == 0) {
+  // DPM_TDEB counts chopping periods of the channel being monitored (CFG_DPM, TDEB = DPM_TDEB / fCHOP),
+  // and fCHOP is per channel (FREQ_CFG). Use the frequency of the channels that have DPM_EN set; with
+  // none set, use the reset value FREQ_CFG = 00 (FMAIN_DIV4).
+  bool found = false;
+  ChopFreq chop_freq = ChopFreq::FMAIN_DIV4;
+  for (uint8_t ch = 0; ch < NUM_CHANNELS_; ++ch) {
+    uint32_t raw = 0;
+    DriverStatus result = readReg32(getChannelCfgBank(ch), raw);
+    if (result != DriverStatus::OK) {
+      updateStatistics(false);
+      return result;
+    }
+    if ((raw & CfgChReg::DPM_EN_BIT) == 0) {
+      continue;
+    }
+    const auto cf = static_cast<ChopFreq>((raw >> CfgChReg::FREQ_CFG_SHIFT) & 0x03u);
+    if (found && cf != chop_freq) {
+      // One TDEB code cannot give the same time at two frequencies: use the explicit overload.
+      updateStatistics(false);
+      return DriverStatus::INVALID_PARAMETER;
+    }
+    chop_freq = cf;
+    found = true;
+  }
+  return ConfigureDpm(start_current_ma, dip_threshold_ma, debounce_ms, chop_freq);
+}
+
+template <typename SpiType>
+DriverStatus MAX22200<SpiType>::ConfigureDpm(float start_current_ma,
+                                              float dip_threshold_ma,
+                                              float debounce_ms,
+                                              ChopFreq chop_freq) {
+  if (board_config_.full_scale_current_ma == 0 || !(debounce_ms >= 0.0f) ||
+      !(start_current_ma >= 0.0f) || !(dip_threshold_ma >= 0.0f)) {
     updateStatistics(false);
     return DriverStatus::INVALID_PARAMETER;
   }
@@ -463,15 +496,15 @@ DriverStatus MAX22200<SpiType>::ConfigureDpm(float start_current_ma,
   }
   // ISTART = plunger_movement_start_current × (IFS/127)  =>  value = round(start_ma / IFS_ma * 127)
   float ratio = start_current_ma / static_cast<float>(board_config_.full_scale_current_ma);
-  config.plunger_movement_start_current = static_cast<uint8_t>(ratio * 127.0f + 0.5f);
-  if (config.plunger_movement_start_current > 127) config.plunger_movement_start_current = 127;
+  uint32_t istart = static_cast<uint32_t>(ratio * 127.0f + 0.5f);
+  config.plunger_movement_start_current = (istart > 127) ? 127 : static_cast<uint8_t>(istart);
   ratio = dip_threshold_ma / static_cast<float>(board_config_.full_scale_current_ma);
   uint32_t ipth = static_cast<uint32_t>(ratio * 127.0f + 0.5f);
   config.plunger_movement_current_threshold = (ipth > 15) ? 15 : static_cast<uint8_t>(ipth);
-  // TDEB = plunger_movement_debounce_time / fCHOP; use actual fCHOP from cached STATUS (FREQM + FMAIN_DIV4)
-  uint32_t fchop_khz = getChopFreqKhz(cached_status_.master_clock_80khz, ChopFreq::FMAIN_DIV4);
-  float periods_f = debounce_ms * static_cast<float>(fchop_khz) + 0.5f;
-  uint32_t periods = static_cast<uint32_t>(periods_f);
+  // TDEB = DPM_TDEB / fCHOP  =>  DPM_TDEB = round(TDEB × fCHOP), with fCHOP = fMAIN / divider
+  // (fMAIN = 100 kHz, or 80 kHz with FREQM = 1; divider 4, 3, 2, 1 for FREQ_CFG 00..11, Table 1).
+  const float fchop_khz = getChopFreqKhzExact(cached_status_.master_clock_80khz, chop_freq);
+  const uint32_t periods = static_cast<uint32_t>(debounce_ms * fchop_khz + 0.5f);
   config.plunger_movement_debounce_time = (periods > 15) ? 15 : static_cast<uint8_t>(periods);
   return WriteDpmConfig(config);
 }

@@ -40,7 +40,8 @@ value was rejected or the transfer failed ([Architecture](architecture.md#errors
 `Initialize()` follows the datasheet's programming flow (Figure 6): it calls your port's `Initialize()` and
 `Configure(10 MHz, mode 0, MSB first)`, raises ENABLE, waits 0.5 ms, reads STATUS to clear the power-up UVM flag,
 writes STATUS with ACTIVE = 1, every channel off and COMER masked (other masks and pair modes as read: their reset
-values after power-up), waits 2.5 ms (t<sub>WU</sub>, ACTIVE = 1 to outputs active), then reads STATUS again. A COMER reply restarts the sequence, up to three times.
+values after power-up), waits 2.5 ms (t<sub>WU</sub>, ACTIVE = 1 to outputs active), then reads STATUS again. A
+COMER reply restarts the sequence, up to three times.
 
 Set the board's full-scale current before you configure a CDR channel. `BoardConfig()` without arguments assumes
 1000 mA (RREF = 15 kΩ); a wrong IFS scales every current by the same error. Because `Initialize()` waits
@@ -140,8 +141,11 @@ own polling code if you use them.
 DPM looks for the dip a moving plunger causes in the HIT current. The search starts above the start current and
 ends at the HIT level or the end of the HIT time; a dip counts when it is deeper than the threshold and longer
 than the debounce time. The settings are global; DPM_EN is per channel and low-side only. The datasheet asks for a
-current slope below 700 mA/ms above the start current. `ConfigureDpm()` converts the debounce with the
-`FMAIN_DIV4` frequency whatever the channels use; use `WriteDpmConfig()` for other frequencies.
+current slope below 700 mA/ms above the start current. The debounce is a count of chopping periods
+(DPM_TDEB / f<sub>CHOP</sub>), and f<sub>CHOP</sub> is per channel: `ConfigureDpm(start, threshold, debounce)` converts
+it with the `chop_freq` of the channels that have DPM enabled, so enable DPM first. With no DPM channel it uses
+`FMAIN_DIV4`; DPM channels at different frequencies return `INVALID_PARAMETER`. Pass the frequency as a fourth
+argument to choose it yourself.
 
 ## Use a register directly
 

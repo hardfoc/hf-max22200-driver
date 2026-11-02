@@ -484,20 +484,38 @@ public:
   /**
    * @brief Configure DPM in real units (easy API)
    *
-   * Sets start current, dip threshold, and debounce time. Uses board IFS for
-   * current conversion and cached STATUS (FREQM) + FMAIN_DIV4 for debounce fCHOP.
-   * Call SetBoardConfig() first so IFS is set; call ReadStatus or Initialize so cache is valid.
+   * Sets start current, dip threshold, and debounce time. Uses board IFS for current conversion.
+   * The debounce is a count of chopping periods (TDEB = DPM_TDEB / fCHOP, datasheet CFG_DPM), and
+   * fCHOP is per channel, so this overload reads CFG_CH0..7 and uses the FREQ_CFG of the channels
+   * that have DPM_EN set (with FREQM from the cached STATUS). With no DPM channel yet it uses
+   * FREQ_CFG = 00 (FMAIN_DIV4, the reset value); enable DPM first, or use the overload that takes
+   * the frequency.
    *
    * @param start_current_ma  Current (mA) above which DPM monitors for dip
    * @param dip_threshold_ma Minimum dip amplitude (mA) to count as valid
-   * @param debounce_ms      Min dip duration (ms); converted to chopping periods using actual fCHOP
+   * @param debounce_ms      Min dip duration (ms); converted to chopping periods, clamped to 15
    * @return DriverStatus::OK on success
-   * @return DriverStatus::INVALID_PARAMETER if IFS not set or values out of range
-   *
-   * @note For custom fCHOP or raw register control use ReadDpmConfig/WriteDpmConfig.
+   * @return DriverStatus::INVALID_PARAMETER if IFS not set, a value is negative or NaN, or DPM
+   *         channels use different FREQ_CFG (nothing is written)
    */
   DriverStatus ConfigureDpm(float start_current_ma, float dip_threshold_ma,
                            float debounce_ms);
+
+  /**
+   * @brief Configure DPM in real units for a given chopping frequency
+   *
+   * As ConfigureDpm(float, float, float), but converts the debounce with @p chop_freq (and FREQM
+   * from the cached STATUS) instead of reading the channels.
+   *
+   * @param start_current_ma  Current (mA) above which DPM monitors for dip
+   * @param dip_threshold_ma Minimum dip amplitude (mA) to count as valid
+   * @param debounce_ms      Min dip duration (ms); converted to chopping periods, clamped to 15
+   * @param chop_freq        FREQ_CFG of the channels DPM will monitor
+   * @return DriverStatus::OK on success
+   * @return DriverStatus::INVALID_PARAMETER if IFS not set or a value is negative or NaN
+   */
+  DriverStatus ConfigureDpm(float start_current_ma, float dip_threshold_ma,
+                           float debounce_ms, ChopFreq chop_freq);
 
   /**
    * @brief Read DPM algorithm configuration (CFG_DPM register)
