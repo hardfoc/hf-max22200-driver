@@ -36,6 +36,8 @@ else()
 endif()
 
 add_library(hf::max22200 ALIAS ${HF_MAX22200_TARGET_NAME})
+# Export as hf::max22200 too, so find_package() users link the same name as add_subdirectory() users.
+set_target_properties(${HF_MAX22200_TARGET_NAME} PROPERTIES EXPORT_NAME max22200)
 
 #===============================================================================
 # Versioning
@@ -74,6 +76,9 @@ install(TARGETS ${HF_MAX22200_TARGET_NAME} EXPORT hf_max22200Targets
 install(DIRECTORY inc/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" PATTERN "*.h.in" EXCLUDE)
 install(FILES "${HF_MAX22200_VERSION_HEADER}" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+# max22200.hpp includes the template implementation; install it next to the headers, where the
+# header looks for it when ../src/ does not exist.
+install(FILES src/max22200.ipp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(EXPORT hf_max22200Targets
     FILE hf_max22200Targets.cmake

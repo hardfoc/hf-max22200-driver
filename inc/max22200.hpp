@@ -1108,5 +1108,10 @@ inline const char* GetDriverVersion() noexcept {
 
 } // namespace max22200
 
-// Include implementation
+// Include implementation: from the source tree (inc/ next to src/), or from an installed tree where
+// `cmake --install` puts max22200.ipp next to this header.
+#if __has_include("../src/max22200.ipp")
 #include "../src/max22200.ipp"
+#else
+#include "max22200.ipp"
+#endif

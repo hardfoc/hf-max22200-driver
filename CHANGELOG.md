@@ -48,6 +48,11 @@ code that used the affected API; together they call for a major version bump at 
 - The fault callback set with `SetFaultCallback()` was stored but never called. The driver now calls it for each
   OCP / HHF / OLF / DPM bit it reads from FAULT, and for OVT / UVM / COMER read from STATUS after `Initialize()`.
 
+- `cmake --install` left out `src/max22200.ipp`, which `max22200.hpp` includes, so an installed driver did not
+  compile. The `.ipp` is now installed next to the headers (the header includes it from there when `../src/` is
+  absent) and the package exports the target as `hf::max22200`, the name `add_subdirectory()` users link (1.0.0
+  exported `hf::hf_max22200`, which could not be used).
+
 ### Added
 
 - `ConfigureDpm(start_ma, threshold_ma, debounce_ms, chop_freq)` overload that takes the chopping frequency.

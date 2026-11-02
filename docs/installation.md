@@ -34,9 +34,21 @@ the generated version header) and requires C++20 (`cxx_std_20`), so your target 
 | `HF_MAX22200_ENABLE_WARNINGS` | `OFF` | Adds `-Wall -Wextra -Wpedantic` to targets that link the driver |
 | `HF_MAX22200_BUILD_TESTS` | `OFF` | Builds the host unit tests in `tests/` ([Testing and CI](testing.md)) |
 
-!!! note "Use the source tree, not `cmake --install`"
-    The install rules copy `inc/` but not `src/max22200.ipp`, which `max22200.hpp` includes. Until that is fixed,
-    consume the driver with `add_subdirectory()` or the ESP-IDF component.
+### Installed package
+
+`cmake --install` copies the headers, the generated `max22200_version.h` and the template implementation
+`max22200.ipp` into `<prefix>/include`, and a CMake package into `<prefix>/lib/cmake/hf_max22200`. A project
+then finds it by name and links the same target:
+
+```bash
+cmake -S external/hf-max22200-driver -B build-max22200
+cmake --install build-max22200 --prefix /opt/hardfoc
+```
+
+```cmake
+find_package(hf_max22200 REQUIRED)   # with CMAKE_PREFIX_PATH=/opt/hardfoc
+target_link_libraries(my_app PRIVATE hf::max22200)
+```
 
 ## ESP-IDF
 
