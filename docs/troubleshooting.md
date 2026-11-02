@@ -23,6 +23,7 @@ They tell bus problems (no reply, COMER) apart from chip problems (the chip answ
 | Channel is on in ONCH but the output does not switch | Less than 2.5 ms (t<sub>WU</sub>) since ACTIVE = 1, or ACTIVE = 0 | Wait after `Initialize()`; check `StatusConfig::active` |
 | Low-side channel does nothing, high side works (or the reverse) | The load is wired for the other side | Low side: load to VM. High side: load to GND, VDR only |
 | `ConfigureChannel()` returns `INVALID_PARAMETER` | IFS is 0, SRC at 50 kHz or more, or channel above 7 | `SetBoardConfig()`, a lower `chop_freq`, the channel number |
+| A current or duty setter returns `INVALID_PARAMETER` | The channel is in the other drive mode: current setters need CDR, duty setters VDR | Configure the mode first with `ConfigureChannelCdr()` / `ConfigureChannelVdr()` |
 | Drive mode or side does not change | A channel is on, or TRIGA / TRIGB is high | Switch every channel off and hold both TRIG pins low first |
 | Current is off by a constant factor | IFS does not match RREF, or `BoardConfig(r, true)` and `half_full_scale` both set | `BoardConfig(rref_kohm, false)` with the real RREF |
 | VDR duty is higher than requested | Driver 1.0.0, which scaled VDR percent by 127 / 100 | Update the driver; see [Drive modes](drive-modes.md#voltage-drive-vdr) |

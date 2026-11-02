@@ -88,9 +88,10 @@ TRIG pin instead of ONCH.
 
 Each `Set...()` call reads CFG_CHx, changes one field and writes all 32 bits back. HOLD current, chopping frequency
 and SRC can change while the channel is on; drive mode and side cannot. The `...A()` variants take amperes, the
-`...CurrentPercent()` variants a fraction of IFS. The current setters also set the channel to CDR and the duty
-setters to VDR: use each only on a channel already in that mode, or the other setpoint is reinterpreted in the
-wrong unit.
+`...CurrentPercent()` variants a fraction of IFS. The setters never change the drive mode: the current setters
+work on a CDR channel and the duty setters on a VDR channel, and on a channel in the other mode they return
+`INVALID_PARAMETER` without writing anything. Select the mode with `ConfigureChannel()`,
+`ConfigureChannelCdr()` or `ConfigureChannelVdr()`.
 
 ## Run a full bridge
 

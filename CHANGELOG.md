@@ -15,6 +15,15 @@ code that used the affected API; together they call for a major version bump at 
   single half-bridges `OUT0` to `OUT7`, SPI is mode 0 only, and there is no RESET pin; ENABLE, CMD and FAULT are
   the control pins.
 
+### Breaking changes
+
+- **BREAKING** (behaviour, no signature change): `SetHitCurrentMa()`, `SetHoldCurrentMa()`, their `...A()` and
+  `...CurrentPercent()` variants, `SetHitDutyPercent()` and `SetHoldDutyPercent()` no longer change the
+  channel's drive mode. A current setter on a VDR channel, or a duty setter on a CDR channel, now returns
+  `INVALID_PARAMETER` and writes nothing. 1.0.0 silently flipped VDRnCDR and reinterpreted the other setpoint in
+  the new unit (and the chip ignores a mode change while any channel is on or a TRIG pin is high). Select the
+  mode with `ConfigureChannel()`, `ConfigureChannelCdr()` or `ConfigureChannelVdr()` before using the setters.
+
 ### Fixed
 
 - VDR duty cycle is written as percent, as datasheet Table 3 defines HIT[6:0] / HOLD[6:0] in VDR: 40 % is now

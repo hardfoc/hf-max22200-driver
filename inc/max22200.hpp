@@ -719,12 +719,20 @@ public:
    * @param channel Channel number (0-7)
    * @param ma     Current in milliamps
    * @return DriverStatus::OK on success
-   * @return DriverStatus::INVALID_PARAMETER if channel >= 8 or IFS not configured
+   * @return DriverStatus::INVALID_PARAMETER if channel >= 8, IFS not configured, or the channel
+   *         is not in CDR (nothing is written)
+   *
+   * @note The current and duty setters never change VDRnCDR: the chip accepts a drive-mode change
+   *       only while every channel is off and TRIGA/TRIGB are low. Select the mode with
+   *       ConfigureChannel(), ConfigureChannelCdr() or ConfigureChannelVdr() first. The same
+   *       applies to SetHoldCurrentMa(), the ...A() and ...CurrentPercent() variants.
    */
   DriverStatus SetHitCurrentMa(uint8_t channel, uint32_t ma);
 
   /**
    * @brief Set HOLD current in milliamps (CDR mode)
+   *
+   * @return DriverStatus::INVALID_PARAMETER if the channel is not in CDR (see SetHitCurrentMa())
    */
   DriverStatus SetHoldCurrentMa(uint8_t channel, uint32_t ma);
 
@@ -790,11 +798,15 @@ public:
    * @param channel Channel number (0-7)
    * @param percent Duty cycle in percent (0-100)
    * @return DriverStatus::OK on success
+   * @return DriverStatus::INVALID_PARAMETER if channel >= 8 or the channel is not in VDR (nothing
+   *         is written; the setter does not change VDRnCDR, see SetHitCurrentMa())
    */
   DriverStatus SetHitDutyPercent(uint8_t channel, float percent);
 
   /**
    * @brief Set HOLD duty cycle in percent (VDR mode)
+   *
+   * @return DriverStatus::INVALID_PARAMETER if the channel is not in VDR
    */
   DriverStatus SetHoldDutyPercent(uint8_t channel, float percent);
 

@@ -772,7 +772,12 @@ DriverStatus MAX22200<SpiType>::SetHitCurrentMa(uint8_t channel, uint32_t ma) {
   if (result != DriverStatus::OK) {
     return result;
   }
-  config.drive_mode = DriveMode::CDR;
+  // A current only means something on a CDR channel. Do not flip VDRnCDR here: the chip changes it only
+  // while every channel is off and TRIGA/TRIGB are low (datasheet, Programming Procedure step 5c).
+  if (config.drive_mode != DriveMode::CDR) {
+    updateStatistics(false);
+    return DriverStatus::INVALID_PARAMETER;
+  }
   config.hit_setpoint = static_cast<float>(ma);
   return ConfigureChannel(channel, config);
 }
@@ -793,7 +798,12 @@ DriverStatus MAX22200<SpiType>::SetHoldCurrentMa(uint8_t channel, uint32_t ma) {
   if (result != DriverStatus::OK) {
     return result;
   }
-  config.drive_mode = DriveMode::CDR;
+  // A current only means something on a CDR channel. Do not flip VDRnCDR here: the chip changes it only
+  // while every channel is off and TRIGA/TRIGB are low (datasheet, Programming Procedure step 5c).
+  if (config.drive_mode != DriveMode::CDR) {
+    updateStatistics(false);
+    return DriverStatus::INVALID_PARAMETER;
+  }
   config.hold_setpoint = static_cast<float>(ma);
   return ConfigureChannel(channel, config);
 }
@@ -940,6 +950,11 @@ DriverStatus MAX22200<SpiType>::SetHitDutyPercent(uint8_t channel, float percent
   if (result != DriverStatus::OK) {
     return result;
   }
+  // A duty cycle only means something on a VDR channel; never flip VDRnCDR implicitly.
+  if (config.drive_mode != DriveMode::VDR) {
+    updateStatistics(false);
+    return DriverStatus::INVALID_PARAMETER;
+  }
 
   // Get duty limits based on FREQM + FREQ_CFG + SRC
   DutyLimits limits;
@@ -952,8 +967,6 @@ DriverStatus MAX22200<SpiType>::SetHitDutyPercent(uint8_t channel, float percent
   if (percent < limits.min_percent) percent = limits.min_percent;
   if (percent > limits.max_percent) percent = limits.max_percent;
 
-  // Set user unit directly (VDR mode)
-  config.drive_mode = DriveMode::VDR;
   config.hit_setpoint = percent;
   return ConfigureChannel(channel, config);
 }
@@ -974,6 +987,11 @@ DriverStatus MAX22200<SpiType>::SetHoldDutyPercent(uint8_t channel, float percen
   if (result != DriverStatus::OK) {
     return result;
   }
+  // A duty cycle only means something on a VDR channel; never flip VDRnCDR implicitly.
+  if (config.drive_mode != DriveMode::VDR) {
+    updateStatistics(false);
+    return DriverStatus::INVALID_PARAMETER;
+  }
 
   DutyLimits limits;
   result = GetDutyLimits(cached_status_.master_clock_80khz, config.chop_freq, config.slew_rate_control_enabled, limits);
@@ -984,8 +1002,6 @@ DriverStatus MAX22200<SpiType>::SetHoldDutyPercent(uint8_t channel, float percen
   if (percent < limits.min_percent) percent = limits.min_percent;
   if (percent > limits.max_percent) percent = limits.max_percent;
 
-  // Set user unit directly (VDR mode)
-  config.drive_mode = DriveMode::VDR;
   config.hold_setpoint = percent;
   return ConfigureChannel(channel, config);
 }

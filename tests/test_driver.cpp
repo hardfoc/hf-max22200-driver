@@ -210,3 +210,28 @@ TEST_CASE("VDR duty is written as percent per Table 3 (40 % -> HIT[6:0] = 40)") 
   REQUIRE(driver.GetChannelConfig(0, back) == DriverStatus::OK);
   CHECK(back.hit_duty_percent() > 99.9f && back.hit_duty_percent() < 100.1f);
 }
+
+TEST_CASE("Current setters do not switch a VDR channel to CDR, duty setters not CDR to VDR") {
+  MockMax22200 chip;
+  Driver driver(chip, board1A());
+  REQUIRE(driver.Initialize() == DriverStatus::OK);
+
+  REQUIRE(driver.ConfigureChannelVdr(0, 60.0f, 30.0f, 0.0f) == DriverStatus::OK);
+  const uint32_t vdr_reg = chip.regs[1];
+  CHECK(driver.SetHoldCurrentMa(0, 200) == DriverStatus::INVALID_PARAMETER);
+  CHECK(driver.SetHitCurrentMa(0, 200) == DriverStatus::INVALID_PARAMETER);
+  CHECK(driver.SetHitCurrentA(0, 0.2f) == DriverStatus::INVALID_PARAMETER);
+  CHECK(driver.SetHoldCurrentPercent(0, 20.0f) == DriverStatus::INVALID_PARAMETER);
+  CHECK_EQ(chip.regs[1], vdr_reg);                  // VDRnCDR and both duties untouched
+  REQUIRE(driver.SetHoldDutyPercent(0, 25.0f) == DriverStatus::OK);
+  CHECK_EQ((chip.regs[1] >> 7) & 1u, 1u);
+  CHECK_EQ((chip.regs[1] >> 24) & 0x7Fu, 25u);
+
+  REQUIRE(driver.ConfigureChannelCdr(1, 500, 200, 10.0f) == DriverStatus::OK);
+  const uint32_t cdr_reg = chip.regs[2];
+  CHECK(driver.SetHitDutyPercent(1, 50.0f) == DriverStatus::INVALID_PARAMETER);
+  CHECK(driver.SetHoldDutyPercent(1, 50.0f) == DriverStatus::INVALID_PARAMETER);
+  CHECK_EQ(chip.regs[2], cdr_reg);
+  REQUIRE(driver.SetHoldCurrentMa(1, 100) == DriverStatus::OK);
+  CHECK_EQ((chip.regs[2] >> 7) & 1u, 0u);
+}
