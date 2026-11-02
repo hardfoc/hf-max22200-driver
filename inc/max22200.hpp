@@ -681,14 +681,19 @@ public:
   // =========================================================================
 
   /**
-   * @brief Register a fault event callback (stored for application use)
+   * @brief Register a fault event callback
    *
-   * @param callback  Function invoked by the application when a fault is detected
+   * The driver calls @p callback from the calling thread whenever it reads a fault:
+   * - once per set bit when it reads FAULT (ReadFaultRegister(), ReadFaultRegisterSelectiveClear(),
+   *   ClearChannelFaults(), ClearAllFaults()): OCP, HHF, OLF or DPM with the channel number;
+   * - when it reads STATUS after Initialize() (ReadStatus(), ReadFaultFlags(), ClearFaultFlags()):
+   *   OVT, UVM or COMER with channel 0xFF. The power-up UVM that Initialize() clears is not reported.
+   *
+   * The driver does not poll: read FAULT or STATUS (for example when the FAULT pin goes low) to get
+   * callbacks. Pass nullptr to stop them.
+   *
+   * @param callback  Function to call for each fault read, or nullptr
    * @param user_data Opaque pointer passed to @p callback
-   *
-   * @note The driver stores the callback but does not invoke it automatically;
-   *       poll ReadFaultRegister() / ReadStatus() and call the callback from
-   *       application code when needed.
    */
   void SetFaultCallback(FaultCallback callback, void *user_data);
 
@@ -998,6 +1003,11 @@ private:
   void *fault_user_data_;
   StateChangeCallback state_callback_;
   void *state_user_data_;
+
+  /** @brief Call the fault callback once per set bit of a FAULT read */
+  void notifyFaults(const FaultStatus &faults) const;
+  /** @brief Call the fault callback for the chip-wide flags (OVT, UVM, COMER) of a STATUS read */
+  void notifyStatusFaults(const StatusConfig &status) const;
 
   // ── Core SPI protocol (two-phase) ──────────────────────────────────────
 

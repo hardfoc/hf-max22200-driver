@@ -170,6 +170,10 @@ DriverStatus MAX22200<SpiType>::ReadStatus(StatusConfig &status) const {
   if (result == DriverStatus::OK) {
     status.fromRegister(raw);
     cached_status_ = status;  // Keep cache in sync for FREQM, ONCH, duty limits, etc.
+    // UVM is set at every power-up and Initialize() reads it to clear it: report only afterwards.
+    if (initialized_) {
+      notifyStatusFaults(status);
+    }
   }
   return result;
 }
@@ -352,6 +356,7 @@ DriverStatus MAX22200<SpiType>::ReadFaultRegister(FaultStatus &faults) const {
   DriverStatus result = readReg32(RegBank::FAULT, raw);
   if (result == DriverStatus::OK) {
     faults.fromRegister(raw);
+    notifyFaults(faults);
   }
   updateStatistics(result == DriverStatus::OK);
   return result;
@@ -389,6 +394,7 @@ DriverStatus MAX22200<SpiType>::ReadFaultRegisterSelectiveClear(
   result = readData32WithTx(tx, raw);
   if (result == DriverStatus::OK) {
     faults.fromRegister(raw);
+    notifyFaults(faults);
   }
   updateStatistics(result == DriverStatus::OK);
   return result;
@@ -590,8 +596,36 @@ void MAX22200<SpiType>::ResetStatistics() {
 }
 
 // ============================================================================
-// Callbacks (stored for application use; not invoked by driver)
+// Callbacks
 // ============================================================================
+
+template <typename SpiType>
+void MAX22200<SpiType>::notifyFaults(const FaultStatus &faults) const {
+  if (fault_callback_ == nullptr) {
+    return;
+  }
+  for (uint8_t ch = 0; ch < NUM_CHANNELS_; ++ch) {
+    const uint8_t bit = static_cast<uint8_t>(1u << ch);
+    if (faults.overcurrent_channel_mask & bit) fault_callback_(ch, FaultType::OCP, fault_user_data_);
+    if (faults.hit_not_reached_channel_mask & bit) fault_callback_(ch, FaultType::HHF, fault_user_data_);
+    if (faults.open_load_fault_channel_mask & bit) fault_callback_(ch, FaultType::OLF, fault_user_data_);
+    if (faults.plunger_movement_fault_channel_mask & bit) {
+      fault_callback_(ch, FaultType::DPM, fault_user_data_);
+    }
+  }
+}
+
+template <typename SpiType>
+void MAX22200<SpiType>::notifyStatusFaults(const StatusConfig &status) const {
+  if (fault_callback_ == nullptr) {
+    return;
+  }
+  // Chip-wide flags only; the per-channel OCP / HHF / OLF / DPM summary bits are reported, with
+  // their channel, when the FAULT register is read.
+  if (status.overtemperature) fault_callback_(0xFF, FaultType::OVT, fault_user_data_);
+  if (status.undervoltage) fault_callback_(0xFF, FaultType::UVM, fault_user_data_);
+  if (status.communication_error) fault_callback_(0xFF, FaultType::COMER, fault_user_data_);
+}
 
 template <typename SpiType>
 void MAX22200<SpiType>::SetFaultCallback(FaultCallback callback,

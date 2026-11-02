@@ -132,6 +132,18 @@ void faults(Driver& driver) {
   // --8<-- [end:faults]
 }
 
+void on_fault(uint8_t channel, max22200::FaultType type, void* /*user_data*/) {
+  std::printf("fault %s on channel %u\n", max22200::FaultTypeToStr(type), channel);   // 0xFF: chip-wide
+}
+
+void fault_callback(Driver& driver) {
+  // --8<-- [start:fault-callback]
+  driver.SetFaultCallback(&on_fault, nullptr);
+  max22200::FaultStatus faults;
+  driver.ReadFaultRegister(faults);               // calls on_fault() once per set FAULT bit
+  // --8<-- [end:fault-callback]
+}
+
 bool dpm(Driver& driver) {
   // --8<-- [start:dpm]
   // Per channel: DPM_EN on channels 0 and 1 (low-side only). Do this first: the debounce below is

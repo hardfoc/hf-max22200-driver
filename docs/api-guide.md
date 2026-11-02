@@ -128,9 +128,18 @@ outputs and the odd channel's is ignored; switch both channels on together.
 | FAULT pin low | Any unmasked fault above | Read STATUS and FAULT |
 
 STATUS bits OCP, OLF, HHF and DPM summarise FAULT; reading STATUS does not clear them. Mask a fault from the FAULT
-pin with the `..._masked` fields of `StatusConfig` and `WriteStatus()`. The fault and state callbacks
-(`SetFaultCallback()`, `SetStateChangeCallback()`) are stored but never called by the driver; call them from your
-own polling code if you use them.
+pin with the `..._masked` fields of `StatusConfig` and `WriteStatus()`.
+
+```cpp
+--8<-- "tests/docs/api_tasks.cpp:fault-callback"
+```
+
+`SetFaultCallback(fn, user_data)` registers a callback the driver calls for every fault it reads: once per set
+bit of a FAULT read (`ReadFaultRegister()`, `ReadFaultRegisterSelectiveClear()`, `ClearChannelFaults()`,
+`ClearAllFaults()`) with the channel and `OCP`, `HHF`, `OLF` or `DPM`, and for OVT, UVM and COMER of a STATUS read
+after `Initialize()` with channel `0xFF`. The driver does not poll: read FAULT when the FAULT pin goes low. The
+callback runs in the caller's context, so keep it short. `SetStateChangeCallback()` is stored but not called by the
+driver.
 
 ## Detect plunger movement
 

@@ -1041,8 +1041,8 @@ using ChannelConfigArray = std::array<ChannelConfig, NUM_CHANNELS_>;
  * @param fault_type Fault category (OCP, HHF, OLF, DPM, OVT, UVM, COMER)
  * @param user_data Application context pointer from SetFaultCallback()
  *
- * @note Stored by the driver; not invoked automatically — call from application
- *       code after ReadFaultRegister() or ReadStatus().
+ * @note Called by the driver for every fault it reads from FAULT (per channel) or, after
+ *       Initialize(), from STATUS (OVT, UVM, COMER with channel 0xFF); see SetFaultCallback().
  */
 using FaultCallback = void (*)(uint8_t channel, FaultType fault_type,
                                void *user_data);

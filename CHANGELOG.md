@@ -29,6 +29,9 @@ code that used the affected API; together they call for a major version bump at 
   find that frequency, and returns `INVALID_PARAMETER` (writing nothing) when DPM channels use different
   frequencies or an argument is negative or NaN. Enable DPM on the channels before calling it, or use the new
   overload that takes the frequency.
+- **BREAKING** (behaviour, no signature change): the callback registered with `SetFaultCallback()` is now called
+  by the driver. Code that called it itself after `ReadFaultRegister()` or `ReadStatus()` now sees each fault
+  twice; remove those calls.
 
 ### Fixed
 
@@ -42,6 +45,8 @@ code that used the affected API; together they call for a major version bump at 
   used; DPM_TDEB counts periods of the monitored channel's fCHOP (datasheet CFG_DPM, TDEB = DPM_TDEB / fCHOP). It
   now uses the `chop_freq` of the channels with DPM enabled (exact fCHOP, e.g. 33.33 kHz), returns
   `INVALID_PARAMETER` if they differ, and rejects negative or NaN arguments.
+- The fault callback set with `SetFaultCallback()` was stored but never called. The driver now calls it for each
+  OCP / HHF / OLF / DPM bit it reads from FAULT, and for OVT / UVM / COMER read from STATUS after `Initialize()`.
 
 ### Added
 

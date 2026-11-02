@@ -268,3 +268,58 @@ TEST_CASE("ConfigureDpm converts the debounce with the fCHOP of the DPM channels
   CHECK(driver.ConfigureDpm(300.0f, 50.0f, 0.1f) == DriverStatus::INVALID_PARAMETER);
   CHECK_EQ(chip.regs[kCfgDpm], before);
 }
+
+namespace {
+struct FaultEvent {
+  uint8_t channel;
+  max22200::FaultType type;
+};
+std::vector<FaultEvent> g_fault_events;
+void recordFault(uint8_t channel, max22200::FaultType type, void* user_data) {
+  CHECK(user_data == &g_fault_events);
+  g_fault_events.push_back({channel, type});
+}
+bool hasEvent(uint8_t channel, max22200::FaultType type) {
+  for (const auto& e : g_fault_events) {
+    if (e.channel == channel && e.type == type) return true;
+  }
+  return false;
+}
+} // namespace
+
+TEST_CASE("Fault callback fires for every FAULT bit and STATUS OVT / UVM read by the driver") {
+  MockMax22200 chip;
+  Driver driver(chip, board1A());
+  g_fault_events.clear();
+  driver.SetFaultCallback(&recordFault, &g_fault_events);
+  REQUIRE(driver.Initialize() == DriverStatus::OK);
+  CHECK(g_fault_events.empty());                    // the power-up UVM read by Initialize() is expected
+
+  chip.regs[kFault] = (1u << 28) | (1u << 17) | (1u << 9) | (1u << 3);   // OCP4, HHF1, OLF1, DPM3
+  max22200::FaultStatus faults;
+  REQUIRE(driver.ReadFaultRegister(faults) == DriverStatus::OK);
+  CHECK_EQ(g_fault_events.size(), 4u);
+  CHECK(hasEvent(4, max22200::FaultType::OCP));
+  CHECK(hasEvent(1, max22200::FaultType::HHF));
+  CHECK(hasEvent(1, max22200::FaultType::OLF));
+  CHECK(hasEvent(3, max22200::FaultType::DPM));
+
+  g_fault_events.clear();
+  chip.regs[kFault] = 1u << 5;                      // DPM on channel 5, read via the selective clear
+  REQUIRE(driver.ClearChannelFaults(0xFF) == DriverStatus::OK);
+  CHECK_EQ(g_fault_events.size(), 1u);
+  CHECK(hasEvent(5, max22200::FaultType::DPM));
+
+  g_fault_events.clear();
+  chip.regs[kStatus] |= 0x80u | 0x02u;              // OVT and UVM
+  max22200::StatusConfig status;
+  REQUIRE(driver.ReadStatus(status) == DriverStatus::OK);
+  CHECK(hasEvent(0xFF, max22200::FaultType::OVT));
+  CHECK(hasEvent(0xFF, max22200::FaultType::UVM));
+
+  g_fault_events.clear();
+  driver.SetFaultCallback(nullptr, nullptr);
+  chip.regs[kFault] = 1u << 24;
+  REQUIRE(driver.ReadFaultRegister(faults) == DriverStatus::OK);
+  CHECK(g_fault_events.empty());
+}
