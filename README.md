@@ -1,157 +1,100 @@
-# HF-MAX22200 Driver
+# MAX22200 Driver
 
-**Portable C++20 driver for the MAX22200 octal solenoid and motor driver with SPI interface**
+A C++20 driver for the Analog Devices MAX22200 octal solenoid and motor driver: configure eight half-bridges for
+current or voltage drive with HIT and HOLD levels, switch them, run full bridges and read faults, from any MCU with
+SPI.
 
-[![C++](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.cppreference.com/w/cpp/20)
-[![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![CI](https://github.com/hardfoc/hf-max22200-driver/actions/workflows/esp32-examples-build-ci.yml/badge.svg?branch=main)](https://github.com/hardfoc/hf-max22200-driver/actions/workflows/esp32-examples-build-ci.yml)
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://hardfoc.github.io/hf-max22200-driver/)
+[![Host tests](https://github.com/hardfoc/hf-max22200-driver/actions/workflows/ci-host-tests.yml/badge.svg?branch=main)](https://github.com/hardfoc/hf-max22200-driver/actions/workflows/ci-host-tests.yml)
+[![ESP32 examples](https://github.com/hardfoc/hf-max22200-driver/actions/workflows/esp32-examples-build-ci.yml/badge.svg?branch=main)](https://github.com/hardfoc/hf-max22200-driver/actions/workflows/esp32-examples-build-ci.yml)
+[![Docs](https://github.com/hardfoc/hf-max22200-driver/actions/workflows/ci-docs-publish.yml/badge.svg?branch=main)](https://hardfoc.github.io/hf-max22200-driver/)
+[![License: GPL-3.0](https://img.shields.io/github/license/hardfoc/hf-max22200-driver)](LICENSE)
 
-## Table of Contents
-1. [Overview](#overview)
-2. [Features](#features)
-3. [Quick Start](#quick-start)
-4. [Installation](#installation)
-5. [API Reference](#api-reference)
-6. [Examples](#examples)
-7. [Documentation](#documentation)
-8. [References](#references)
-9. [Contributing](#contributing)
-10. [License](#license)
+**Documentation: <https://hardfoc.github.io/hf-max22200-driver/>**
 
-## Overview
+<!-- figure: driver-layers -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/driver-layers.dark.svg">
+  <img src="docs/diagrams/driver-layers.svg"
+    alt="Layer diagram: the application calls the hardware-agnostic MAX22200 driver, which uses the CRTP SPI
+    interface, which calls the platform port you write, which drives the SPI bus and the ENABLE, CMD and
+    FAULT pins of the MAX22200.">
+</picture>
+<!-- /figure -->
 
-> **📖 [📚🌐 Live Complete Documentation](https://hardfoc.github.io/hf-max22200-driver/)** - 
-> Interactive guides, examples, and step-by-step tutorials
+## In 30 seconds
 
-**HF-MAX22200** is a portable C++20 driver for the **MAX22200** octal (eight-channel) solenoid and motor driver IC. The MAX22200 features eight half-bridges, each capable of handling up to 36V and 1A RMS, with integrated current sensing, current/voltage regulation, and comprehensive protection features.
+Write a small port class for your MCU (SPI transfer, ENABLE and CMD pins, FAULT input, a delay;
+[Porting](https://hardfoc.github.io/hf-max22200-driver/latest/porting/)), then:
 
-The driver uses a CRTP-based `SpiInterface` for hardware abstraction, allowing it to run on any platform (ESP32, STM32, Arduino, etc.) with zero runtime overhead. It implements all major features from the MAX22200 datasheet including channel configuration, current/voltage regulation modes, integrated current sensing (ICS), fault detection, and callback support for event-driven programming.
-
-![MAX22200 octal half-bridge topology with HIT/HOLD current profile](docs/assets/max22200-topology.svg)
-
-## Features
-
-- ✅ **Eight Half-Bridges**: Each channel handles up to 36V and 1A RMS
-- ✅ **Current and Voltage Regulation**: Supports both CDR (Current Drive Regulation) and VDR (Voltage Drive Regulation) modes
-- ✅ **Integrated Current Sensing (ICS)**: Real-time current monitoring without external sense resistors
-- ✅ **Half-Bridge and Full-Bridge Modes**: Flexible bridge configurations
-- ✅ **HIT/HOLD Current Control**: Programmable hit current, hold current, and hit time
-- ✅ **Comprehensive Protection**: OCP, OL, DPM, UVLO, TSD, and fault registers
-- ✅ **Hardware Agnostic**: SPI interface for platform independence
-- ✅ **Modern C++**: C++20 with CRTP-based design
-- ✅ **Zero Overhead**: CRTP-based design for compile-time polymorphism
-- ✅ **Callback Support**: Event-driven programming with fault and state callbacks
-- ✅ **Statistics Tracking**: Runtime performance and error monitoring
-
-## Quick Start
-
+<!-- generated: quickstart-code -->
 ```cpp
 #include "max22200.hpp"
 
-// 1. Implement the SPI interface (see platform_integration.md)
-class MySpi : public max22200::SpiInterface<MySpi> {
-public:
-    bool Initialize() { return true; }
-    bool Transfer(const uint8_t* tx_data, uint8_t* rx_data, size_t length) {
-        // Your SPI transfer implementation
-        (void)tx_data; (void)rx_data; (void)length;
-        return true;
-    }
-    void SetChipSelect(bool state) { (void)state; }
-    bool Configure(uint32_t speed_hz, uint8_t mode, bool msb_first) {
-        (void)speed_hz; (void)mode; (void)msb_first;
-        return true;
-    }
-    bool IsReady() const { return true; }
-    void DelayUs(uint32_t us) { (void)us; }
-    void GpioSet(CtrlPin pin, GpioSignal signal) { (void)pin; (void)signal; }
-    bool GpioRead(CtrlPin pin, GpioSignal& signal) { (void)pin; (void)signal; return true; }
-};
+int pull_in_solenoid_on_out0(MySpi& spi) {
+  // 1. Board: RREF = 30 kOhm on IREF, so IFS = 15k x 1 V / 30 kOhm = 500 mA.
+  max22200::MAX22200<MySpi> driver(spi, max22200::BoardConfig(30.0f, false));
 
-// 2. Create driver instance
-MySpi spi;
-max22200::MAX22200<MySpi> driver(spi);
+  if (driver.Initialize() != max22200::DriverStatus::OK) {   // 2. ENABLE, STATUS, ACTIVE = 1
+    return -1;                                               // wiring, SPI mode, VM
+  }
 
-// 3. Set board config (IFS from RREF; required for CDR)
-driver.SetBoardConfig(max22200::BoardConfig(30.0f, false));
-
-// 4. Initialize
-if (driver.Initialize() == max22200::DriverStatus::OK) {
-    // 5. Configure channel 0 (CDR, low-side)
-    max22200::ChannelConfig config;
-    config.drive_mode = max22200::DriveMode::CDR;
-    config.side_mode = max22200::SideMode::LOW_SIDE;
-    config.hit_setpoint = 500.0f;   // desired current, mA
-    config.hold_setpoint = 200.0f;
-    config.hit_time_ms = 10.0f;
-    config.chop_freq = max22200::ChopFreq::FMAIN_DIV2;
-
-    driver.ConfigureChannel(0, config);
-    driver.EnableChannel(0);
+  // 3. Channel 0: low-side CDR, 400 mA for 20 ms to pull in, then 150 mA to hold.
+  const auto valve = max22200::ChannelConfig::makeSolenoidCdr(400.0f, 150.0f, 20.0f);
+  if (driver.ConfigureChannel(0, valve) != max22200::DriverStatus::OK) {
+    return -2;
+  }
+  return driver.EnableChannel(0) == max22200::DriverStatus::OK ? 0 : -3;   // 4. on
 }
 ```
+<!-- /generated -->
 
-For detailed setup, see [Installation](docs/installation.md) and [Quick Start Guide](docs/quickstart.md).
+## What it does
 
-## Installation
+- Runs the datasheet's start-up flow in `Initialize()`: ENABLE, the 0.5 ms wait, the UVM clear and ACTIVE = 1.
+- Configures each channel in real units: HIT and HOLD in mA (CDR) or percent (VDR), HIT time in ms, from the
+  board's RREF and the chip's chopping frequency.
+- Switches channels with one 8-bit ONCH write; runs pairs in parallel or as full bridges (forward, reverse, brake).
+- Reads STATUS and per-channel OCP, HHF, open-load and plunger-movement faults, with selective clear on the
+  MAX22200A.
+- No heap, no exceptions, no RTOS, no virtual calls (the port is a CRTP class).
 
-1. **Clone or copy** the driver files into your project
-2. **Implement the SPI interface** for your platform (see [Platform Integration](docs/platform_integration.md))
-3. **Include the header** in your code:
-   ```cpp
-   #include "max22200.hpp"
-   ```
-4. Compile with a **C++20** or newer compiler
+## Install
 
-For detailed installation instructions, see [docs/installation.md](docs/installation.md).
+```bash
+git submodule add https://github.com/hardfoc/hf-max22200-driver.git external/hf-max22200-driver
+```
 
-## API Reference
+```cmake
+add_subdirectory(external/hf-max22200-driver)
+target_link_libraries(my_app PRIVATE hf::max22200)
+```
 
-| Method | Description |
-|--------|-------------|
-| `Initialize()` / `Deinitialize()` | Initialize or shut down (ENABLE, STATUS ACTIVE) |
-| `ConfigureChannel()` | Configure a channel (CFG_CHx) |
-| `EnableChannel()` / `DisableChannel()` | Turn a channel on or off |
-| `EnableAllChannels()` / `DisableAllChannels()` | Turn all channels on or off |
-| `SetChannelsOn(mask)` | Set which channels are on (bitmask) |
-| `ReadStatus()` / `WriteStatus()` | Read/write STATUS (ONCH, fault masks, ACTIVE) |
-| `ReadFaultRegister()` / `ClearAllFaults()` | Read or clear per-channel faults (OCP, HHF, OLF, DPM) |
-| `SetBoardConfig()` | Set IFS and limits for mA/% APIs |
-| `SetHitCurrentMa()` / `GetHitCurrentMa()` | Set/get current in mA (CDR) |
-| `ConfigureDpm()` | Configure plunger movement detection in mA/ms |
-| `EnableDevice()` / `DisableDevice()` | ENABLE pin on/off |
-| `SetFaultCallback()` | Fault event callback; use `FaultTypeToStr()` for names |
-| `GetStatistics()` | Driver statistics |
-
-For complete API documentation, see [docs/api_reference.md](docs/api_reference.md).
-
-## Examples
-
-For ESP32 examples, see the [examples/esp32](examples/esp32/) directory.
-Additional examples for other platforms are available in the [examples](examples/) directory.
-
-Detailed example walkthroughs are available in [docs/examples.md](docs/examples.md).
+ESP-IDF: use the component wrapper in
+[`examples/esp32/components/hf_max22200`](examples/esp32/components/hf_max22200/CMakeLists.txt).
+Details: [Installation](https://hardfoc.github.io/hf-max22200-driver/latest/installation/).
 
 ## Documentation
 
-For complete documentation, see the [docs directory](docs/index.md).
+| | |
+| --- | --- |
+| [Quickstart](https://hardfoc.github.io/hf-max22200-driver/latest/quickstart/) | Wire it, write the port, pull in a solenoid |
+| [Hardware](https://hardfoc.github.io/hf-max22200-driver/latest/hardware/) | Pins, external parts, bus settings, timing, limits |
+| [Drive modes](https://hardfoc.github.io/hf-max22200-driver/latest/drive-modes/) | CDR, VDR, HIT and HOLD, chopping frequency |
+| [API guide](https://hardfoc.github.io/hf-max22200-driver/latest/api-guide/) | Configure, switch, bridges, faults, DPM |
+| [Examples](https://hardfoc.github.io/hf-max22200-driver/latest/examples/) | ESP32 applications |
+| [API reference](https://hardfoc.github.io/hf-max22200-driver/latest/api/) | Doxygen, every class and member |
 
-## References
+The pages are in [`docs/`](docs/index.md); the datasheet is in [`docs/datasheet/`](docs/datasheet/MAX22200.pdf).
 
-| Resource | Link |
-|----------|------|
-| ADI/Maxim MAX22200 product page | <https://www.analog.com/en/products/max22200.html> |
-| MAX22200 datasheet (ADI) | <https://www.analog.com/media/en/technical-documentation/data-sheets/max22200.pdf> |
-| ESP-IDF SPI master | <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/spi_master.html> |
-| C++20 language reference | <https://en.cppreference.com/w/cpp/20> |
+## Tests
 
-## Contributing
+```bash
+cmake -S . -B build-host -DHF_MAX22200_BUILD_TESTS=ON && cmake --build build-host && ctest --test-dir build-host
+```
 
-Pull requests and suggestions are welcome! Please follow the existing code style and include tests for new features.
+The host tests run the driver against a model of the chip's SPI protocol; the code on the documentation site is
+compiled by the same build.
 
 ## License
 
-This project is licensed under the **GNU General Public License v3.0**.
-See the [LICENSE](LICENSE) file for details.
-
+GPL-3.0. See [LICENSE](LICENSE).
