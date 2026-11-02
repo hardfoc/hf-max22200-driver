@@ -158,7 +158,7 @@ constexpr uint8_t MODE_32BIT    = 0x00; ///< 32-bit full access (bit 0 = 0)
  * @param mode8   true for 8-bit MSB only, false for 32-bit full register
  * @return 8-bit command register value ready for SPI transfer
  *
- * @example
+ * @par Example
  * @code
  * // Write 32-bit STATUS register
  * uint8_t cmd = CommandReg::build(RegBank::STATUS, true, false);
@@ -526,7 +526,7 @@ constexpr uint32_t DPM_IPTH_MASK    = 0x0Fu; ///< DPM_IPTH mask (4-bit)
  * @param channel Channel number (0-7)
  * @return Register bank address (0x01-0x08) for the specified channel
  *
- * @example
+ * @par Example
  * @code
  * uint8_t bank = getChannelCfgBank(0);  // Returns 0x01 (CFG_CH0)
  * uint8_t bank = getChannelCfgBank(3);  // Returns 0x04 (CFG_CH3)

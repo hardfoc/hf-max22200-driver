@@ -1073,7 +1073,7 @@ struct BoardConfig {
    * @param rref_kohm RREF resistor value in kΩ (e.g., 15.0 for 15kΩ)
    * @param hfs       true if HFS=1 (half-scale), false if HFS=0 (full-scale)
    *
-   * @example
+   * @par Example
    * @code
    * // RREF = 30kΩ, HFS = 0 → IFS = 15k × 1000 / 30k = 500 mA
    * BoardConfig config(30.0f, false);

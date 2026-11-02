@@ -90,7 +90,7 @@ namespace max22200 {
  *                 - GpioSet() for CMD/ENABLE/FAULT pin control
  *                 - GpioGet() for FAULT pin reading
  *
- * @example Basic usage (CDR mode):
+ * @par Basic usage (CDR mode):
  * @code
  * MySPI spi;
  * MAX22200<MySPI> driver(spi);
@@ -111,7 +111,7 @@ namespace max22200 {
  * }
  * @endcode
  *
- * @example Fast HOLD current update (8-bit mode):
+ * @par Fast HOLD current update (8-bit mode):
  * @code
  * // Update HOLD on-the-fly: CFG_CH[31:24] = HFS (bit 7) | HOLD[6:0] (bits 6:0)
  * ChannelConfig config;
@@ -120,7 +120,7 @@ namespace max22200 {
  * driver.WriteRegister8(RegBank::CFG_CH0, (config.half_full_scale ? 0x80u : 0u) | (hold_raw & 0x7Fu));
  * @endcode
  *
- * @example Channel-pair configuration (parallel mode):
+ * @par Channel-pair configuration (parallel mode):
  * @code
  * StatusConfig status;
  * driver.ReadStatus(status);
@@ -369,7 +369,7 @@ public:
    * @param channel_mask Bitmask: bit 0 = channel 0, bit 1 = channel 1, ... bit 7 = channel 7
    * @return DriverStatus::OK on success
    *
-   * @example Turn on channels 0, 2, and 5:
+   * @par Turn on channels 0, 2, and 5:
    * @code
    * driver.SetChannelsOn((1u << 0) | (1u << 2) | (1u << 5));
    * @endcode
@@ -530,7 +530,7 @@ public:
    * @param channel_mask Bit N = 1 to enable DPM on channel N, 0 to disable (channels 0–7).
    * @return DriverStatus::OK if all selected channels updated successfully.
    *
-   * @example Enable DPM on channels 0, 2, and 5:
+   * @par Enable DPM on channels 0, 2, and 5:
    * @code
    * driver.SetDpmEnabledChannels((1u << 0) | (1u << 2) | (1u << 5));
    * @endcode
@@ -627,7 +627,7 @@ public:
    * @note Check for communication error: return value = 0x04 (COMER flag)
    * @note This byte contains: OVT, OCP, OLF, HHF, DPM, COMER, UVM, ACTIVE bits
    *
-   * @example Check for communication error:
+   * @par Check for communication error:
    * @code
    * uint8_t fault_byte = driver.GetLastFaultByte();
    * if (fault_byte == 0x04) {
