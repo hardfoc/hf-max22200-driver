@@ -1,12 +1,3 @@
----
-layout: default
-title: "💡 Examples"
-description: "Example walkthroughs for the MAX22200 driver"
-nav_order: 7
-parent: "📚 Documentation"
-permalink: /docs/examples/
----
-
 # Examples
 
 Working examples using the current driver API (STATUS, CFG_CHx, FAULT, CFG_DPM, and types in `max22200_types.hpp`).

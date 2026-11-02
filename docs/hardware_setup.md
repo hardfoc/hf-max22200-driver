@@ -1,12 +1,3 @@
----
-layout: default
-title: "🔌 Hardware Setup"
-description: "Hardware wiring and connection guide for MAX22200 driver"
-nav_order: 3
-parent: "📚 Documentation"
-permalink: /docs/hardware_setup/
----
-
 # Hardware Setup
 
 ![MAX22200 octal half-bridge topology with HIT/HOLD current profile](assets/max22200-topology.svg)

@@ -1,12 +1,3 @@
----
-layout: default
-title: "⚙️ Configuration"
-description: "Configuration options for the MAX22200 driver"
-nav_order: 5
-parent: "📚 Documentation"
-permalink: /docs/configuration/
----
-
 # Configuration
 
 This guide covers configuration options for the MAX22200 driver, aligned with the device registers (STATUS, CFG_CHx, CFG_DPM) and types in `max22200_types.hpp`.

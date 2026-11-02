@@ -1,11 +1,3 @@
----
-layout: default
-title: "HardFOC MAX22200 Driver"
-description: "Portable C++20 driver for the MAX22200 octal solenoid and motor driver with SPI interface"
-nav_order: 1
-permalink: /
----
-
 # HF-MAX22200 Driver
 
 **Portable C++20 driver for the MAX22200 octal solenoid and motor driver with SPI interface**
@@ -15,19 +7,19 @@ permalink: /
 [![CI](https://github.com/hardfoc/hf-max22200-driver/actions/workflows/esp32-examples-build-ci.yml/badge.svg?branch=main)](https://github.com/hardfoc/hf-max22200-driver/actions/workflows/esp32-examples-build-ci.yml)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://hardfoc.github.io/hf-max22200-driver/)
 
-## 📚 Table of Contents
-1. [Overview](#-overview)
-2. [Features](#-features)
-3. [Quick Start](#-quick-start)
-4. [Installation](#-installation)
-5. [API Reference](#-api-reference)
-6. [Examples](#-examples)
-7. [Documentation](#-documentation)
-8. [References](#-references)
-9. [Contributing](#-contributing)
-10. [License](#-license)
+## Table of Contents
+1. [Overview](#overview)
+2. [Features](#features)
+3. [Quick Start](#quick-start)
+4. [Installation](#installation)
+5. [API Reference](#api-reference)
+6. [Examples](#examples)
+7. [Documentation](#documentation)
+8. [References](#references)
+9. [Contributing](#contributing)
+10. [License](#license)
 
-## 📦 Overview
+## Overview
 
 > **📖 [📚🌐 Live Complete Documentation](https://hardfoc.github.io/hf-max22200-driver/)** - 
 > Interactive guides, examples, and step-by-step tutorials
@@ -38,7 +30,7 @@ The driver uses a CRTP-based `SpiInterface` for hardware abstraction, allowing i
 
 ![MAX22200 octal half-bridge topology with HIT/HOLD current profile](docs/assets/max22200-topology.svg)
 
-## ✨ Features
+## Features
 
 - ✅ **Eight Half-Bridges**: Each channel handles up to 36V and 1A RMS
 - ✅ **Current and Voltage Regulation**: Supports both CDR (Current Drive Regulation) and VDR (Voltage Drive Regulation) modes
@@ -52,7 +44,7 @@ The driver uses a CRTP-based `SpiInterface` for hardware abstraction, allowing i
 - ✅ **Callback Support**: Event-driven programming with fault and state callbacks
 - ✅ **Statistics Tracking**: Runtime performance and error monitoring
 
-## 🚀 Quick Start
+## Quick Start
 
 ```cpp
 #include "max22200.hpp"
@@ -102,7 +94,7 @@ if (driver.Initialize() == max22200::DriverStatus::OK) {
 
 For detailed setup, see [Installation](docs/installation.md) and [Quick Start Guide](docs/quickstart.md).
 
-## 🔧 Installation
+## Installation
 
 1. **Clone or copy** the driver files into your project
 2. **Implement the SPI interface** for your platform (see [Platform Integration](docs/platform_integration.md))
@@ -114,7 +106,7 @@ For detailed setup, see [Installation](docs/installation.md) and [Quick Start Gu
 
 For detailed installation instructions, see [docs/installation.md](docs/installation.md).
 
-## 📖 API Reference
+## API Reference
 
 | Method | Description |
 |--------|-------------|
@@ -134,18 +126,18 @@ For detailed installation instructions, see [docs/installation.md](docs/installa
 
 For complete API documentation, see [docs/api_reference.md](docs/api_reference.md).
 
-## 📊 Examples
+## Examples
 
 For ESP32 examples, see the [examples/esp32](examples/esp32/) directory.
 Additional examples for other platforms are available in the [examples](examples/) directory.
 
 Detailed example walkthroughs are available in [docs/examples.md](docs/examples.md).
 
-## 📚 Documentation
+## Documentation
 
 For complete documentation, see the [docs directory](docs/index.md).
 
-## 🔗 References
+## References
 
 | Resource | Link |
 |----------|------|
@@ -154,11 +146,11 @@ For complete documentation, see the [docs directory](docs/index.md).
 | ESP-IDF SPI master | <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/spi_master.html> |
 | C++20 language reference | <https://en.cppreference.com/w/cpp/20> |
 
-## 🤝 Contributing
+## Contributing
 
 Pull requests and suggestions are welcome! Please follow the existing code style and include tests for new features.
 
-## 📄 License
+## License
 
 This project is licensed under the **GNU General Public License v3.0**.
 See the [LICENSE](LICENSE) file for details.

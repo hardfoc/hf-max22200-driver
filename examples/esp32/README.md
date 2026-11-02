@@ -2,19 +2,19 @@
 
 This directory contains comprehensive test suites for the MAX22200 octal solenoid and motor driver using the ESP32-C6 DevKit-M-1.
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [Hardware Overview](#-hardware-overview)
-- [Pin Connections](#-pin-connections)
-- [Hardware Setup](#-hardware-setup)
-- [Building the Tests](#-building-the-tests)
-- [Running the Tests](#-running-the-tests)
-- [Test Suites](#-test-suites)
-- [Troubleshooting](#-troubleshooting)
+- [Hardware Overview](#hardware-overview)
+- [Pin Connections](#pin-connections)
+- [Hardware Setup](#hardware-setup)
+- [Building the Tests](#building-the-tests)
+- [Running the Tests](#running-the-tests)
+- [Test Suites](#test-suites)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
-## 🔌 Hardware Overview
+## Hardware Overview
 
 ### ESP32-C6 DevKit-M-1
 
@@ -85,7 +85,7 @@ The MAX22200 is an octal (eight-channel) solenoid and motor driver featuring:
 
 ---
 
-## 📌 Pin Connections
+## Pin Connections
 
 ### SPI Bus Connections
 
@@ -121,7 +121,7 @@ Default SPI configuration (can be modified in test file):
 
 ---
 
-## 🛠️ Hardware Setup
+## Hardware Setup
 
 ### Basic Setup
 
@@ -157,7 +157,7 @@ For comprehensive testing, you can connect:
 
 ---
 
-## 🚀 Building the Tests
+## Building the Tests
 
 ### Prerequisites
 
@@ -224,7 +224,7 @@ The test suites use a centralized build system with scripts. Available applicati
 
 ---
 
-## 📤 Running the Tests
+## Running the Tests
 
 ### Flash Application
 
@@ -255,7 +255,7 @@ idf.py -p /dev/ttyUSB0 monitor
 
 ---
 
-## 🧪 Test Suites
+## Test Suites
 
 ### Comprehensive Test Suite
 
@@ -470,7 +470,7 @@ See the file header for a full tuning workflow.
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### SPI Bus Configuration
 
@@ -508,7 +508,7 @@ channel_config.chop_freq = ChopFreq::FMAIN_DIV2;
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### SPI Communication Failures
 
@@ -575,7 +575,7 @@ channel_config.chop_freq = ChopFreq::FMAIN_DIV2;
 
 ---
 
-## 📚 Additional Resources
+## Additional Resources
 
 - [MAX22200 Datasheet](../../docs/datasheet/MAX22200.pdf)
 - [Driver API Documentation](../../docs/api_reference.md)
@@ -584,7 +584,7 @@ channel_config.chop_freq = ChopFreq::FMAIN_DIV2;
 
 ---
 
-## 🎯 Quick Reference
+## Quick Reference
 
 ### Build Commands
 
@@ -615,7 +615,7 @@ GPIO14 toggles between HIGH/LOW for each completed test, providing visual feedba
 
 ---
 
-## 📝 Notes
+## Notes
 
 - **SPI Configuration**: Use Mode 0 or Mode 3, MSB first, up to 10MHz clock
 - **Power Requirements**: 3.3V/5V for logic, 12V-36V for load power

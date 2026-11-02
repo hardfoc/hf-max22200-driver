@@ -1,12 +1,3 @@
----
-layout: default
-title: "🐛 Troubleshooting"
-description: "Common issues and solutions for the MAX22200 driver"
-nav_order: 8
-parent: "📚 Documentation"
-permalink: /docs/troubleshooting/
----
-
 # Troubleshooting
 
 This guide helps you diagnose and resolve common issues when using the MAX22200 driver. For a detailed analysis of SPI command bytes, write/read byte order, and decoding (and why raw register HEX comparison is used for pass/fail), see [SPI Protocol Analysis](spi_protocol_analysis.md).
