@@ -75,7 +75,8 @@ Every call that touches the chip returns `max22200::DriverStatus`:
 | `OK` | Done |
 | `INVALID_PARAMETER` | Channel above 7, pair above 3, IFS of 0, SRC at 50 kHz or more, a value out of range; nothing is written |
 | `COMMUNICATION_ERROR` | Your `Transfer()` or `GpioRead()` returned `false`, or `Initialize()` saw COMER three times |
-| `INITIALIZATION_ERROR` | Your `Initialize()` or `Configure()` returned `false` |
+| `INITIALIZATION_ERROR` | Your `Initialize()` or `Configure()` returned `false`, or `GpioSet(ENABLE, ACTIVE)` did during `Driver::Initialize()` (nothing is sent) |
+| `GPIO_ERROR` | Your `GpioSet()` returned `false` for CMD (the frame is not sent, or the access fails when CMD did not go back low) or for ENABLE in `EnableDevice()`, `DisableDevice()` and `Deinitialize()` (the device may still be enabled) |
 
 `HARDWARE_FAULT` and `TIMEOUT` exist in the enum but no call returns them. Chip faults (overcurrent, open load) are
 not errors of the call: read them with `ReadStatus()` and `ReadFaultRegister()`.

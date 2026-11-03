@@ -17,6 +17,14 @@ code that used the affected API; together they call for a major version bump at 
 
 ### Breaking changes
 
+- **BREAKING** The port's `GpioSet()` returns `bool` (`true` = pin driven or not wired, `false` = GPIO error)
+  instead of `void`; `MAX22200` rejects a port whose `GpioSet()` returns anything else at compile time, and
+  `SpiInterface::GpioSet()`, `GpioSetActive()` and `GpioSetInactive()` return the result. A failed pin is now
+  reported instead of ignored: ENABLE in `Initialize()` returns `INITIALIZATION_ERROR` before any SPI access;
+  CMD returns the new `DriverStatus::GPIO_ERROR` (the Command Register byte is not sent when CMD cannot be raised,
+  and the access fails when CMD does not go back low); ENABLE in `EnableDevice()`, `DisableDevice()` and
+  `Deinitialize()` returns `GPIO_ERROR` (they returned `OK` while the device could still be enabled).
+  `GPIO_ERROR` is appended to `DriverStatus`. Ports: return the GPIO call's result.
 - **BREAKING** (behaviour, no signature change): `SetHitCurrentMa()`, `SetHoldCurrentMa()`, their `...A()` and
   `...CurrentPercent()` variants, `SetHitDutyPercent()` and `SetHoldDutyPercent()` no longer change the
   channel's drive mode. A current setter on a VDR channel, or a duty setter on a CDR channel, now returns
