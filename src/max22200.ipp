@@ -61,8 +61,13 @@ DriverStatus MAX22200<SpiType>::Initialize() {
     return DriverStatus::INITIALIZATION_ERROR;
   }
 
-  // Step 1: ENABLE pin HIGH, then tEN (0.5 ms, ENABLE rising edge to SPI ready) before the first access
-  spi_interface_.GpioSetActive(CtrlPin::ENABLE);
+  // Step 1: ENABLE pin HIGH, then tEN (0.5 ms, ENABLE rising edge to SPI ready) before the first access.
+  // A pin the port could not raise leaves the device in shutdown: report it, send nothing.
+  if (!spi_interface_.GpioSetActive(CtrlPin::ENABLE)) {
+    (void)spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
+    updateStatistics(false);
+    return DriverStatus::INITIALIZATION_ERROR;
+  }
   spi_interface_.DelayUs(ENABLE_TIME_US_);
 
   constexpr int kMaxInitRetries = 3;
@@ -73,7 +78,7 @@ DriverStatus MAX22200<SpiType>::Initialize() {
     // Step 2: Read STATUS register to clear UVM and deassert nFAULT
     result = ReadStatus(status);
     if (result != DriverStatus::OK) {
-      spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
+      (void)spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
       updateStatistics(false);
       return result;
     }
@@ -89,7 +94,7 @@ DriverStatus MAX22200<SpiType>::Initialize() {
 
     result = WriteStatus(status);
     if (result != DriverStatus::OK) {
-      spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
+      (void)spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
       updateStatistics(false);
       return result;
     }
@@ -107,7 +112,7 @@ DriverStatus MAX22200<SpiType>::Initialize() {
     // Step 4: Read STATUS again to verify UVM is cleared
     result = ReadStatus(status);
     if (result != DriverStatus::OK) {
-      spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
+      (void)spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
       updateStatistics(false);
       return result;
     }
@@ -127,7 +132,7 @@ DriverStatus MAX22200<SpiType>::Initialize() {
   }
 
   // COMER persisted after all retries
-  spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
+  (void)spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
   updateStatistics(false);
   return DriverStatus::COMMUNICATION_ERROR;
 }
@@ -146,12 +151,12 @@ DriverStatus MAX22200<SpiType>::Deinitialize() {
   cached_status_.channels_on_mask = 0;
   WriteStatus(cached_status_);
 
-  // ENABLE pin LOW
-  spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
+  // ENABLE pin LOW. If the pin cannot be lowered the device stays enabled: report it.
+  const bool enable_low = spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
 
   initialized_ = false;
-  updateStatistics(true);
-  return DriverStatus::OK;
+  updateStatistics(enable_low);
+  return enable_low ? DriverStatus::OK : DriverStatus::GPIO_ERROR;
 }
 
 template <typename SpiType>
@@ -531,13 +536,10 @@ DriverStatus MAX22200<SpiType>::DisableDevice() {
 
 template <typename SpiType>
 DriverStatus MAX22200<SpiType>::SetDeviceEnable(bool enable) {
-  if (enable) {
-    spi_interface_.GpioSetActive(CtrlPin::ENABLE);
-  } else {
-    spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
-  }
-  updateStatistics(true);
-  return DriverStatus::OK;
+  const bool ok = enable ? spi_interface_.GpioSetActive(CtrlPin::ENABLE)
+                         : spi_interface_.GpioSetInactive(CtrlPin::ENABLE);
+  updateStatistics(ok);
+  return ok ? DriverStatus::OK : DriverStatus::GPIO_ERROR;
 }
 
 template <typename SpiType>
@@ -660,18 +662,26 @@ DriverStatus MAX22200<SpiType>::writeCommandRegister(uint8_t bank,
   uint8_t cmd_byte = CommandReg::build(bank, is_write, mode8);
   uint8_t rx_byte = 0xFF;
 
-  // CMD pin HIGH for Command Register write
-  spi_interface_.GpioSetActive(CtrlPin::CMD);
+  // CMD pin HIGH for Command Register write. Without it the byte would be taken as a data phase:
+  // send nothing.
+  if (!spi_interface_.GpioSetActive(CtrlPin::CMD)) {
+    (void)spi_interface_.GpioSetInactive(CtrlPin::CMD);
+    return DriverStatus::GPIO_ERROR;
+  }
 
   // CS LOW → transfer 1 byte → CS HIGH
   // Note: ESP-IDF handles CS automatically in the Transfer call
   bool success = spi_interface_.Transfer(&cmd_byte, &rx_byte, 1);
 
-  // CMD pin LOW (prepare for data phase)
-  spi_interface_.GpioSetInactive(CtrlPin::CMD);
+  // CMD pin LOW (prepare for data phase). If it stays high, the data phase would be taken as
+  // another command: the access fails.
+  const bool cmd_low = spi_interface_.GpioSetInactive(CtrlPin::CMD);
 
   if (!success) {
     return DriverStatus::COMMUNICATION_ERROR;
+  }
+  if (!cmd_low) {
+    return DriverStatus::GPIO_ERROR;
   }
 
   // Store the fault flags byte returned by the device

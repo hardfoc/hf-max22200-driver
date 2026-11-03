@@ -988,7 +988,8 @@ enum class DriverStatus : uint8_t {
   COMMUNICATION_ERROR,  ///< SPI transfer failed or COMER fault byte (0x04) detected
   INVALID_PARAMETER,    ///< Channel index, IFS, or unit conversion argument out of range
   HARDWARE_FAULT,       ///< Reserved for hardware fault detection (not currently returned)
-  TIMEOUT               ///< Reserved for timed operations (not currently returned)
+  TIMEOUT,              ///< Reserved for timed operations (not currently returned)
+  GPIO_ERROR            ///< The port's GpioSet() could not drive ENABLE or CMD
 };
 
 /**
@@ -1010,6 +1011,8 @@ inline const char *DriverStatusToStr(DriverStatus s) {
       return "HARDWARE_FAULT";
     case DriverStatus::TIMEOUT:
       return "TIMEOUT";
+    case DriverStatus::GPIO_ERROR:
+      return "GPIO_ERROR";
     default:
       return "UNKNOWN";
   }

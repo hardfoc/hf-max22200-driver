@@ -15,7 +15,7 @@
 // Platform hooks: your SDK's calls. Declared only, so the docs build checks the port compiles.
 bool platform_spi_init(uint32_t clock_hz, uint8_t mode) noexcept;
 bool platform_spi_transfer(const uint8_t* tx, uint8_t* rx, std::size_t len) noexcept;  // CS low .. CS high
-void platform_gpio_write(int gpio, bool level) noexcept;
+bool platform_gpio_write(int gpio, bool level) noexcept;  // false on a GPIO error
 bool platform_gpio_read(int gpio) noexcept;
 void platform_delay_us(uint32_t us) noexcept;
 
@@ -49,11 +49,13 @@ public:
 
   void DelayUs(uint32_t us) { platform_delay_us(us); }
 
-  // ENABLE and CMD are active high, FAULT is active low (open drain).
-  void GpioSet(max22200::CtrlPin pin, max22200::GpioSignal signal) {
+  // ENABLE and CMD are active high, FAULT is active low (open drain). Return false when the pin
+  // could not be driven: the driver then fails the call with GPIO_ERROR.
+  bool GpioSet(max22200::CtrlPin pin, max22200::GpioSignal signal) {
     const bool high = signal == max22200::GpioSignal::ACTIVE;
-    if (pin == max22200::CtrlPin::ENABLE) platform_gpio_write(kEnablePin, high);
-    if (pin == max22200::CtrlPin::CMD) platform_gpio_write(kCmdPin, high);
+    if (pin == max22200::CtrlPin::ENABLE) return platform_gpio_write(kEnablePin, high);
+    if (pin == max22200::CtrlPin::CMD) return platform_gpio_write(kCmdPin, high);
+    return false;  // FAULT is an input
   }
 
   bool GpioRead(max22200::CtrlPin pin, max22200::GpioSignal& signal) {
