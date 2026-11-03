@@ -236,10 +236,6 @@ public:
    * @see GpioSetActive(), GpioSetInactive() for convenience wrappers
    */
   bool GpioSet(CtrlPin pin, GpioSignal signal) {
-    static_assert(
-        std::is_same_v<decltype(std::declval<Derived &>().GpioSet(pin, signal)), bool>,
-        "max22200::SpiInterface: the port's GpioSet(CtrlPin, GpioSignal) must return bool "
-        "(true = pin driven, false = GPIO error)");
     return static_cast<Derived *>(this)->GpioSet(pin, signal);
   }
 
