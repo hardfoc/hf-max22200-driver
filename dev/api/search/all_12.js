@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['parallel_0',['PARALLEL',['../namespacemax22200.html#a339d71547e4d3f6ad5d66252bb002beaadf13a99b035d6f0bce4f44ab18eec8eb',1,'max22200']]],
+  ['parallel_20cmxy_2001_1',['PARALLEL (CMxy = 01)',['../namespacemax22200.html#autotoc_md42',1,'']]],
+  ['parameters_2',['DPM Algorithm Parameters',['../namespacemax22200_1_1_cfg_dpm_reg.html#autotoc_md23',1,'']]],
+  ['phase_201_3a_20command_20register_20write_3',['Phase 1: Command Register Write',['../max22200_8hpp.html#autotoc_md1',1,'']]],
+  ['phase_202_3a_20data_20transfer_4',['Phase 2: Data Transfer',['../max22200_8hpp.html#autotoc_md2',1,'']]],
+  ['phase_20spi_20protocol_5',['Two-Phase SPI Protocol',['../max22200_8hpp.html#autotoc_md0',1,'']]],
+  ['pin_20control_6',['pin control',['../max22200__spi__interface_8hpp.html#autotoc_md29',1,'CMD Pin Control'],['../max22200__spi__interface_8hpp.html#autotoc_md30',1,'ENABLE Pin Control']]],
+  ['pin_20reading_7',['FAULT Pin Reading',['../max22200__spi__interface_8hpp.html#autotoc_md31',1,'']]],
+  ['plunger_5fmovement_5fcurrent_5fthreshold_8',['plunger_movement_current_threshold',['../structmax22200_1_1_dpm_config.html#ab1635046e27ae10bacfb694df79d65e3',1,'max22200::DpmConfig']]],
+  ['plunger_5fmovement_5fdebounce_5ftime_9',['plunger_movement_debounce_time',['../structmax22200_1_1_dpm_config.html#aa60bcde51145ff25c45a974af4c854c0',1,'max22200::DpmConfig']]],
+  ['plunger_5fmovement_5fdetection_5fenabled_10',['plunger_movement_detection_enabled',['../structmax22200_1_1_channel_config.html#a9a34fa107efe2576f9807214552e7b46',1,'max22200::ChannelConfig']]],
+  ['plunger_5fmovement_5ffault_11',['plunger_movement_fault',['../structmax22200_1_1_status_config.html#ac6b8af0e779e791116f175edf075e05b',1,'max22200::StatusConfig']]],
+  ['plunger_5fmovement_5ffault_5fchannel_5fmask_12',['plunger_movement_fault_channel_mask',['../structmax22200_1_1_fault_status.html#a9a34fd5261bae85fd1987f5f66d71677',1,'max22200::FaultStatus']]],
+  ['plunger_5fmovement_5ffault_5fmasked_13',['plunger_movement_fault_masked',['../structmax22200_1_1_status_config.html#af156ed03c855a2fbad6a714a89d683fe',1,'max22200::StatusConfig']]],
+  ['plunger_5fmovement_5fstart_5fcurrent_14',['plunger_movement_start_current',['../structmax22200_1_1_dpm_config.html#a683dd886e4618220bdb35152cac250ef',1,'max22200::DpmConfig']]],
+  ['primary_20storage_15',['User Units (Primary Storage)',['../structmax22200_1_1_channel_config.html#autotoc_md47',1,'']]],
+  ['programming_16',['HIT Time Programming',['../namespacemax22200_1_1_cfg_ch_reg.html#autotoc_md17',1,'']]],
+  ['programming_20cdr_20mode_17',['Current Programming (CDR Mode)',['../namespacemax22200_1_1_cfg_ch_reg.html#autotoc_md15',1,'']]],
+  ['programming_20details_18',['Current Programming Details',['../max22200__types_8hpp.html#autotoc_md32',1,'']]],
+  ['programming_20vdr_20mode_19',['Current Programming (VDR Mode)',['../namespacemax22200_1_1_cfg_ch_reg.html#autotoc_md16',1,'']]],
+  ['protocol_20',['protocol',['../max22200__registers_8hpp.html#autotoc_md9',1,'Command Register Protocol'],['../max22200_8hpp.html#autotoc_md0',1,'Two-Phase SPI Protocol']]],
+  ['protocol_20sequence_21',['Protocol Sequence',['../namespacemax22200_1_1_command_reg.html#autotoc_md11',1,'']]]
+];
