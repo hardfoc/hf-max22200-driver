@@ -12,6 +12,7 @@
 add_executable(hf_max22200_host_tests
   test_main.cpp
   test_driver.cpp
+  test_gpio_errors.cpp
 )
 
 target_link_libraries(hf_max22200_host_tests PRIVATE ${HF_MAX22200_TARGET_NAME})

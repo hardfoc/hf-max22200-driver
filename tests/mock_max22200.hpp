@@ -50,10 +50,20 @@ public:
   void SetChipSelect(bool) {}
   void DelayUs(uint32_t us) { delay_us_total += us; }
 
-  void GpioSet(max22200::CtrlPin pin, max22200::GpioSignal signal) {
+  bool enable_pin_fails = false;  ///< fault injection: GpioSet(ENABLE) fails, the pin keeps its level
+  bool cmd_pin_fails = false;     ///< fault injection: GpioSet(CMD) fails, the pin keeps its level
+
+  bool GpioSet(max22200::CtrlPin pin, max22200::GpioSignal signal) {
     const bool active = signal == max22200::GpioSignal::ACTIVE;
-    if (pin == max22200::CtrlPin::ENABLE) enable = active;
-    if (pin == max22200::CtrlPin::CMD) cmd = active;
+    if (pin == max22200::CtrlPin::ENABLE) {
+      if (enable_pin_fails) return false;
+      enable = active;
+    }
+    if (pin == max22200::CtrlPin::CMD) {
+      if (cmd_pin_fails) return false;
+      cmd = active;
+    }
+    return true;
   }
 
   bool GpioRead(max22200::CtrlPin pin, max22200::GpioSignal& signal) {

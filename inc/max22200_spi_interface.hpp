@@ -47,6 +47,8 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
+#include <utility>
 
 namespace max22200 {
 
@@ -226,10 +228,15 @@ public:
    * @note For ENABLE pin: 0.5ms delay required after setting HIGH before SPI access.
    * @note FAULT pin is read-only (open-drain output from device).
    *
+   * @return true when the pin was driven, false on a GPIO error. The driver
+   *         reports a failure as DriverStatus::GPIO_ERROR (INITIALIZATION_ERROR
+   *         for ENABLE during Initialize()); the port's GpioSet() must return
+   *         bool (checked at compile time).
+   *
    * @see GpioSetActive(), GpioSetInactive() for convenience wrappers
    */
-  void GpioSet(CtrlPin pin, GpioSignal signal) {
-    static_cast<Derived *>(this)->GpioSet(pin, signal);
+  bool GpioSet(CtrlPin pin, GpioSignal signal) {
+    return static_cast<Derived *>(this)->GpioSet(pin, signal);
   }
 
   /**
@@ -259,14 +266,14 @@ public:
    * Convenience wrapper for `GpioSet(pin, GpioSignal::ACTIVE)`.
    * @param[in] pin  Which control pin to assert.
    */
-  void GpioSetActive(CtrlPin pin) { GpioSet(pin, GpioSignal::ACTIVE); }
+  bool GpioSetActive(CtrlPin pin) { return GpioSet(pin, GpioSignal::ACTIVE); }
 
   /**
    * @brief Deassert a control pin (set to INACTIVE).
    * Convenience wrapper for `GpioSet(pin, GpioSignal::INACTIVE)`.
    * @param[in] pin  Which control pin to deassert.
    */
-  void GpioSetInactive(CtrlPin pin) { GpioSet(pin, GpioSignal::INACTIVE); }
+  bool GpioSetInactive(CtrlPin pin) { return GpioSet(pin, GpioSignal::INACTIVE); }
 
   /// @}
 

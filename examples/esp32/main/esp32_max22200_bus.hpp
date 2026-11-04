@@ -208,12 +208,14 @@ public:
    * Maps GpioSignal to physical level based on pin polarity:
    * - ENABLE: active-high (ACTIVE → GPIO 1, INACTIVE → GPIO 0)
    * - CMD:    active-high (ACTIVE → GPIO 1, INACTIVE → GPIO 0)
-   * - FAULT:  read-only, GpioSet on FAULT returns silently
+   * - FAULT:  read-only, GpioSet on FAULT returns false
    *
    * @param pin   Which control pin to drive
    * @param signal ACTIVE to assert, INACTIVE to deassert
+   * @return true when the pin was driven (or is not wired), false when
+   *         gpio_set_level() failed or the pin is FAULT
    */
-  void GpioSet(max22200::CtrlPin pin, max22200::GpioSignal signal) {
+  bool GpioSet(max22200::CtrlPin pin, max22200::GpioSignal signal) {
     int gpio_pin = -1;
     int level = 0;
     switch (pin) {
@@ -226,11 +228,12 @@ public:
         level = (signal == max22200::GpioSignal::ACTIVE) ? 1 : 0; // Active-high
         break;
       case max22200::CtrlPin::FAULT:
-        return; // FAULT is read-only
+        return false; // FAULT is read-only
     }
     if (gpio_pin >= 0) {
-      gpio_set_level(static_cast<gpio_num_t>(gpio_pin), level);
+      return gpio_set_level(static_cast<gpio_num_t>(gpio_pin), level) == ESP_OK;
     }
+    return true; // not wired on this board (e.g. ENABLE tied high)
   }
 
   /**

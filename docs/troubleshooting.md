@@ -10,7 +10,7 @@ They tell bus problems (no reply, COMER) apart from chip problems (the chip answ
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| `Initialize()` returns `INITIALIZATION_ERROR` | Your port's `Initialize()` or `Configure()` returned `false` | Check the port: SPI host, pins, mode 0 accepted |
+| `Initialize()` returns `INITIALIZATION_ERROR` | Your port's `Initialize()` or `Configure()` returned `false`, or its `GpioSet()` could not raise ENABLE | Check the port: SPI host, pins, mode 0 accepted |
 | `Initialize()` returns `COMMUNICATION_ERROR` | `Transfer()` failed, or the chip answered COMER (`0x04`) three times | CMD wiring and level; `Transfer()` blocking until CS is high; one call, one CS frame |
 | Every read is `0xFF` or `0x00` | SDO not pulled up, ENABLE low, VM off or below 4.5 V | Pull-up on SDO, ENABLE trace, VM at the chip pins |
 | `Initialize()` is `OK` but STATUS reads ACTIVE = 0 or UVM = 1 | VM sagging below UVLO, or V18 not settled | Check VM under load, the 2.2 µF on V18, the charge-pump parts; write ACTIVE again after the supply is stable |

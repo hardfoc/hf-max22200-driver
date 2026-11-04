@@ -24,7 +24,7 @@ to allocate.
 | `Initialize()` | Bring the SPI peripheral and the GPIOs up. Called first by the driver's `Initialize()` |
 | `Configure(hz, mode, msb_first)` | Called with 10 MHz, mode 0, `true`. Apply it, or keep a lower clock |
 | `Transfer(tx, rx, len)` | One blocking full-duplex transaction of `len` bytes (1 or 4), CS low for all of it |
-| `GpioSet(pin, signal)` | Drive `ENABLE` or `CMD`: `ACTIVE` is high for both |
+| `GpioSet(pin, signal)` | Drive `ENABLE` or `CMD`: `ACTIVE` is high for both. Return `true` when the pin was driven (or is not wired), `false` on a GPIO error; must return `bool` (checked at compile time) |
 | `GpioRead(pin, signal)` | Read `FAULT`: low is `ACTIVE`. Return `false` if the pin is not wired |
 | `DelayUs(us)` | Block for at least that long (the 0.5 ms enable time) |
 | `SetChipSelect(state)` | Required by the base class; the driver does not call it |
@@ -56,7 +56,7 @@ Rules the transfer must follow:
 | `FAULT` (input, pull-up) | low | low until the first STATUS read (UVM) |
 
 A board with an inverting buffer flips the level in your `GpioSet()` or `GpioRead()`; the driver only deals in
-`ACTIVE` and `INACTIVE`. If ENABLE is tied high on your board, ignore it in `GpioSet()`; if FAULT is not wired,
+`ACTIVE` and `INACTIVE`. If ENABLE is tied high on your board, ignore it in `GpioSet()` and return `true`; if FAULT is not wired,
 return `false` from `GpioRead()` and poll `ReadStatus()` instead.
 
 ## Reference implementation

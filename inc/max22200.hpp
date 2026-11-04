@@ -74,6 +74,8 @@
 #include "max22200_spi_interface.hpp"
 #include "max22200_version.h"
 #include <cstdint>
+#include <type_traits>
+#include <utility>
 
 namespace max22200 {
 
@@ -131,6 +133,12 @@ namespace max22200 {
  * @endcode
  */
 template <typename SpiType> class MAX22200 {
+  static_assert(std::is_same_v<decltype(std::declval<SpiType &>().GpioSet(
+                                   CtrlPin::ENABLE, GpioSignal::ACTIVE)),
+                               bool>,
+                "max22200::MAX22200: the port's GpioSet(CtrlPin, GpioSignal) must return bool "
+                "(true = pin driven, false = GPIO error)");
+
 public:
   /**
    * @brief Constructor (SPI only; set board config later with SetBoardConfig())
