@@ -1075,7 +1075,7 @@ They tell bus problems (no reply, COMER) apart from chip problems (the chip answ
 <tbody>
 <tr>
 <td><code>Initialize()</code> returns <code>INITIALIZATION_ERROR</code></td>
-<td>Your port's <code>Initialize()</code> or <code>Configure()</code> returned <code>false</code></td>
+<td>Your port's <code>Initialize()</code> or <code>Configure()</code> returned <code>false</code>, or its <code>GpioSet()</code> could not raise ENABLE</td>
 <td>Check the port: SPI host, pins, mode 0 accepted</td>
 </tr>
 <tr>

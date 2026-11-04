@@ -1102,6 +1102,14 @@ affected API.</p>
 </ul>
 <h3 id="breaking-changes">Breaking changes<a class="headerlink" href="#breaking-changes" title="Permanent link">&para;</a></h3>
 <ul>
+<li><strong>BREAKING</strong> The port's <code>GpioSet()</code> returns <code>bool</code> (<code>true</code> = pin driven or not wired, <code>false</code> = GPIO error)
+  instead of <code>void</code>; <code>MAX22200</code> rejects a port whose <code>GpioSet()</code> returns anything else at compile time, and
+  <code>SpiInterface::GpioSet()</code>, <code>GpioSetActive()</code> and <code>GpioSetInactive()</code> return the result. A failed pin is now
+  reported instead of ignored: ENABLE in <code>Initialize()</code> returns <code>INITIALIZATION_ERROR</code> before any SPI access;
+  CMD returns the new <code>DriverStatus::GPIO_ERROR</code> (the Command Register byte is not sent when CMD cannot be raised,
+  and the access fails when CMD does not go back low); ENABLE in <code>EnableDevice()</code>, <code>DisableDevice()</code> and
+  <code>Deinitialize()</code> returns <code>GPIO_ERROR</code> (they returned <code>OK</code> while the device could still be enabled).
+  <code>GPIO_ERROR</code> is appended to <code>DriverStatus</code>. Ports: return the GPIO call's result.</li>
 <li><strong>BREAKING</strong> (behaviour, no signature change): <code>SetHitCurrentMa()</code>, <code>SetHoldCurrentMa()</code>, their <code>...A()</code> and
   <code>...CurrentPercent()</code> variants, <code>SetHitDutyPercent()</code> and <code>SetHoldDutyPercent()</code> no longer change the
   channel's drive mode. A current setter on a VDR channel, or a duty setter on a CDR channel, now returns

@@ -1177,13 +1177,13 @@ then finds it by name and links the same target:</p>
 </span></code></pre></div>
 <h2 id="esp-idf">ESP-IDF<a class="headerlink" href="#esp-idf" title="Permanent link">&para;</a></h2>
 <p>The ESP-IDF component wrapper is
-<a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/components/hf_max22200/CMakeLists.txt"><code>examples/esp32/components/hf_max22200/</code></a>. Copy that
+<a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/components/hf_max22200/CMakeLists.txt"><code>examples/esp32/components/hf_max22200/</code></a>. Copy that
 folder into your project's <code>components/</code> (or point <code>EXTRA_COMPONENT_DIRS</code> at it) and set the <code>HF_MAX22200_ROOT</code>
 cache variable to the driver checkout; the wrapper stops with a clear message when the path is wrong. Your
 component then declares <code>REQUIRES hf_max22200</code>.</p>
 <h2 id="without-cmake">Without CMake<a class="headerlink" href="#without-cmake" title="Permanent link">&para;</a></h2>
 <p>Add <code>inc/</code> to the include path and generate <code>max22200_version.h</code> from
-<a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/inc/max22200_version.h.in"><code>inc/max22200_version.h.in</code></a> once (replace the four <code>@...@</code> fields with the
+<a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/inc/max22200_version.h.in"><code>inc/max22200_version.h.in</code></a> once (replace the four <code>@...@</code> fields with the
 version). <code>max22200.hpp</code> includes <code>src/max22200.ipp</code> by relative path, so keep <code>inc/</code> and <code>src/</code> side by side.</p>
 <h2 id="how-the-build-is-organised">How the build is organised<a class="headerlink" href="#how-the-build-is-organised" title="Permanent link">&para;</a></h2>
 <table>
@@ -1195,15 +1195,15 @@ version). <code>max22200.hpp</code> includes <code>src/max22200.ipp</code> by re
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/cmake/hf_max22200_build_settings.cmake"><code>cmake/hf_max22200_build_settings.cmake</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/cmake/hf_max22200_build_settings.cmake"><code>cmake/hf_max22200_build_settings.cmake</code></a></td>
 <td>Target name, include directories, version: the single source of truth</td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/CMakeLists.txt"><code>CMakeLists.txt</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/CMakeLists.txt"><code>CMakeLists.txt</code></a></td>
 <td>Interface library for host builds and CI</td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/components/hf_max22200/CMakeLists.txt"><code>examples/esp32/components/hf_max22200/CMakeLists.txt</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/components/hf_max22200/CMakeLists.txt"><code>examples/esp32/components/hf_max22200/CMakeLists.txt</code></a></td>
 <td>ESP-IDF component over the same settings</td>
 </tr>
 </tbody>

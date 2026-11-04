@@ -1078,7 +1078,7 @@
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>From top to bottom. Your application talks to one MAX22200<SpiType> object; its main calls (listed from inc/max22200.hpp) configure channels, switch them, and read faults. Each call becomes the chip's two-phase SPI access: a command byte with CMD high, then 8 or 32 data bits with CMD low. The communication interface (SpiInterface in inc/max22200_spi_interface.hpp) is a CRTP base that forwards those transfers and the ENABLE, CMD and FAULT pins to your class. The platform port is the only code you write. Below it is the hardware.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/inc/max22200.hpp"><code>inc/max22200.hpp</code></a> <code>MAX22200 public calls</code>; <a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/inc/max22200.hpp"><code>inc/max22200.hpp</code></a> <code>MAX22200 public calls</code>; <a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
 </details>
 <h2 id="the-three-layers">The three layers<a class="headerlink" href="#the-three-layers" title="Permanent link">&para;</a></h2>
 <table>
@@ -1092,12 +1092,12 @@
 <tbody>
 <tr>
 <td><strong>Hardware-agnostic core</strong>: <code>MAX22200&lt;SpiType&gt;</code></td>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/inc/max22200.hpp"><code>inc/max22200.hpp</code></a>, <a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/src/max22200.ipp"><code>src/max22200.ipp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/inc/max22200.hpp"><code>inc/max22200.hpp</code></a>, <a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/src/max22200.ipp"><code>src/max22200.ipp</code></a></td>
 <td>Never, for a new board</td>
 </tr>
 <tr>
 <td><strong>Communication interface</strong>: <code>SpiInterface&lt;Derived&gt;</code></td>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/inc/max22200_spi_interface.hpp"><code>inc/max22200_spi_interface.hpp</code></a></td>
 <td>Never</td>
 </tr>
 <tr>
@@ -1186,7 +1186,11 @@ ONCH write uses the cached mask for the channels you did not name.</p>
 </tr>
 <tr>
 <td><code>INITIALIZATION_ERROR</code></td>
-<td>Your <code>Initialize()</code> or <code>Configure()</code> returned <code>false</code></td>
+<td>Your <code>Initialize()</code> or <code>Configure()</code> returned <code>false</code>, or <code>GpioSet(ENABLE, ACTIVE)</code> did during <code>Driver::Initialize()</code> (nothing is sent)</td>
+</tr>
+<tr>
+<td><code>GPIO_ERROR</code></td>
+<td>Your <code>GpioSet()</code> returned <code>false</code> for CMD (the frame is not sent, or the access fails when CMD did not go back low) or for ENABLE in <code>EnableDevice()</code>, <code>DisableDevice()</code> and <code>Deinitialize()</code> (the device may still be enabled)</td>
 </tr>
 </tbody>
 </table>

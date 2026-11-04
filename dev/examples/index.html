@@ -1063,8 +1063,8 @@
 cycling and plunger-movement tuning.</p>
 <p>They run on an ESP32-S3 wired to a MAX22200 at 1 MHz SPI (SDO on GPIO35, SDI on GPIO37, SCK on GPIO36, CSB on
 GPIO38; ENABLE on GPIO2, FAULT on GPIO42, CMD on GPIO39) with RREF = 15 kΩ. The pins are in
-<a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/main/esp32_max22200_test_config.hpp"><code>esp32_max22200_test_config.hpp</code></a> and the port in
-<a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/main/esp32_max22200_bus.hpp"><code>esp32_max22200_bus.hpp</code></a>. CI builds the apps marked "yes" on each
+<a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/main/esp32_max22200_test_config.hpp"><code>esp32_max22200_test_config.hpp</code></a> and the port in
+<a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/main/esp32_max22200_bus.hpp"><code>esp32_max22200_bus.hpp</code></a>. CI builds the apps marked "yes" on each
 pull request.</p>
 <h2 id="the-apps">The apps<a class="headerlink" href="#the-apps" title="Permanent link">&para;</a></h2>
 <!-- generated: examples -->
@@ -1081,31 +1081,31 @@ pull request.</p>
 <tr>
 <td><code>max22200_comprehensive_test</code> <span class="twemoji" title="featured"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.45 4.73L5.82 21z"/></svg></span></td>
 <td>Comprehensive MAX22200 driver test suite covering all functionality</td>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/main/max22200_comprehensive_test.cpp"><code>max22200_comprehensive_test.cpp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/main/max22200_comprehensive_test.cpp"><code>max22200_comprehensive_test.cpp</code></a></td>
 <td>yes</td>
 </tr>
 <tr>
 <td><code>max22200_solenoid_valve_test</code> <span class="twemoji" title="featured"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.45 4.73L5.82 21z"/></svg></span></td>
 <td>Solenoid/valve test: all 8 channels, C21 hit/hold, sequential and parallel patterns, full diagnostics</td>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/main/max22200_solenoid_valve_test.cpp"><code>max22200_solenoid_valve_test.cpp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/main/max22200_solenoid_valve_test.cpp"><code>max22200_solenoid_valve_test.cpp</code></a></td>
 <td>no</td>
 </tr>
 <tr>
 <td><code>max22200_diagnostic</code></td>
 <td>Fault-isolation diagnostic: round-trips CFG_CH0, dumps STATUS+FAULT raw, tries both ACTIVE=1 write paths, then 5 Hz continuous STATUS dump for scope probing</td>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/main/max22200_diagnostic.cpp"><code>max22200_diagnostic.cpp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/main/max22200_diagnostic.cpp"><code>max22200_diagnostic.cpp</code></a></td>
 <td>no</td>
 </tr>
 <tr>
 <td><code>c21_cycle_test</code></td>
 <td>Cycle a Parker C21 24V solenoid on CH0 (102 mA hit / 51 mA hold) with continuous STATUS+FAULT telemetry and DPM detection</td>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/main/c21_cycle_test.cpp"><code>c21_cycle_test.cpp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/main/c21_cycle_test.cpp"><code>c21_cycle_test.cpp</code></a></td>
 <td>no</td>
 </tr>
 <tr>
 <td><code>c21_dpm_tuning_test</code></td>
 <td>Cycle C21 with DPM enabled, poll FAULT @ 1 kHz during HIT window, emit CSV stream + summary stats so DPM ISTART/IPTH/TDEB can be tuned against real plunger movement</td>
-<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/main/c21_dpm_tuning_test.cpp"><code>c21_dpm_tuning_test.cpp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/main/c21_dpm_tuning_test.cpp"><code>c21_dpm_tuning_test.cpp</code></a></td>
 <td>no</td>
 </tr>
 </tbody>
@@ -1114,7 +1114,7 @@ pull request.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>./scripts/build_app.sh<span class="w"> </span>max22200_comprehensive_test<span class="w"> </span>Release
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>./scripts/flash_app.sh<span class="w"> </span>flash_monitor<span class="w"> </span>max22200_comprehensive_test<span class="w"> </span>Release
 </span></code></pre></div>
-<p>Source of this table: <a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/app_config.yml"><code>examples/esp32/app_config.yml</code></a>.</p>
+<p>Source of this table: <a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/app_config.yml"><code>examples/esp32/app_config.yml</code></a>.</p>
 <!-- /generated -->
 
 <h2 id="set-up-once">Set up once<a class="headerlink" href="#set-up-once" title="Permanent link">&para;</a></h2>
@@ -1123,7 +1123,7 @@ pull request.</p>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>.<span class="w"> </span><span class="nv">$IDF_PATH</span>/export.sh<span class="w">                                 </span><span class="c1"># ESP-IDF v5.5</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>./scripts/build_app.sh<span class="w"> </span>list<span class="w">                           </span><span class="c1"># every app and build type</span>
 </span></code></pre></div>
-<p>The scripts read <a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/app_config.yml"><code>app_config.yml</code></a> (the same file this page's table comes
+<p>The scripts read <a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/app_config.yml"><code>app_config.yml</code></a> (the same file this page's table comes
 from) and build each app as its own firmware image.</p>
 <h2 id="what-to-read-in-an-example">What to read in an example<a class="headerlink" href="#what-to-read-in-an-example" title="Permanent link">&para;</a></h2>
 <table>
@@ -1160,7 +1160,7 @@ from) and build each app as its own firmware image.</p>
 </tr>
 </tbody>
 </table>
-<p>The <a href="https://github.com/hardfoc/hf-max22200-driver/blob/e2c6ed0cfe379ba91c5d6d3769cc253c1715aa2b/examples/esp32/README.md">example folder's README</a> has the wiring, the build options and what each app
+<p>The <a href="https://github.com/hardfoc/hf-max22200-driver/blob/00dfc10f9bcb838c411b29f39dd250050d979309/examples/esp32/README.md">example folder's README</a> has the wiring, the build options and what each app
 prints.</p>
 
 
